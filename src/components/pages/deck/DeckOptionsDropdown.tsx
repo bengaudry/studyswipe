@@ -1,60 +1,61 @@
 "use client";
+import { Button } from "@nextui-org/button";
+import { Input } from "@nextui-org/react";
 import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-  Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   useDisclosure,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
 } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Edit2, MoreVertical, Trash } from "react-feather";
+import { MoreVertical, Edit2, Trash } from "react-feather";
 
-export function CollectionOptionsDropdown({
-  collectionId,
-  collectionTitle,
+export function DeckOptionsDropdown({
+  deckId,
+  deckTitle,
 }: {
-  collectionId: string;
-  collectionTitle?: string;
+  deckId: string;
+  deckTitle?: string;
 }) {
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [modalType, setModalType] = useState<"rename" | "delete">("delete");
-  const [newtitle, setNewtitle] = useState(collectionTitle ?? "");
+  const [newtitle, setNewtitle] = useState(deckTitle ?? "");
+  const { prefetch, replace } = useRouter();
 
-  const handleDeleteCollection = async () => {
+  const handleDeleteDeck = async () => {
     setLoading(true);
     try {
-      await fetch(`/api/collection?id=${collectionId}`, {
+      prefetch("/decks");
+      await fetch(`/api/deck?id=${deckId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
       });
+      replace("/decks");
     } finally {
       onClose();
       setLoading(false);
     }
   };
 
-  const handleRenameCollection = async () => {
+  const handleRenameDeck = async () => {
     setLoading(true);
     try {
-      await fetch(
-        `/api/collection?id=${collectionId}&action=rename&newtitle=${newtitle}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await fetch(`/api/deck?id=${deckId}&action=rename&newtitle=${newtitle}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
     } finally {
       onClose();
       setLoading(false);
@@ -91,7 +92,7 @@ export function CollectionOptionsDropdown({
               onOpen();
             }}
           >
-            Delete collection
+            Delete deck
           </DropdownItem>
         </DropdownMenu>
       </Dropdown>
@@ -102,11 +103,11 @@ export function CollectionOptionsDropdown({
             modalType === "delete" ? (
               <>
                 <ModalHeader className="flex flex-col gap-1">
-                  Delete collection
+                  Delete deck
                 </ModalHeader>
                 <ModalBody>
-                  If you delete this collection, all decks in it, and the cards it contains
-                  will be deleted too, and cannot be recovered.
+                  If you delete this deck, all cards in it will be deleted too,
+                  and cannot be recovered
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" variant="flat" onPress={onClose}>
@@ -115,16 +116,16 @@ export function CollectionOptionsDropdown({
                   <Button
                     color="danger"
                     isLoading={loading}
-                    onPress={handleDeleteCollection}
+                    onPress={handleDeleteDeck}
                   >
-                    Delete collection
+                    Delete deck
                   </Button>
                 </ModalFooter>
               </>
             ) : (
               <>
                 <ModalHeader className="flex flex-col gap-1">
-                  Rename collection
+                  Rename deck
                 </ModalHeader>
                 <ModalBody>
                   <Input
@@ -144,9 +145,9 @@ export function CollectionOptionsDropdown({
                   <Button
                     color="primary"
                     isLoading={loading}
-                    onPress={handleRenameCollection}
+                    onPress={handleRenameDeck}
                   >
-                    Rename collection
+                    Rename deck
                   </Button>
                 </ModalFooter>
               </>

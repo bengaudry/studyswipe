@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { ChevronLeft, Play } from "react-feather";
 import { clsx } from "clsx";
 import Link from "next/link";
+import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
 
 export default async function DeckPage({
   params,
@@ -16,26 +17,31 @@ export default async function DeckPage({
     where: { id: (await params).deckid },
   });
 
-  if (deck === null) redirect("/collections");
+  if (deck === null) redirect("/");
 
   const cards = deck.cards as FlashCard[];
 
   return (
     <div>
-      <Link href=".." className="text-neutral-400 flex items-center mb-3">
-        <ChevronLeft /><span> Back</span>
-      </Link>
-
-      <header className="flex justify-between items-center gap-4 mb-6">
-        <h1 className="text-2xl font-semibold">{deck.title}</h1>
-        <Button
-          color="primary"
-          size="sm"
-          className={clsx(`bg-${deck.theme}-500`)}
-          startContent={<Play fill="#fff" size={18} />}
-        >
-          Launch
-        </Button>
+      <header className="flex flex-col gap-3 mb-6">
+        <div className="flex justify-between items-center gap-4">
+          <Link href=".." className="text-neutral-400 flex items-center mb-3">
+            <ChevronLeft />
+            <span> Back</span>
+          </Link>
+          <Button
+            color="primary"
+            size="sm"
+            className={clsx(`bg-${deck.theme}-500`)}
+            startContent={<Play fill="#fff" size={18} />}
+          >
+            Launch
+          </Button>
+        </div>
+        <div className="flex justify-between items-center gap-4">
+          <h1 className="text-2xl font-semibold">{deck.title}</h1>
+          <DeckOptionsDropdown deckId={deck.id} deckTitle={deck.title} />
+        </div>
       </header>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         <NewCardModal deckid={deck.id} decktheme={deck.theme} />
