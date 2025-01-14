@@ -1,7 +1,8 @@
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
-import { Check, Plus } from "react-feather";
+import { Check, Plus, Shuffle } from "react-feather";
+import { Button } from "@nextui-org/button";
 
 export default async function PlayPage({
   params,

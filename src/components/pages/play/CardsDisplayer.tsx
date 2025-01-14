@@ -1,9 +1,11 @@
 "use client";
+import { shuffleArray } from "@/lib/arrays";
 import { Button } from "@nextui-org/button";
+import { Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
 import { pre } from "framer-motion/client";
 import { useState } from "react";
-import { Check, Home, Plus, RefreshCw } from "react-feather";
+import { Check, Home, Play, Plus, RefreshCw, Shuffle } from "react-feather";
 
 function ContentElement({ content }: { content: FlashCardContentJSON }) {
   if (content.type === "text") {
@@ -75,6 +77,23 @@ export function CardsDisplayer({
 
   return (
     <>
+      <div className="absolute top-20 right-3 p-3 rounded-full border shadow-xl">
+        <Tooltip content="Shuffle cards" placement="left">
+          <button
+            onClick={() => setCards((prev) => shuffleArray(prev))}
+            className="block p-8 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+          >
+            <Shuffle size={20} />
+          </button>
+        </Tooltip>
+
+        <Tooltip content="Restart" placement="left">
+          <button className="block p-8 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all">
+            <RefreshCw size={20} />
+          </button>
+        </Tooltip>
+      </div>
+
       <div className="relative w-full aspect-square max-w-80 mx-auto">
         {cards.length > 0 ? (
           <button
@@ -111,12 +130,12 @@ export function CardsDisplayer({
                 startContent={<RefreshCw />}
                 onPress={() => setCards(deckCards)}
               >
-                Play again
+                Restart
               </Button>
               {skippedCards.length > 0 && (
                 <Button
                   color="primary"
-                  startContent={<RefreshCw />}
+                  startContent={<Play />}
                   onPress={() => {
                     setCards(skippedCards);
                     setSkippedCards([]);
