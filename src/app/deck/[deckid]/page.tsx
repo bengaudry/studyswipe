@@ -25,11 +25,11 @@ export default async function DeckPage({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         <NewCardModal deckid={deck.id} decktheme={deck.theme} />
 
-        {cards.map(({ question, answer }, idx) => (
+        {cards.map(({ question }, idx) => (
           <button
             key={idx}
             className={clsx(
-              `border-2 border-neutral-200 bg-${deck.theme}-500/20 transition-colors rounded-lg p-4 grid place-content-center`
+              `border-2 aspect-square border-neutral-200 bg-${deck.theme}-500/20 transition-colors rounded-lg p-4 grid place-content-center`
             )}
           >
             {question.map((value) => {

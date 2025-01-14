@@ -54,7 +54,7 @@ export function CardsDisplayer({
   deckTheme: string;
 }) {
   const [cards, setCards] = useState(deckCards);
-  const [stats, setStats] = useState({ skipped: 0, validated: 0 });
+  const [skippedCards, setSkippedCards] = useState<FlashCard[]>([]);
 
   const [faceShowed, setFaceShowed] = useState<"question" | "answer">(
     "question"
@@ -62,20 +62,14 @@ export function CardsDisplayer({
 
   const replayCard = () => {
     const currCard = cards[0];
+    setSkippedCards((prev) => [...prev, currCard]);
+    console.log("skipped :", skippedCards);
     setFaceShowed("question");
-    setStats((prev) => ({
-      skipped: prev.skipped + 1,
-      validated: prev.validated,
-    }));
-    setCards((prev) => [...prev.slice(1), currCard]);
+    setCards((prev) => prev.slice(1));
   };
 
   const validateCard = () => {
     setFaceShowed("question");
-    setStats((prev) => ({
-      skipped: prev.skipped,
-      validated: prev.validated + 1,
-    }));
     setCards((prev) => prev.slice(1));
   };
 
@@ -104,9 +98,11 @@ export function CardsDisplayer({
           </button>
         ) : (
           <div className="flex flex-col gap-2 items-center">
-            <p className="text-neutral-400 text-center">No card to play.</p>
-            <p>
-              {stats.skipped} cards skipped / {stats.validated} cards validated
+            <p className="text-neutral-400 text-center">
+              No card left to play.
+              {skippedCards.length > 0 && (
+                <p>{skippedCards.length} cards skipped.</p>
+              )}
             </p>
             <div className="flex flex-row gap-4 items-center">
               <Button
@@ -117,6 +113,18 @@ export function CardsDisplayer({
               >
                 Play again
               </Button>
+              {skippedCards.length > 0 && (
+                <Button
+                  color="primary"
+                  startContent={<RefreshCw />}
+                  onPress={() => {
+                    setCards(skippedCards);
+                    setSkippedCards([]);
+                  }}
+                >
+                  Play skipped
+                </Button>
+              )}
             </div>
           </div>
         )}
