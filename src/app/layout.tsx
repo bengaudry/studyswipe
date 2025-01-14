@@ -41,10 +41,15 @@ export default function RootLayout({
       >
         <Navbar className="border-b-1 border-neutral-200">
           <NavbarBrand>
-            <div className="flex gap-2 items-center">
-              <Image src={"/icon-svg.svg"} width={36} height={36} alt="App icon"/>
+            <Link href="/" className="flex gap-2 items-center">
+              <Image
+                src={"/icon-svg.svg"}
+                width={36}
+                height={36}
+                alt="App icon"
+              />
               <span className="font-semibold">Studyswipe</span>
-            </div>
+            </Link>
           </NavbarBrand>
           <NavbarContent justify="center">
             <NavbarItem>
