@@ -1,18 +1,15 @@
+import { BackButton } from "@/components/BackButton";
 import { NewCardModal } from "@/components/pages/deck/NewCardModal";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { Button } from "@nextui-org/button";
-import Link from "next/link";
-import { ChevronLeft, Play } from "react-feather";
+import { Play } from "react-feather";
 
 export default async function DeckPageLoader() {
   return (
     <div>
       <header className="flex flex-col gap-3 mb-6">
         <div className="flex justify-between items-center gap-4">
-          <Link href=".." className="text-neutral-400 flex items-center mb-3">
-            <ChevronLeft />
-            <span> Back</span>
-          </Link>
+          <BackButton />
           <Button size="sm" startContent={<Play fill="#fff" size={18} />}>
             Launch
           </Button>

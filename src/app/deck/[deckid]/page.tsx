@@ -3,21 +3,17 @@ import prisma from "@/lib/prisma";
 import { Button } from "@nextui-org/button";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { ChevronLeft, Play } from "react-feather";
+import { Play } from "react-feather";
 import { clsx } from "clsx";
-import Link from "next/link";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
 import { Deck } from "@prisma/client";
-import { wait } from "@/lib/time";
+import { BackButton } from "@/components/BackButton";
 
 export function DeckPageHeader({ deck }: { deck: Deck }) {
   return (
     <header className="flex flex-col gap-3 mb-6">
       <div className="flex justify-between items-center gap-4">
-        <Link href=".." className="text-neutral-400 flex items-center mb-3">
-          <ChevronLeft />
-          <span> Back</span>
-        </Link>
+        <BackButton />
         <Button
           color="primary"
           size="sm"
