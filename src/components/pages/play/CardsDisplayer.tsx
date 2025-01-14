@@ -29,8 +29,8 @@ function FlashcardPreview({
   return (
     <div
       className={clsx(
-        `absolute inset-0 w-full h-full bg-${decktheme}-500/20 rounded-lg p-6 overflow-y-scroll grid place-content-center ${
-          isActive ? "scale-100 opacity-100" : "scale-85 opacity-0"
+        `absolute inset-0 w-full h-full bg-${decktheme}-500/20 shadow-xl rounded-lg p-6 overflow-y-scroll grid place-content-center ${
+          isActive ? "scale-100 opacity-100 shadow-neutral-500/20" : "scale-85 opacity-0 shadow-neutral-500/0"
         } transition-all`
       )}
     >
