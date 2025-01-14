@@ -119,21 +119,21 @@ export function NewCardModal({
                   </div>
                 </div>
 
-                {current === "question" && (
+                <div className="relative w-full max-w-80 aspect-square mx-auto">
                   <FlashcardPreview
+                    isActive={current === "question"}
                     content={questionContent}
                     updateContent={setQuestionContent}
                     decktheme={decktheme}
                   />
-                )}
 
-                {current === "answer" && (
                   <FlashcardPreview
+                    isActive={current === "answer"}
                     content={answerContent}
                     updateContent={setAnswerContent}
                     decktheme={decktheme}
                   />
-                )}
+                </div>
               </ModalBody>
               <ModalFooter>
                 <Button color="primary" variant="flat" onPress={onClose}>
@@ -156,41 +156,43 @@ export function NewCardModal({
 }
 
 function FlashcardPreview({
+  isActive,
   content,
   updateContent,
   decktheme,
 }: {
+  isActive: boolean;
   content: FlashCardContentJSON[];
   updateContent: Dispatch<SetStateAction<FlashCardContentJSON[]>>;
   decktheme: string;
 }) {
   return (
-    <>
-      <div
-        className={clsx(
-          `w-full mx-auto max-w-80 aspect-square bg-${decktheme}-500/20 rounded-lg p-6 overflow-y-scroll}`
-        )}
-      >
-        {content.map((value, idx) => (
-          <ContentElement
-            key={idx}
-            content={value}
-            onUpdate={(updatedValue) =>
-              updateContent((prev) =>
-                prev.map((item, itemIdx) =>
-                  itemIdx === idx ? updatedValue : item
-                )
+    <div
+      className={clsx(
+        `absolute w-full h-full bg-${decktheme}-500/20 rounded-lg p-6 overflow-y-scroll ${
+          isActive ? "scale-100 opacity-100" : "scale-85 opacity-0"
+        } transition-all`
+      )}
+    >
+      {content.map((value, idx) => (
+        <ContentElement
+          key={idx}
+          content={value}
+          onUpdate={(updatedValue) =>
+            updateContent((prev) =>
+              prev.map((item, itemIdx) =>
+                itemIdx === idx ? updatedValue : item
               )
-            }
-            onDelete={() =>
-              updateContent((prev) =>
-                prev.filter((_, itemIdx) => itemIdx !== idx)
-              )
-            }
-          />
-        ))}
-      </div>
-    </>
+            )
+          }
+          onDelete={() =>
+            updateContent((prev) =>
+              prev.filter((_, itemIdx) => itemIdx !== idx)
+            )
+          }
+        />
+      ))}
+    </div>
   );
 }
 
