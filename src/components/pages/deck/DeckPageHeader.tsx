@@ -4,7 +4,6 @@ import { Deck } from "@prisma/client";
 import clsx from "clsx";
 import { Play } from "react-feather";
 import { DeckOptionsDropdown } from "./DeckOptionsDropdown";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export function DeckPageHeader({ deck }: { deck: Deck }) {
