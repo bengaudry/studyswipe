@@ -90,11 +90,11 @@ export function CardsDisplayer({
 
   return (
     <>
-      <div className="absolute z-30 top-20 right-3 p-3 rounded-full border shadow-xl">
+      <div className="absolute flex items-center gap-2 z-30 top-20 right-3 p-2 rounded-full border shadow-xl bg-white">
         <Tooltip content="Shuffle cards" placement="left">
           <button
             onClick={() => setCards((prev) => shuffleArray(prev))}
-            className="block p-2 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+            className="block p-1 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
           >
             <Shuffle size={20} />
           </button>
@@ -106,7 +106,7 @@ export function CardsDisplayer({
               setCards(deckCards);
               setSkippedCards([]);
             }}
-            className="block p-2 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+            className="block p-1 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
           >
             <RefreshCw size={20} />
           </button>
@@ -114,7 +114,7 @@ export function CardsDisplayer({
       </div>
 
       <div
-        className={`animate-next-card relative bg-red-400 w-full aspect-square max-w-80 mx-auto `}
+        className={`${animPlaying ? "animate-next-card" : ""} relative w-full aspect-square max-w-80 mx-auto`}
       >
         {cards.length > 0 ? (
           <CardElement

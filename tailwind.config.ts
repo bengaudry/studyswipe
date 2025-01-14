@@ -47,6 +47,8 @@ export default {
     "bg-pink-500",
     "bg-pink-500/20",
     "group-data-[selected=true]:border-pink-500",
+    "bg-green-100",
+    "bg-red-100",
   ],
   darkMode: "class",
   plugins: [nextui()],
