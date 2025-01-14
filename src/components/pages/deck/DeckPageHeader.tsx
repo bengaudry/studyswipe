@@ -1,3 +1,4 @@
+"use client";
 import { BackButton } from "@/components/BackButton";
 import { Button } from "@nextui-org/button";
 import { Deck } from "@prisma/client";
