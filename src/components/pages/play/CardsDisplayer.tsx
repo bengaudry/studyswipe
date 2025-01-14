@@ -4,7 +4,7 @@ import { Button } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
 import { pre } from "framer-motion/client";
-import { useState } from "react";
+import { JSX, ReactNode, useState } from "react";
 import { Check, Home, Play, Plus, RefreshCw, Shuffle } from "react-feather";
 
 function ContentElement({ content }: { content: FlashCardContentJSON }) {
@@ -57,6 +57,7 @@ export function CardsDisplayer({
 }) {
   const [cards, setCards] = useState(deckCards);
   const [skippedCards, setSkippedCards] = useState<FlashCard[]>([]);
+  const [animPlaying, setAnimPlaying] = useState(false);
 
   const [faceShowed, setFaceShowed] = useState<"question" | "answer">(
     "question"
@@ -68,20 +69,32 @@ export function CardsDisplayer({
     console.log("skipped :", skippedCards);
     setFaceShowed("question");
     setCards((prev) => prev.slice(1));
+    setAnimPlaying(true);
+    setTimeout(() => {
+      setAnimPlaying(false);
+    }, 300);
   };
 
   const validateCard = () => {
     setFaceShowed("question");
     setCards((prev) => prev.slice(1));
+    setAnimPlaying(true);
+    setTimeout(() => {
+      setAnimPlaying(false);
+    }, 300);
+  };
+
+  const flipCard = () => {
+    setFaceShowed((prev) => (prev === "question" ? "answer" : "question"));
   };
 
   return (
     <>
-      <div className="absolute top-20 right-3 p-3 rounded-full border shadow-xl">
+      <div className="absolute z-30 top-20 right-3 p-3 rounded-full border shadow-xl">
         <Tooltip content="Shuffle cards" placement="left">
           <button
             onClick={() => setCards((prev) => shuffleArray(prev))}
-            className="block p-8 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+            className="block p-2 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
           >
             <Shuffle size={20} />
           </button>
@@ -93,42 +106,35 @@ export function CardsDisplayer({
               setCards(deckCards);
               setSkippedCards([]);
             }}
-            className="block p-8 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+            className="block p-2 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
           >
             <RefreshCw size={20} />
           </button>
         </Tooltip>
       </div>
 
-      <div className="relative w-full aspect-square max-w-80 mx-auto">
+      <div
+        className={`animate-next-card relative bg-red-400 w-full aspect-square max-w-80 mx-auto `}
+      >
         {cards.length > 0 ? (
-          <button
-            onClick={() =>
-              setFaceShowed((prev) =>
-                prev === "question" ? "answer" : "question"
-              )
-            }
-            className="w-full h-full scale-100 hover:scale-95 transition-transform"
-          >
-            <FlashcardPreview
-              content={cards[0].question}
-              decktheme={deckTheme}
-              isActive={faceShowed === "question"}
-            />
-            <FlashcardPreview
-              content={cards[0].answer}
-              decktheme={deckTheme}
-              isActive={faceShowed === "answer"}
-            />
-          </button>
+          <CardElement
+            content={cards[0]}
+            faceShowed={faceShowed}
+            onFlip={flipCard}
+            theme={deckTheme}
+          />
         ) : (
           <div className="flex flex-col gap-2 items-center">
-            <p className="text-neutral-400 text-center">
-              No card left to play.
-              {skippedCards.length > 0 && (
-                <p>{skippedCards.length} cards skipped.</p>
-              )}
-            </p>
+            <div>
+              <p className="text-neutral-400 text-center">
+                No card left to play.
+              </p>
+              <p className="text-neutral-400 text-center">
+                {skippedCards.length > 0 && (
+                  <>{skippedCards.length} card(s) skipped.</>
+                )}
+              </p>
+            </div>
             <div className="flex flex-row gap-4 items-center">
               <Button
                 variant="flat"
@@ -158,23 +164,84 @@ export function CardsDisplayer({
         )}
       </div>
 
-      <button
+      <ActionButton
+        color="red"
+        disabled={cards.length < 1}
         onClick={replayCard}
-        className="fixed flex items-start h-80 w-32 -bottom-24 left-6 rotate-12 rounded-t-full border-2 border-dashed border-neutral-300 hover:-translate-y-6 transition-all active:scale-95 shadow-xl"
-      >
-        <div className="w-full aspect-square bg-red-100 rounded-full grid place-content-center">
-          <Plus className="rotate-45 text-red-800" size={44} />
-        </div>
-      </button>
+        Icon={<Plus className="rotate-45 text-red-800" size={44} />}
+      />
 
-      <button
+      <ActionButton
+        disabled={cards.length < 1}
+        color="green"
+        position="right"
         onClick={validateCard}
-        className="fixed flex items-start h-80 w-32 -bottom-24 right-6 -rotate-12 rounded-t-full border-2 border-dashed border-neutral-300 hover:-translate-y-6 transition-all active:scale-95 shadow-xl"
-      >
-        <div className="w-full aspect-square bg-green-100 rounded-full grid place-content-center">
-          <Check className="text-green-800" size={44} />
-        </div>
-      </button>
+        Icon={<Check className="text-green-800" size={44} />}
+      />
     </>
   );
 }
+
+const CardElement = ({
+  content,
+  onFlip,
+  theme,
+  faceShowed,
+}: {
+  content: FlashCard;
+  onFlip: () => void;
+  theme: string;
+  faceShowed: "question" | "answer";
+}) => {
+  return (
+    <button
+      onClick={onFlip}
+      className="w-full h-full hover:scale-95 opacity-100 scale-100 transition-all"
+    >
+      <FlashcardPreview
+        content={content.question}
+        decktheme={theme}
+        isActive={faceShowed === "question"}
+      />
+      <FlashcardPreview
+        content={content.answer}
+        decktheme={theme}
+        isActive={faceShowed === "answer"}
+      />
+    </button>
+  );
+};
+
+/** The "fingers" at the bottom of the screen */
+const ActionButton = ({
+  color,
+  onClick,
+  Icon,
+  position = "left",
+  disabled,
+}: {
+  color: string;
+  onClick: () => void;
+  Icon: JSX.Element;
+  position?: "left" | "right";
+  disabled?: boolean;
+}) => (
+  <button
+    onClick={onClick}
+    className={`fixed flex items-start h-80 w-32 -bottom-24 ${
+      position === "left" ? "left-6 rotate-12" : "right-6 -rotate-12"
+    } ${
+      disabled
+        ? "scale-85 grayscale cursor-default"
+        : "hover:-translate-y-6 active:scale-95"
+    } rounded-t-full border-2 border-dashed border-neutral-300 transition-all shadow-xl`}
+  >
+    <div
+      className={clsx(
+        `w-full aspect-square bg-${color}-100 rounded-full grid place-content-center`
+      )}
+    >
+      {Icon}
+    </div>
+  </button>
+);
