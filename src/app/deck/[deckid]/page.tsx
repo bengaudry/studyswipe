@@ -1,35 +1,9 @@
 import { NewCardModal } from "@/components/pages/deck/NewCardModal";
 import prisma from "@/lib/prisma";
-import { Button } from "@nextui-org/button";
 import Image from "next/image";
 import { redirect } from "next/navigation";
-import { Play } from "react-feather";
 import { clsx } from "clsx";
-import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
-import { Deck } from "@prisma/client";
-import { BackButton } from "@/components/BackButton";
-
-export function DeckPageHeader({ deck }: { deck: Deck }) {
-  return (
-    <header className="flex flex-col gap-3 mb-6">
-      <div className="flex justify-between items-center gap-4">
-        <BackButton />
-        <Button
-          color="primary"
-          size="sm"
-          className={clsx(`bg-${deck.theme}-500`)}
-          startContent={<Play fill="#fff" size={18} />}
-        >
-          Launch
-        </Button>
-      </div>
-      <div className="flex justify-between items-center gap-4">
-        <h1 className="text-2xl font-semibold">{deck.title}</h1>
-        <DeckOptionsDropdown deckId={deck.id} deckTitle={deck.title} />
-      </div>
-    </header>
-  );
-}
+import { DeckPageHeader } from "@/components/pages/deck/DeckPageHeader";
 
 export default async function DeckPage({
   params,
