@@ -88,7 +88,13 @@ export function CardsDisplayer({
         </Tooltip>
 
         <Tooltip content="Restart" placement="left">
-          <button className="block p-8 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all">
+          <button
+            onClick={() => {
+              setCards(deckCards);
+              setSkippedCards([]);
+            }}
+            className="block p-8 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+          >
             <RefreshCw size={20} />
           </button>
         </Tooltip>
@@ -128,7 +134,10 @@ export function CardsDisplayer({
                 variant="flat"
                 color="primary"
                 startContent={<RefreshCw />}
-                onPress={() => setCards(deckCards)}
+                onPress={() => {
+                  setCards(deckCards);
+                  setSkippedCards([]);
+                }}
               >
                 Restart
               </Button>
