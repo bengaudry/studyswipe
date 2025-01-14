@@ -32,8 +32,8 @@ const renderCollections = (collections: Collection[] | null) => {
     return <p>No deck yet. Start by creating a category, and then a deck.</p>;
 
   return collections.map(({ id, title }, idx) => (
-    <>
-      <div key={id} className="pt-4 pb-6">
+    <div key={id}>
+      <div className="pt-4 pb-6">
         <div className="flex flex-row items-center justify-between">
           <h3 className="text-xl font-medium">{title}</h3>
 
@@ -43,11 +43,11 @@ const renderCollections = (collections: Collection[] | null) => {
         <div className="flex flex-col">{renderDecks(id)}</div>
       </div>
       {idx < collections.length - 1 && <Divider />}
-    </>
+    </div>
   ));
 };
 
-export default async function CollectionsPage() {
+export default async function DecksPage() {
   const collections = await prisma.user.findFirst().collections();
 
   return (
