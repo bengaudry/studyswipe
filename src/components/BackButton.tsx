@@ -18,7 +18,7 @@ export function BackButton({
     <Link
       href={href ?? ".."}
       onMouseEnter={() => prefetch(href ?? "..")}
-      className={cn("text-neutral-400 flex items-center mb-3", className)}
+      className={cn("text-neutral-400 flex items-center", className)}
       {...props}
     >
       <ChevronLeft />
