@@ -15,6 +15,7 @@ export default function Home() {
           by playing it
         </h1>
         <Button
+          size="lg"
           onPress={() => push("/decks")}
           className="mt-6 w-fit mx-auto"
           color="primary"

@@ -7,7 +7,7 @@ export default async function ProfilePage() {
 
   return (
     <>
-      <ProfileAvatar src={session?.user?.image} />
+      <ProfileAvatar />
       <p>{session?.user?.name}</p>
       <p>{session?.user?.email}</p>
       <SignOutBtn />
