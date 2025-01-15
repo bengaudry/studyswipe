@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 
 /** Creates a collection in the database */
-export async function POST(req: NextRequest) {
+export const POST = auth(async (req) => {
   const params = req.nextUrl.searchParams;
   try {
     const deckid = params.get("deckid");
@@ -42,7 +43,10 @@ export async function POST(req: NextRequest) {
     const cards = deck.cards as FlashCard[];
     cards.push(body);
 
-    await prisma.deck.update({ where: { id: deckid }, data: { ...deck, cards } });
+    await prisma.deck.update({
+      where: { id: deckid },
+      data: { ...deck, cards },
+    });
 
     return NextResponse.json(null, { status: 200 });
   } catch (err) {
@@ -52,28 +56,30 @@ export async function POST(req: NextRequest) {
       { status: 501 }
     );
   }
-}
+});
 
-export async function DELETE(req: NextRequest) {
+export const DELETE = auth(async (req) => {
   const params = req.nextUrl.searchParams;
   try {
-    const id = params.get("id");
+    // const id = params.get("id");
 
-    if (!id) {
-      return NextResponse.json(
-        { error: { message: "missing-parameters" } },
-        { status: 400 }
-      );
-    }
+    // if (!id) {
+    //   return NextResponse.json(
+    //     { error: { message: "missing-parameters" } },
+    //     { status: 400 }
+    //   );
+    // }
 
-    await prisma.collection.delete({ where: { id } });
+    // await prisma.collection.delete({ where: { id } });
+
+    // TODO
 
     return NextResponse.json(null, { status: 200 });
   } catch (err) {
-    console.error("Error while deleting category :\n", err);
+    console.error("Error while deleting card :\n", err);
     return NextResponse.json(
-      { error: { message: "failed-adding-to-db" } },
+      { error: { message: "failed-deleting-card-from-db" } },
       { status: 501 }
     );
   }
-}
+});

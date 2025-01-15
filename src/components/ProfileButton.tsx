@@ -32,14 +32,13 @@ export function ProfileButton() {
     return <SkeletonLoader className="w-20 h-8 rounded-md" />;
 
   return (
-    <Link href="/profile">
-      <Avatar
-        src={session.user?.image ?? undefined}
-        fallback={(session.user?.name ?? "-")[0]}
-        isBordered
-      >
-        <AvatarIcon />
-      </Avatar>
-    </Link>
+    <Button
+      variant="flat"
+      color="primary"
+      onPress={() => push("/profile")}
+      startContent={<User size={20} />}
+    >
+      Account
+    </Button>
   );
 }

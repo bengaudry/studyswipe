@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 
 /** Creates a collection in the database */
-export async function POST(req: NextRequest) {
+export const POST = auth(async (req) => {
   try {
     const body = await req.json();
     console.log(body);
@@ -23,8 +24,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("before prisma");
-
     await prisma.deck.create({
       data: {
         title: body.title,
@@ -42,9 +41,9 @@ export async function POST(req: NextRequest) {
       { status: 501 }
     );
   }
-}
+});
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = auth(async (req) => {
   const params = req.nextUrl.searchParams;
   try {
     const action = params.get("action");
@@ -81,9 +80,9 @@ export async function PATCH(req: NextRequest) {
       { status: 501 }
     );
   }
-}
+});
 
-export async function DELETE(req: NextRequest) {
+export const DELETE = auth(async (req) => {
   const params = req.nextUrl.searchParams;
   try {
     const id = params.get("id");
@@ -105,4 +104,4 @@ export async function DELETE(req: NextRequest) {
       { status: 501 }
     );
   }
-}
+});

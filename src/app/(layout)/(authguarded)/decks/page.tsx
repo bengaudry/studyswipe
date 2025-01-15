@@ -5,6 +5,7 @@ import { NewCategoryModal } from "@/components/pages/decks/NewCategoryModal";
 import { Divider } from "@nextui-org/react";
 import { CreateDeckButton } from "@/components/pages/decks/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/decks/CollectionOptionsDropdown";
+import { auth } from "@/lib/auth";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({ where: { collectionId } });
@@ -29,14 +30,21 @@ const renderDecks = async (collectionId: string) => {
 
 const renderCollections = (collections: Collection[] | null) => {
   if (collections === null || collections.length < 1)
-    return <p className="mt-2 text-neutral-400">No deck yet. Start by creating a collection, and then a deck.</p>;
+    return (
+      <p className="mt-2 text-neutral-400">
+        No deck yet. Start by creating a collection, and then a deck.
+      </p>
+    );
 
   return collections.map(({ id, title }, idx) => (
     <div key={id}>
       <div className="pt-4 pb-6">
         <div className="flex flex-row items-center justify-between mb-2">
           <h3 className="text-xl font-medium">{title}</h3>
-          <CollectionOptionsDropdown collectionId={id} collectionTitle={title} />
+          <CollectionOptionsDropdown
+            collectionId={id}
+            collectionTitle={title}
+          />
         </div>
 
         <div className="flex flex-col">{renderDecks(id)}</div>
@@ -47,7 +55,13 @@ const renderCollections = (collections: Collection[] | null) => {
 };
 
 export default async function DecksPage() {
-  const collections = await prisma.user.findFirst().collections();
+  const session = await auth();
+
+  if (session?.user?.id === undefined) return null;
+
+  const collections = await prisma.collection.findMany({
+    where: { ownerId: session.user.id },
+  });
 
   return (
     <div>

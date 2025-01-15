@@ -28,7 +28,7 @@ export function DeckOptionsDropdown({
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [modalType, setModalType] = useState<"rename" | "delete">("delete");
   const [newtitle, setNewtitle] = useState(deckTitle ?? "");
-  const { prefetch, replace } = useRouter();
+  const { prefetch, replace, refresh } = useRouter();
 
   const handleDeleteDeck = async () => {
     setLoading(true);
@@ -44,6 +44,7 @@ export function DeckOptionsDropdown({
     } finally {
       onClose();
       setLoading(false);
+      refresh();
     }
   };
 
@@ -59,6 +60,7 @@ export function DeckOptionsDropdown({
     } finally {
       onClose();
       setLoading(false);
+      refresh();
     }
   };
 

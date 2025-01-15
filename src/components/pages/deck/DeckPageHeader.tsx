@@ -15,6 +15,8 @@ export function DeckPageHeader({ deck }: { deck: Deck }) {
       <div className="flex justify-between items-center gap-4">
         <BackButton />
         <Button
+          disabled={deck.cards.length < 1}
+          isDisabled={deck.cards.length < 1}
           color="primary"
           size="sm"
           className={clsx(`bg-${deck.theme}-500`)}

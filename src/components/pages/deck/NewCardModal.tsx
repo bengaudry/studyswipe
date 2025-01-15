@@ -16,6 +16,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { clsx } from "clsx";
+import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Plus, Type, Image, Zap } from "react-feather";
 
@@ -27,6 +28,7 @@ export function NewCardModal({
   decktheme: string;
 }) {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
+  const { refresh } = useRouter();
 
   const [loading, setLoading] = useState(false);
 
@@ -54,6 +56,7 @@ export function NewCardModal({
     } finally {
       onClose();
       setLoading(false);
+      refresh();
     }
   };
 

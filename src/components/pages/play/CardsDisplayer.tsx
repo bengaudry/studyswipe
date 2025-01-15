@@ -90,33 +90,33 @@ export function CardsDisplayer({
 
   return (
     <>
-      <div className="absolute flex items-center gap-2 z-30 top-20 right-3 p-2 rounded-full border shadow-xl bg-white">
+      <div className="absolute flex items-center z-30 bottom-3 left-1/2 -translate-x-1/2 rounded-full border shadow-xl bg-white">
         <Tooltip content="Shuffle cards" placement="left">
           <button
             onClick={() => setCards((prev) => shuffleArray(prev))}
-            className="block p-1 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+            className="block p-3 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
           >
-            <Shuffle size={20} />
+            <Shuffle size={24} />
           </button>
         </Tooltip>
 
-        <Tooltip content="Restart" placement="left">
+        <Tooltip content="Restart" placement="right">
           <button
             onClick={() => {
               setCards(deckCards);
               setSkippedCards([]);
             }}
-            className="block p-1 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+            className="block p-3 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
           >
-            <RefreshCw size={20} />
+            <RefreshCw size={24} />
           </button>
         </Tooltip>
       </div>
 
-      <Button onPress={async () => await signIn()}>Sign in</Button>
-
       <div
-        className={`${animPlaying ? "animate-next-card" : ""} relative w-full aspect-square max-w-80 mx-auto`}
+        className={`${
+          animPlaying ? "animate-next-card" : ""
+        } relative w-full aspect-square max-w-80 mx-auto`}
       >
         {cards.length > 0 ? (
           <CardElement
@@ -166,20 +166,24 @@ export function CardsDisplayer({
         )}
       </div>
 
-      <ActionButton
-        color="red"
-        disabled={cards.length < 1}
-        onClick={replayCard}
-        Icon={<Plus className="rotate-45 text-red-800" size={44} />}
-      />
+      <div className="fixed bottom-0 w-full max-w-md left-1/2 -translate-x-1/2">
+        <div className="relative">
+          <ActionButton
+            color="red"
+            disabled={cards.length < 1}
+            onClick={replayCard}
+            Icon={<Plus className="rotate-45 text-red-800" size={44} />}
+          />
 
-      <ActionButton
-        disabled={cards.length < 1}
-        color="green"
-        position="right"
-        onClick={validateCard}
-        Icon={<Check className="text-green-800" size={44} />}
-      />
+          <ActionButton
+            disabled={cards.length < 1}
+            color="green"
+            position="right"
+            onClick={validateCard}
+            Icon={<Check className="text-green-800" size={44} />}
+          />
+        </div>
+      </div>
     </>
   );
 }
@@ -230,7 +234,7 @@ const ActionButton = ({
 }) => (
   <button
     onClick={onClick}
-    className={`fixed flex items-start h-80 w-32 -bottom-24 ${
+    className={`absolute flex items-start h-80 w-32 -bottom-24 ${
       position === "left" ? "left-6 rotate-12" : "right-6 -rotate-12"
     } ${
       disabled

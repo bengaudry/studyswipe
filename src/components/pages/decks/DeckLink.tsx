@@ -15,6 +15,7 @@ import {
   Tooltip,
   useDisclosure,
 } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import React, { PropsWithChildren, useState } from "react";
 import { Plus } from "react-feather";
 
@@ -51,6 +52,7 @@ const CustomRadio = ({ color }: { color: string }) => (
 export function CreateDeckButton({ collectionId }: { collectionId: string }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(false);
+  const { refresh } = useRouter();
 
   const [data, setData] = useState<{
     title: string;
@@ -66,16 +68,13 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "/api/deck",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ...data, collectionId }),
-        }
-      );
+      const response = await fetch("/api/deck", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...data, collectionId }),
+      });
 
       if (!response.ok) {
         throw new Error("Failed to add collection");
@@ -83,13 +82,19 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
     } finally {
       onClose();
       setLoading(false);
+      refresh();
     }
   };
 
   return (
     <>
       <Tooltip content="Create a deck of cards" placement="bottom">
-        <Button variant="faded" color="default" className="w-8 h-40" onPress={onOpen}>
+        <Button
+          variant="faded"
+          color="default"
+          className="w-8 h-40"
+          onPress={onOpen}
+        >
           <Plus />
         </Button>
       </Tooltip>
