@@ -105,6 +105,7 @@ model Deck {
   description String?
   theme       String
   iconUri     String?
+  isPublic    Boolean @default(false)
   cards       Json[]
 
   createdAt DateTime @default(now())

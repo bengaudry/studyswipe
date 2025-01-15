@@ -13,28 +13,23 @@ import {
   ModalBody,
   ModalFooter,
 } from "@nextui-org/react";
+import { Deck } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { MoreVertical, Edit2, Trash } from "react-feather";
+import { MoreVertical, Edit2, Trash, EyeOff, Eye } from "react-feather";
 
-export function DeckOptionsDropdown({
-  deckId,
-  deckTitle,
-}: {
-  deckId: string;
-  deckTitle?: string;
-}) {
+export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [modalType, setModalType] = useState<"rename" | "delete">("delete");
-  const [newtitle, setNewtitle] = useState(deckTitle ?? "");
+  const [newtitle, setNewtitle] = useState(deck.title ?? "");
   const { prefetch, replace, refresh } = useRouter();
 
   const handleDeleteDeck = async () => {
     setLoading(true);
     try {
       prefetch("/decks");
-      await fetch(`/api/deck?id=${deckId}`, {
+      await fetch(`/api/deck?id=${deck.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -51,12 +46,34 @@ export function DeckOptionsDropdown({
   const handleRenameDeck = async () => {
     setLoading(true);
     try {
-      await fetch(`/api/deck?id=${deckId}&action=rename&newtitle=${newtitle}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+      await fetch(
+        `/api/deck?id=${deck.id}&action=rename&newtitle=${newtitle}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    } finally {
+      onClose();
+      setLoading(false);
+      refresh();
+    }
+  };
+
+  const handleToggleVisibility = async () => {
+    setLoading(true);
+    try {
+      await fetch(
+        `/api/deck?id=${deck.id}&action=toggle-visibility`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
     } finally {
       onClose();
       setLoading(false);
@@ -74,15 +91,24 @@ export function DeckOptionsDropdown({
         </DropdownTrigger>
         <DropdownMenu variant="flat" aria-label="Static Actions">
           <DropdownItem
-            key="copy"
+            key="rename"
             startContent={<Edit2 size={16} />}
-            showDivider
             onPress={() => {
               setModalType("rename");
               onOpen();
             }}
           >
             Rename
+          </DropdownItem>
+          <DropdownItem
+            key="toggleVisibility"
+            startContent={
+              deck.isPublic ? <EyeOff size={16} /> : <Eye size={16} />
+            }
+            showDivider
+            onPress={handleToggleVisibility}
+          >
+            {deck.isPublic ? "Make private" : "Make public"}
           </DropdownItem>
           <DropdownItem
             key="delete"

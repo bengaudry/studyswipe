@@ -72,6 +72,23 @@ export const PATCH = auth(async (req) => {
       });
     }
 
+    if (action === "toggle-visibility") {
+      const prev = await prisma.deck.findUnique({ where: { id } });
+
+      if (prev === null)
+        return NextResponse.json(
+          {
+            error: { message: "Deck not found in db" },
+          },
+          { status: 401 }
+        );
+
+      await prisma.deck.update({
+        where: { id },
+        data: { isPublic: !prev.isPublic },
+      });
+    }
+
     return NextResponse.json(null, { status: 200 });
   } catch (err) {
     console.error("Error while deleting deck :\n", err);

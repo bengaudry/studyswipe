@@ -1,7 +1,7 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Collection } from "@prisma/client";
-import { NewCategoryModal } from "@/components/pages/decks/NewCategoryModal";
+import { NewCategoryModal } from "@/components/pages/decks/NewCollectionModal";
 import { Divider } from "@nextui-org/react";
 import { CreateDeckButton } from "@/components/pages/decks/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/decks/CollectionOptionsDropdown";
@@ -36,18 +36,15 @@ const renderCollections = (collections: Collection[] | null) => {
       </p>
     );
 
-  return collections.map(({ id, title }, idx) => (
-    <div key={id}>
+  return collections.map((collection, idx) => (
+    <div key={collection.id}>
       <div className="pt-4 pb-6">
         <div className="flex flex-row items-center justify-between mb-2">
-          <h3 className="text-xl font-medium">{title}</h3>
-          <CollectionOptionsDropdown
-            collectionId={id}
-            collectionTitle={title}
-          />
+          <h3 className="text-xl font-medium">{collection.title}</h3>
+          <CollectionOptionsDropdown collection={collection} />
         </div>
 
-        <div className="flex flex-col">{renderDecks(id)}</div>
+        <div className="flex flex-col">{renderDecks(collection.id)}</div>
       </div>
       {idx < collections.length - 1 && <Divider />}
     </div>

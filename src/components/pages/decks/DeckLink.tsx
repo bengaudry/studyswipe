@@ -14,7 +14,9 @@ import {
   Textarea,
   Tooltip,
   useDisclosure,
+  Switch,
 } from "@nextui-org/react";
+import { Deck } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import React, { PropsWithChildren, useState } from "react";
 import { Plus } from "react-feather";
@@ -58,10 +60,12 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
     title: string;
     description: string;
     theme: string;
+    isPublic: boolean;
   }>({
     title: "",
     description: "",
     theme: "neutral",
+    isPublic: false,
   });
 
   const handleSubmit = async (onClose: () => void) => {
@@ -73,7 +77,10 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...data, collectionId }),
+        body: JSON.stringify({
+          ...data,
+          collectionId,
+        }),
       });
 
       if (!response.ok) {
@@ -130,6 +137,22 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
                     }))
                   }
                 />
+
+                <RadioGroup
+                  label="Visibility"
+                  orientation="horizontal"
+                  value={data.isPublic ? "public" : "private"}
+                  onValueChange={(value) =>
+                    setData((prev) => ({
+                      ...prev,
+                      isPublic: value === "public",
+                    }))
+                  }
+                >
+                  <Radio description="Private" value="private" />
+                  <Radio description="Public" value="public" />
+                </RadioGroup>
+
                 <Divider orientation="horizontal" />
                 <RadioGroup
                   label="Theme color"

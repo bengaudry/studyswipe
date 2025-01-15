@@ -28,7 +28,7 @@ export function DeckPageHeader({ deck }: { deck: Deck }) {
       </div>
       <div className="flex justify-between items-center gap-4">
         <h1 className="text-2xl font-semibold">{deck.title}</h1>
-        <DeckOptionsDropdown deckId={deck.id} deckTitle={deck.title} />
+        <DeckOptionsDropdown deck={deck} />
       </div>
     </header>
   );

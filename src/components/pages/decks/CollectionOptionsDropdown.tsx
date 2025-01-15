@@ -13,27 +13,26 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
+import { Collection } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Edit2, MoreVertical, Trash } from "react-feather";
+import { Edit2, Eye, EyeOff, MoreVertical, Trash } from "react-feather";
 
 export function CollectionOptionsDropdown({
-  collectionId,
-  collectionTitle,
+  collection,
 }: {
-  collectionId: string;
-  collectionTitle?: string;
+  collection: Collection;
 }) {
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [modalType, setModalType] = useState<"rename" | "delete">("delete");
-  const [newtitle, setNewtitle] = useState(collectionTitle ?? "");
+  const [newtitle, setNewtitle] = useState(collection.title ?? "");
   const { refresh } = useRouter();
 
   const handleDeleteCollection = async () => {
     setLoading(true);
     try {
-      await fetch(`/api/collection?id=${collectionId}`, {
+      await fetch(`/api/collection?id=${collection.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -50,7 +49,7 @@ export function CollectionOptionsDropdown({
     setLoading(true);
     try {
       await fetch(
-        `/api/collection?id=${collectionId}&action=rename&newtitle=${newtitle}`,
+        `/api/collection?id=${collection.id}&action=rename&newtitle=${newtitle}`,
         {
           method: "PATCH",
           headers: {
@@ -75,9 +74,9 @@ export function CollectionOptionsDropdown({
         </DropdownTrigger>
         <DropdownMenu variant="flat" aria-label="Static Actions">
           <DropdownItem
-            key="copy"
-            startContent={<Edit2 size={16} />}
+            key="rename"
             showDivider
+            startContent={<Edit2 size={16} />}
             onPress={() => {
               setModalType("rename");
               onOpen();
