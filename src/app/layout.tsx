@@ -52,7 +52,7 @@ export default function RootLayout({
             <NavbarContent justify="center">
               <NavbarItem>
                 <Link href="/decks" color="foreground">
-                  My decks
+                  My collections
                 </Link>
               </NavbarItem>
             </NavbarContent>

@@ -63,7 +63,7 @@ export default async function DecksPage() {
   return (
     <div>
       <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold">My decks</h1>
+        <h1 className="text-3xl font-semibold">My collections</h1>
         <NewCategoryModal />
       </header>
       <div className="flex flex-col">{renderCollections(collections)}</div>

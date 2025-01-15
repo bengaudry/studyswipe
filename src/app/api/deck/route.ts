@@ -99,7 +99,7 @@ export const PATCH = async (req: NextRequest) => {
   }
 };
 
-export const DELETE = auth(async (req) => {
+export const DELETE = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
     const id = params.get("id");
@@ -121,4 +121,4 @@ export const DELETE = auth(async (req) => {
       { status: 501 }
     );
   }
-});
+};
