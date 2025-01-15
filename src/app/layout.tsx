@@ -26,11 +26,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Studyswipe",
   description: "An app that allows you to study your courses with flashcards.",
+  icons: { icon: "/icon-png.png" },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<PropsWithChildren>) {
+export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
     <html lang="en">
       <body
