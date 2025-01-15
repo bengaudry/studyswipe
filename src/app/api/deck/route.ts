@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
 /** Creates a collection in the database */
-export const POST = auth(async (req) => {
+export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
     console.log(body);
@@ -41,9 +41,9 @@ export const POST = auth(async (req) => {
       { status: 501 }
     );
   }
-});
+};
 
-export const PATCH = auth(async (req) => {
+export const PATCH = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
     const action = params.get("action");
@@ -97,7 +97,7 @@ export const PATCH = auth(async (req) => {
       { status: 501 }
     );
   }
-});
+};
 
 export const DELETE = auth(async (req) => {
   const params = req.nextUrl.searchParams;

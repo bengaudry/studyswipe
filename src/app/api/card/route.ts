@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
 /** Creates a collection in the database */
-export const POST = auth(async (req) => {
+export const POST = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
     const deckid = params.get("deckid");
@@ -56,9 +56,9 @@ export const POST = auth(async (req) => {
       { status: 501 }
     );
   }
-});
+};
 
-export const DELETE = auth(async (req) => {
+export const DELETE = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
     // const id = params.get("id");
@@ -82,4 +82,4 @@ export const DELETE = auth(async (req) => {
       { status: 501 }
     );
   }
-});
+};
