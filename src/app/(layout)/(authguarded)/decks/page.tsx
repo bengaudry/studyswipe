@@ -29,7 +29,7 @@ const renderDecks = async (collectionId: string) => {
 
 const renderCollections = (collections: Collection[] | null) => {
   if (collections === null || collections.length < 1)
-    return <p>No deck yet. Start by creating a category, and then a deck.</p>;
+    return <p className="mt-2 text-neutral-400">No deck yet. Start by creating a collection, and then a deck.</p>;
 
   return collections.map(({ id, title }, idx) => (
     <div key={id}>

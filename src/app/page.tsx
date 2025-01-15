@@ -3,7 +3,7 @@ import { Button } from "@nextui-org/button";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "react-feather";
 
-export default async function Home() {
+export default function Home() {
   const { push } = useRouter();
 
   return (
