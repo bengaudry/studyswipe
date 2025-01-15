@@ -1,11 +1,11 @@
 "use client";
+import { signIn } from "next-auth/react";
 import { shuffleArray } from "@/lib/arrays";
 import { Button } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
-import { pre } from "framer-motion/client";
-import { JSX, ReactNode, useState } from "react";
-import { Check, Home, Play, Plus, RefreshCw, Shuffle } from "react-feather";
+import { JSX, useState } from "react";
+import { Check, Play, Plus, RefreshCw, Shuffle } from "react-feather";
 
 function ContentElement({ content }: { content: FlashCardContentJSON }) {
   if (content.type === "text") {
@@ -112,6 +112,8 @@ export function CardsDisplayer({
           </button>
         </Tooltip>
       </div>
+
+      <Button onPress={async () => await signIn()}>Sign in</Button>
 
       <div
         className={`${animPlaying ? "animate-next-card" : ""} relative w-full aspect-square max-w-80 mx-auto`}

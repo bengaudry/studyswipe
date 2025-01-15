@@ -34,9 +34,8 @@ const renderCollections = (collections: Collection[] | null) => {
   return collections.map(({ id, title }, idx) => (
     <div key={id}>
       <div className="pt-4 pb-6">
-        <div className="flex flex-row items-center justify-between">
+        <div className="flex flex-row items-center justify-between mb-2">
           <h3 className="text-xl font-medium">{title}</h3>
-
           <CollectionOptionsDropdown collectionId={id} collectionTitle={title} />
         </div>
 

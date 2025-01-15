@@ -7,12 +7,10 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  NavbarMenu,
-  NavbarMenuItem,
 } from "@nextui-org/navbar";
-import { Button } from "@nextui-org/button";
 import Link from "next/link";
 import Image from "next/image";
+import { ProfileButton } from "@/components/ProfileButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -39,27 +37,30 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased light`}
       >
-        <Navbar className="border-b-1 border-neutral-200">
-          <NavbarBrand>
-            <Link href="/" className="flex gap-2 items-center">
-              <Image
-                src={"/icon-svg.svg"}
-                width={36}
-                height={36}
-                alt="App icon"
-              />
-              <span className="font-semibold">Studyswipe</span>
-            </Link>
-          </NavbarBrand>
-          <NavbarContent justify="center">
-            <NavbarItem>
-              <Link href="/decks" color="foreground">
-                My decks
-              </Link>
-            </NavbarItem>
-          </NavbarContent>
-        </Navbar>
         <AppLayout>
+          <Navbar className="border-b-1 border-neutral-200">
+            <NavbarBrand>
+              <Link href="/" className="flex gap-2 items-center">
+                <Image
+                  src={"/icon-svg.svg"}
+                  width={36}
+                  height={36}
+                  alt="App icon"
+                />
+                <span className="font-semibold">Studyswipe</span>
+              </Link>
+            </NavbarBrand>
+            <NavbarContent justify="center">
+              <NavbarItem>
+                <Link href="/decks" color="foreground">
+                  My decks
+                </Link>
+              </NavbarItem>
+            </NavbarContent>
+            <NavbarContent justify="end">
+              <ProfileButton />
+            </NavbarContent>
+          </Navbar>
           <main className="w-full max-w-screen-lg mx-auto px-6 py-6">
             {children}
           </main>
