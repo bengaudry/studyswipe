@@ -7,7 +7,7 @@ export default async function AuthGuardedLayout({
 }: PropsWithChildren) {
   const session = await auth();
 
-  if (session === null) redirect("/");
+  if (session === null) redirect("/auth");
   
   return children;
 }

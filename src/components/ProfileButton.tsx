@@ -15,7 +15,7 @@ export function ProfileButton() {
   };
 
   return (
-    <Button onPress={handlePress} startContent={<User size={20} />}>
+    <Button variant="flat" color="primary" onPress={handlePress} startContent={<User size={20} />}>
       {session === null ? "Sign in" : "Profile"}
     </Button>
   );

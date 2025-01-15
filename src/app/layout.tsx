@@ -61,9 +61,7 @@ export default function RootLayout({
               <ProfileButton />
             </NavbarContent>
           </Navbar>
-          <main className="w-full max-w-screen-lg mx-auto px-6 py-6">
-            {children}
-          </main>
+          {children}
         </AppLayout>
       </body>
     </html>

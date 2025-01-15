@@ -8,6 +8,11 @@ export const authConfig: NextAuthConfig = {
   adapter: PrismaAdapter(prisma),
   providers: [Google],
   secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/auth",
+    newUser: "/auth",
+    error: "/auth"
+  },
   session: {
     strategy: "database",
   },
