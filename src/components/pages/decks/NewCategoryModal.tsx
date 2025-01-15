@@ -10,6 +10,7 @@ import {
   useDisclosure,
 } from "@nextui-org/react";
 import { Collection } from "@prisma/client";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Plus } from "react-feather";
 
@@ -21,6 +22,7 @@ export type PartialCollection = Omit<
 export function NewCategoryModal() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loadingCreation, setLoadingCreation] = useState(false);
+  const { refresh } = useRouter();
 
   const [data, setData] = useState<PartialCollection>({
     title: "",
@@ -44,6 +46,7 @@ export function NewCategoryModal() {
     } finally {
       onClose();
       setLoadingCreation(false);
+      refresh();
     }
   };
 

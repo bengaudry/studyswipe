@@ -7,7 +7,7 @@ export function authErrorToMessage(err: string) {
         case "Verification":
             return "Token expired. Please try again, or contact the developper if the issue persists.";
         case "OAuthAccountNotLinked":
-            return "An account using the same email already exists.";
+            return "This email is linked to another provider.";
         default:
             return "Unknown server error, please contact the developper.";
     }

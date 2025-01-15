@@ -1,6 +1,6 @@
 "use client";
 import { SignOutBtn } from "@/components/pages/profile/SignoutBtn";
-import { User } from "@nextui-org/react";
+import { Divider, User } from "@nextui-org/react";
 import { useSession } from "next-auth/react";
 
 export default function ProfilePage() {
@@ -10,7 +10,7 @@ export default function ProfilePage() {
 
   return (
     <div className="max-w-screen-sm w-full mx-auto">
-      <header className="flex items-center justify-between w-full">
+      <header className="flex items-center justify-between w-full pb-6">
         <User
           avatarProps={{
             src: session.user.image ?? undefined,
@@ -21,6 +21,8 @@ export default function ProfilePage() {
         />
         <SignOutBtn />
       </header>
+
+      <Divider />
     </div>
   );
 }

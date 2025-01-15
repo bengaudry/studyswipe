@@ -13,6 +13,7 @@ import {
   ModalHeader,
   useDisclosure,
 } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Edit2, MoreVertical, Trash } from "react-feather";
 
@@ -27,6 +28,7 @@ export function CollectionOptionsDropdown({
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [modalType, setModalType] = useState<"rename" | "delete">("delete");
   const [newtitle, setNewtitle] = useState(collectionTitle ?? "");
+  const { refresh } = useRouter();
 
   const handleDeleteCollection = async () => {
     setLoading(true);
@@ -40,6 +42,7 @@ export function CollectionOptionsDropdown({
     } finally {
       onClose();
       setLoading(false);
+      refresh();
     }
   };
 
@@ -58,6 +61,7 @@ export function CollectionOptionsDropdown({
     } finally {
       onClose();
       setLoading(false);
+      refresh();
     }
   };
 
@@ -105,8 +109,8 @@ export function CollectionOptionsDropdown({
                   Delete collection
                 </ModalHeader>
                 <ModalBody>
-                  If you delete this collection, all decks in it, and the cards it contains
-                  will be deleted too, and cannot be recovered.
+                  If you delete this collection, all decks in it, and the cards
+                  it contains will be deleted too, and cannot be recovered.
                 </ModalBody>
                 <ModalFooter>
                   <Button color="danger" variant="flat" onPress={onClose}>

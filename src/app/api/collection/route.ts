@@ -1,11 +1,18 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 
 /** Creates a collection in the database */
-export async function POST(req: NextRequest) {
+export const POST = auth(async (req) => {
   try {
+    if (req.auth?.user?.id === undefined) {
+      return NextResponse.json(
+        { error: { message: "Not authenticated (no id found)" } },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
-    console.log(body);
 
     if (!body || typeof body !== "object" || !body.title) {
       return NextResponse.json(
@@ -18,12 +25,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log("before prisma");
-
     await prisma.collection.create({
       data: {
         title: body.title,
-        ownerId: "ojdpODZIQFJQUPIJDFQHIL",
+        ownerId: req.auth.user.id,
       },
     });
 
@@ -35,9 +40,9 @@ export async function POST(req: NextRequest) {
       { status: 501 }
     );
   }
-}
+});
 
-export async function PATCH(req: NextRequest) {
+export const PATCH = auth(async (req) => {
   const params = req.nextUrl.searchParams;
   try {
     const action = params.get("action");
@@ -74,9 +79,9 @@ export async function PATCH(req: NextRequest) {
       { status: 501 }
     );
   }
-}
+});
 
-export async function DELETE(req: NextRequest) {
+export const DELETE = auth(async (req) => {
   const params = req.nextUrl.searchParams;
   try {
     const id = params.get("id");
@@ -98,4 +103,4 @@ export async function DELETE(req: NextRequest) {
       { status: 501 }
     );
   }
-}
+});
