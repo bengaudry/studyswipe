@@ -20,7 +20,7 @@ export function SignOutBtn() {
     <Button
       color="danger"
       isLoading={loading}
-      startContent={<LogOut size={20} />}
+      startContent={loading ? null : <LogOut size={20} />}
       onPress={handleSignOut}
     >
       Sign out
