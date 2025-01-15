@@ -1,16 +1,26 @@
-import { ProfileAvatar } from "@/components/pages/profile/ProfileAvatar";
+"use client";
 import { SignOutBtn } from "@/components/pages/profile/SignoutBtn";
-import { auth } from "@/lib/auth";
+import { User } from "@nextui-org/react";
+import { useSession } from "next-auth/react";
 
-export default async function ProfilePage() {
-  const session = await auth();
+export default function ProfilePage() {
+  const { data: session } = useSession();
+
+  if (session?.user === undefined) return null;
 
   return (
-    <>
-      <ProfileAvatar />
-      <p>{session?.user?.name}</p>
-      <p>{session?.user?.email}</p>
-      <SignOutBtn />
-    </>
+    <div className="max-w-screen-sm w-full mx-auto">
+      <header className="flex items-center justify-between w-full">
+        <User
+          avatarProps={{
+            src: session.user.image ?? undefined,
+            fallback: (session.user.name ?? "-")[0],
+          }}
+          name={session.user.name}
+          description={session.user.email ?? undefined}
+        />
+        <SignOutBtn />
+      </header>
+    </div>
   );
 }
