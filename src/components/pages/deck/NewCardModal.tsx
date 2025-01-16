@@ -14,11 +14,12 @@ import {
   Tab,
   Tabs,
   useDisclosure,
+  Image,
 } from "@nextui-org/react";
 import { clsx } from "clsx";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Plus, Type, Image, Zap } from "react-feather";
+import { Plus, Image as ImageIcon, Type, Zap } from "react-feather";
 
 /** Provide `card` if this if for editing the card */
 export function NewCardModal({
@@ -250,7 +251,7 @@ function AddElementDropdown({
           Add element
         </Button>
       </DropdownTrigger>
-      <DropdownMenu variant="flat" disabledKeys={["image", "equation"]}>
+      <DropdownMenu variant="flat" disabledKeys={["image"]}>
         <DropdownItem
           key="title"
           startContent={<Type />}
@@ -291,10 +292,14 @@ function AddElementDropdown({
         >
           Text
         </DropdownItem>
-        <DropdownItem key="image" startContent={<Image />}>
+        <DropdownItem key="image" startContent={<ImageIcon />}>
           Image (soon)
         </DropdownItem>
-        <DropdownItem key="equation" startContent={<Zap />}>
+        <DropdownItem
+          key="equation"
+          startContent={<Zap />}
+          onPress={() => onAdd({ type: "equation", equation: "" })}
+        >
           Equation (soon)
         </DropdownItem>
       </DropdownMenu>
@@ -330,5 +335,25 @@ function ContentElement({
       </div>
     );
   }
+
+  if (content.type === "equation") {
+    return (
+      <div className="group relative">
+        <textarea
+          placeholder="Type your equation in LaTex format here"
+          value={content.equation || ""}
+          className={`bg-transparent w-full h-fit overflow-hidden whitespace-normal border-transparent border-dashed border-2 rounded-md p-2 focus:border-black outline-none`}
+          onChange={(e) => onUpdate({ ...content, equation: e.target.value })}
+        />
+        <Image
+          src={`https://latex.codecogs.com/svg.image?${content.equation}`}
+          width={200}
+          height={25}
+          alt={content.equation || "Equation"}
+        />
+      </div>
+    );
+  }
+
   return null; // Extend here for other content types like images or equations.
 }

@@ -1,6 +1,6 @@
 "use client";
-import { signIn } from "next-auth/react";
 import { shuffleArray } from "@/lib/arrays";
+import { Image } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
@@ -19,6 +19,18 @@ function ContentElement({ content }: { content: FlashCardContentJSON }) {
       </p>
     );
   }
+
+  if (content.type === "equation") {
+    return (
+      <Image
+        src={`https://latex.codecogs.com/svg.image?${content.equation}`}
+        width={200}
+        height={25}
+        alt={content.equation || "Equation"}
+      />
+    );
+  }
+
   return null; // Extend here for other content types like images or equations.
 }
 

@@ -25,6 +25,15 @@ export const CardPreview = React.forwardRef<
           if (value.type === "text") return value.text;
           if (value.type === "image")
             return <Image src={value.imgUri} alt={value.alt} />;
+          if (value.type === "equation")
+            return (
+              <Image
+                src={`https://latex.codecogs.com/svg.image?${value.equation}`}
+                width={200}
+                height={12}
+                alt={value.equation || "Equation"}
+              />
+            );
         })}
       </div>
       <div className="absolute left-0 bottom-0 flex items-center justify-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform w-full bg-gradient-to-b from-black/0 to-black/30 py-2">
