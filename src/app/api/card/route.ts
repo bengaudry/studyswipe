@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
@@ -58,21 +57,104 @@ export const POST = async (req: NextRequest) => {
   }
 };
 
+export const PATCH = async (req: NextRequest) => {
+  const params = req.nextUrl.searchParams;
+  try {
+    const deckid = params.get("deckid");
+    const cardindex = params.get("cardindex");
+
+    if (!deckid || !cardindex) {
+      return NextResponse.json(
+        { error: { message: "Paramz deckid, cardindex are missing" } },
+        { status: 400 }
+      );
+    }
+
+    const body = await req.json();
+
+    if (!body || typeof body !== "object" || !body.question || !body.answer) {
+      return NextResponse.json(
+        {
+          error: {
+            message: "Invalid payload. Card is not in the correct format.",
+          },
+        },
+        { status: 400 }
+      );
+    }
+
+    const deck = await prisma.deck.findFirst({
+      where: {
+        id: deckid,
+      },
+    });
+
+    if (!deck) {
+      return NextResponse.json(
+        { error: { message: "Deck does not exist" } },
+        { status: 400 }
+      );
+    }
+
+    const newCards: FlashCard[] = (deck.cards as FlashCard[]).map(
+      (card, idx) => {
+        if (idx === parseInt(cardindex)) {
+          return { question: body.question, answer: body.answer };
+        }
+        return card;
+      }
+    );
+
+    await prisma.deck.update({
+      where: { id: deck.id },
+      data: { ...deck, cards: newCards },
+    });
+
+    return NextResponse.json(null, { status: 200 });
+  } catch (err) {
+    console.error("Error while adding category :\n", err);
+    return NextResponse.json(
+      { error: { message: "failed-changing-card-data" } },
+      { status: 501 }
+    );
+  }
+};
+
 export const DELETE = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
-    // const id = params.get("id");
+    const deckid = params.get("deckid");
+    const cardindex = params.get("cardindex");
 
-    // if (!id) {
-    //   return NextResponse.json(
-    //     { error: { message: "missing-parameters" } },
-    //     { status: 400 }
-    //   );
-    // }
+    if (!deckid || !cardindex) {
+      return NextResponse.json(
+        { error: { message: "Paramz deckid, cardindex are missing" } },
+        { status: 400 }
+      );
+    }
 
-    // await prisma.collection.delete({ where: { id } });
+    const deck = await prisma.deck.findFirst({
+      where: {
+        id: deckid,
+      },
+    });
 
-    // TODO
+    if (!deck) {
+      return NextResponse.json(
+        { error: { message: "Deck does not exist" } },
+        { status: 400 }
+      );
+    }
+
+    console.log("Deck cards :", deck.cards);
+    const newCards = (deck.cards as FlashCard[])
+    newCards.splice(parseInt(cardindex), 1);
+    console.log("New cards :", newCards);
+
+    await prisma.deck.update({
+      where: { id: deck.id },
+      data: { ...deck, cards: newCards },
+    });
 
     return NextResponse.json(null, { status: 200 });
   } catch (err) {

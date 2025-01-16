@@ -17,19 +17,21 @@ import {
 } from "@nextui-org/react";
 import { clsx } from "clsx";
 import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { Plus, Type, Image, Zap } from "react-feather";
 
+/** Provide `card` if this if for editing the card */
 export function NewCardModal({
   deckid,
   decktheme,
+  card,
 }: {
   deckid: string;
   decktheme: string;
+  card?: { data: FlashCard; index: number };
 }) {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { refresh } = useRouter();
-
   const [loading, setLoading] = useState(false);
 
   const [questionContent, setQuestionContent] = useState<
@@ -40,11 +42,35 @@ export function NewCardModal({
   );
   const [current, setCurrent] = useState<"question" | "answer">("question");
 
-  const handleCreateCard = async () => {
+  useEffect(() => {
+    if (card) {
+      setQuestionContent(card.data.question);
+      setAnswerContent(card.data.answer);
+      onOpen();
+    }
+  }, [card]);
+
+  const handleCardChanges = async () => {
     setLoading(true);
     try {
-      await fetch(`/api/card?deckid=${deckid}`, {
-        method: "POST",
+      // Create a card if we are creating a card
+      if (card === undefined) {
+        await fetch(`/api/card?deckid=${deckid}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            question: questionContent,
+            answer: answerContent,
+          }),
+        });
+        return;
+      }
+
+      // Edit the card otherwise
+      await fetch(`/api/card?deckid=${deckid}&cardindex=${card.index}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
@@ -54,9 +80,9 @@ export function NewCardModal({
         }),
       });
     } finally {
-      onClose();
       setLoading(false);
       refresh();
+      onClose();
     }
   };
 
@@ -145,9 +171,9 @@ export function NewCardModal({
                 <Button
                   color="primary"
                   isLoading={loading}
-                  onPress={handleCreateCard}
+                  onPress={handleCardChanges}
                 >
-                  Create card
+                  {card ? "Edit card" : "Create card"}
                 </Button>
               </ModalFooter>
             </>
@@ -173,7 +199,9 @@ function FlashcardPreview({
     <div
       className={clsx(
         `absolute w-full h-full bg-${decktheme}-500/20 rounded-lg p-6 overflow-y-scroll ${
-          isActive ? "scale-100 opacity-100 pointer-events-auto" : "scale-85 opacity-0 pointer-events-none"
+          isActive
+            ? "scale-100 opacity-100 pointer-events-auto"
+            : "scale-85 opacity-0 pointer-events-none"
         } transition-all`
       )}
     >
@@ -285,7 +313,7 @@ function ContentElement({
       <div className="group relative">
         <textarea
           value={content.text || ""}
-          className={`bg-transparent w-full overflow-hidden text-nowrap border-transparent border-dashed border-2 rounded-md p-2 focus:border-black outline-none ${
+          className={`bg-transparent w-full h-fit overflow-hidden whitespace-normal border-transparent border-dashed border-2 rounded-md p-2 focus:border-black outline-none ${
             content.heading === "title" && "text-2xl font-semibold"
           } ${content.heading === "subtitle" && "text-xl font-medium"}`}
           onChange={(e) => onUpdate({ ...content, text: e.target.value })}

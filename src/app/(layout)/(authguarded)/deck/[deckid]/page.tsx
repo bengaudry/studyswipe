@@ -1,9 +1,9 @@
 import { NewCardModal } from "@/components/pages/deck/NewCardModal";
 import prisma from "@/lib/prisma";
-import Image from "next/image";
 import { redirect } from "next/navigation";
-import { clsx } from "clsx";
 import { DeckPageHeader } from "@/components/pages/deck/DeckPageHeader";
+import { CardPreview } from "@/components/pages/deck/CardPreview";
+import { DeckPageBody } from "@/components/pages/deck/DeckPageBody";
 
 export default async function DeckPage({
   params,
@@ -23,22 +23,7 @@ export default async function DeckPage({
       <DeckPageHeader deck={deck} />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        <NewCardModal deckid={deck.id} decktheme={deck.theme} />
-
-        {cards.map(({ question }, idx) => (
-          <button
-            key={idx}
-            className={clsx(
-              `border-2 aspect-square border-neutral-200 bg-${deck.theme}-500/20 transition-colors rounded-lg p-4 grid place-content-center`
-            )}
-          >
-            {question.map((value) => {
-              if (value.type === "text") return value.text;
-              if (value.type === "image")
-                return <Image src={value.imgUri} alt={value.alt} />;
-            })}
-          </button>
-        ))}
+        <DeckPageBody deck={deck} cards={cards} />
       </div>
     </div>
   );
