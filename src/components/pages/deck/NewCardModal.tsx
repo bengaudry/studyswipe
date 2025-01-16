@@ -173,7 +173,7 @@ function FlashcardPreview({
     <div
       className={clsx(
         `absolute w-full h-full bg-${decktheme}-500/20 rounded-lg p-6 overflow-y-scroll ${
-          isActive ? "scale-100 opacity-100" : "scale-85 opacity-0"
+          isActive ? "scale-100 opacity-100 pointer-events-auto" : "scale-85 opacity-0 pointer-events-none"
         } transition-all`
       )}
     >
@@ -226,7 +226,7 @@ function AddElementDropdown({
           onPress={() =>
             onAdd({
               type: "text",
-              text: "This is a title",
+              text: "Click to edit title",
               heading: "title",
             })
           }
@@ -239,7 +239,7 @@ function AddElementDropdown({
           onPress={() =>
             onAdd({
               type: "text",
-              text: "This is a subtitle",
+              text: "Click to edit subtitle",
               heading: "subtitle",
             })
           }
@@ -253,7 +253,7 @@ function AddElementDropdown({
           onPress={() =>
             onAdd({
               type: "text",
-              text: "This is a paragraph",
+              text: "Click to edit paragraph",
               heading: "paragraph",
             })
           }
