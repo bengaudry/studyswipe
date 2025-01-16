@@ -169,6 +169,9 @@ export function NewCardModal({
                   Close
                 </Button>
                 <Button
+                  isDisabled={
+                    answerContent.length < 1 || questionContent.length < 1
+                  }
                   color="primary"
                   isLoading={loading}
                   onPress={handleCardChanges}

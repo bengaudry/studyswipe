@@ -234,8 +234,8 @@ const ActionButton = ({
 }) => (
   <button
     onClick={onClick}
-    className={`absolute flex items-start h-80 w-32 -bottom-24 ${
-      position === "left" ? "left-6 rotate-12" : "right-6 -rotate-12"
+    className={`absolute flex items-start h-80 w-28 -bottom-32 ${
+      position === "left" ? "left-2 rotate-12" : "right-2 -rotate-12"
     } ${
       disabled
         ? "scale-85 grayscale cursor-default"

@@ -48,7 +48,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
                 <span className="font-semibold">Studyswipe</span>
               </Link>
             </NavbarBrand>
-            <NavbarContent justify="center">
+            <NavbarContent justify="center" className="hidden sm:flex gap-4">
               <NavbarItem>
                 <Link href="/decks" color="foreground">
                   My collections
