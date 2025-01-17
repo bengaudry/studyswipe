@@ -20,6 +20,7 @@ model User {
   Authenticator Authenticator[]
 
   collections Collection[]
+  decks       Deck[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -100,6 +101,7 @@ model Collection {
 model Deck {
   id           String @unique @default(uuid())
   collectionId String
+  ownerId      String
 
   title       String
   description String?
@@ -112,4 +114,5 @@ model Deck {
   updatedAt DateTime @default(now())
 
   Collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  Owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade) // Relation to User
 }

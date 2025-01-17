@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
@@ -24,12 +23,24 @@ export const POST = async (req: NextRequest) => {
       );
     }
 
+    const collection = await prisma.collection.findUnique({
+      where: { id: body.collectionId },
+    });
+
+    if (collection === null) {
+      return NextResponse.json(
+        { error: { message: "Collection does not exist" } },
+        { status: 401 }
+      );
+    }
+
     await prisma.deck.create({
       data: {
         title: body.title,
         description: body.description,
         theme: body.theme ?? "neutral",
-        collectionId: body.collectionId,
+        collectionId: collection.id,
+        ownerId: collection.ownerId,
       },
     });
 
