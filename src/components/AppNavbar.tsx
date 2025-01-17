@@ -26,6 +26,9 @@ export function AppNavbar() {
       </NavbarBrand>
       <NavbarContent justify="center" className="hidden sm:flex gap-4">
         <NavbarItem>
+          <Link href="/discover" color="foreground">
+            Discover
+          </Link>
           <Link href="/decks" color="foreground">
             My collections
           </Link>
@@ -41,7 +44,7 @@ export function AppNavbar() {
       <NavbarMenu>
         <NavbarMenuItem>
           <Link
-            href="/"
+            href="/discover"
             className="w-full text-center"
             color="foreground"
             size="lg"
