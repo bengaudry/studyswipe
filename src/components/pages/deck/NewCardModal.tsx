@@ -14,7 +14,7 @@ import {
   Tab,
   Tabs,
   useDisclosure,
-  Image,
+  Image
 } from "@nextui-org/react";
 import { clsx } from "clsx";
 import { useRouter } from "next/navigation";
@@ -202,7 +202,7 @@ function FlashcardPreview({
   return (
     <div
       className={clsx(
-        `absolute w-full h-full bg-${decktheme}-500/20 rounded-lg p-6 overflow-y-scroll ${
+        `absolute w-full h-full bg-${decktheme}-500/20 rounded-lg p-3 overflow-y-scroll flex flex-col gap-2 ${
           isActive
             ? "scale-100 opacity-100 pointer-events-auto"
             : "scale-85 opacity-0 pointer-events-none"
@@ -292,15 +292,15 @@ function AddElementDropdown({
         >
           Text
         </DropdownItem>
-        <DropdownItem key="image" startContent={<ImageIcon />}>
-          Image (soon)
-        </DropdownItem>
         <DropdownItem
           key="equation"
           startContent={<Zap />}
           onPress={() => onAdd({ type: "equation", equation: "" })}
         >
-          Equation (soon)
+          Equation
+        </DropdownItem>
+        <DropdownItem key="image" startContent={<ImageIcon />}>
+          Image (soon)
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
@@ -316,44 +316,81 @@ function ContentElement({
   onUpdate: (updatedContent: FlashCardContentJSON) => void;
   onDelete: () => void;
 }) {
-  if (content.type === "text") {
-    return (
-      <div className="group relative">
-        <textarea
-          value={content.text || ""}
-          className={`bg-transparent w-full h-fit overflow-hidden whitespace-normal border-transparent border-dashed border-2 rounded-md p-2 focus:border-black outline-none ${
-            content.heading === "title" && "text-2xl font-semibold"
-          } ${content.heading === "subtitle" && "text-xl font-medium"}`}
-          onChange={(e) => onUpdate({ ...content, text: e.target.value })}
-        />
-        <button
-          onClick={onDelete}
-          className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 translate-x-1/2 -translate-y-1/2 rounded-full h-5 w-5 bg-red-500"
-        >
-          <Plus size={15} color="#fff" className="mx-auto rotate-45" />
-        </button>
-      </div>
-    );
-  }
+  const [isFocused, setFocused] = useState(false);
 
-  if (content.type === "equation") {
-    return (
-      <div className="group relative">
-        <textarea
-          placeholder="Type your equation in LaTex format here"
-          value={content.equation || ""}
-          className={`bg-transparent w-full h-fit overflow-hidden whitespace-normal border-transparent border-dashed border-2 rounded-md p-2 focus:border-black outline-none`}
-          onChange={(e) => onUpdate({ ...content, equation: e.target.value })}
-        />
-        <Image
-          src={`https://latex.codecogs.com/svg.image?${content.equation}`}
-          width={200}
-          height={25}
-          alt={content.equation || "Equation"}
-        />
-      </div>
-    );
-  }
+  if (content.type === "image") return null; // TODO
 
-  return null; // Extend here for other content types like images or equations.
+  return (
+    <div
+      className={`group relative border-2 border-dashed rounded-lg transition-colors ${
+        isFocused
+          ? "border-black shadow-md"
+          : "border-neutral-300 hover:border-neutral-500"
+      }`}
+    >
+      {content.type === "text" && (
+        <>
+          <button onClick={() => setFocused(true)}>
+            <p
+              className={`bg-transparent whitespace-normal px-3 py-1 ${
+                content.heading === "title" && "text-2xl font-semibold"
+              } ${content.heading === "subtitle" && "text-xl font-medium"}`}
+            >
+              {content.text || ""}
+            </p>
+          </button>
+          {isFocused && (
+            <textarea
+              value={content.text || ""}
+              autoFocus
+              className={`absolute z-40 top-full left-0 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              onChange={(e) => onUpdate({ ...content, text: e.target.value })}
+            />
+          )}
+        </>
+      )}
+
+      {content.type === "equation" && (
+        <>
+          {isFocused && (
+            <textarea
+              placeholder="Type your equation in LaTex format here"
+              autoFocus
+              autoCorrect="false"
+              autoComplete="false"
+              value={content.equation || ""}
+              onBlur={() => setFocused(false)}
+              wrap="hard"
+              rows={2}
+              className={`absolute z-40 top-full mt-2 bg-white rounded-lg w-full h-fit overflow-y-scroll p-2`}
+              onChange={(e) =>
+                onUpdate({ ...content, equation: e.target.value })
+              }
+            />
+          )}
+          <button
+            onClick={() => setFocused(true)}
+            className="w-full py-2 grid place-content-center"
+          >
+            <Image
+              src={`https://latex.codecogs.com/svg.image?${content.equation}`}
+              width={200}
+              height={25}
+              className="w-fullrounded-none"
+              alt={content.equation || "Equation preview"}
+            />
+          </button>
+        </>
+      )}
+
+      <button
+        onClick={onDelete}
+        className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 translate-x-1/2 -translate-y-1/2 rounded-full h-5 w-5 bg-red-500"
+      >
+        <Plus size={15} color="#fff" className="mx-auto rotate-45" />
+      </button>
+    </div>
+  );
 }
