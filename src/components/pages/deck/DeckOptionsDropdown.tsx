@@ -14,6 +14,7 @@ import {
   ModalFooter,
 } from "@nextui-org/react";
 import { Deck } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { MoreVertical, Edit2, Trash, EyeOff, Eye } from "react-feather";
@@ -39,7 +40,7 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
     } finally {
       onClose();
       setLoading(false);
-      refresh();
+      revalidatePath(`/deck/${deck.id}`);
     }
   };
 
@@ -58,22 +59,19 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
     } finally {
       onClose();
       setLoading(false);
-      refresh();
+      revalidatePath(`/deck/${deck.id}`);
     }
   };
 
   const handleToggleVisibility = async () => {
     setLoading(true);
     try {
-      await fetch(
-        `/api/deck?id=${deck.id}&action=toggle-visibility`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      await fetch(`/api/deck?id=${deck.id}&action=toggle-visibility`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
     } finally {
       onClose();
       setLoading(false);

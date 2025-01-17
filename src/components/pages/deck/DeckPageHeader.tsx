@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { Play, Shuffle } from "react-feather";
 import { DeckOptionsDropdown } from "./DeckOptionsDropdown";
 import { useRouter } from "next/navigation";
-import { Tooltip } from "@nextui-org/react";
+import { Chip, Tooltip } from "@nextui-org/react";
 
 export function DeckPageHeader({ deck }: { deck: Deck }) {
   const { push } = useRouter();
@@ -40,7 +40,12 @@ export function DeckPageHeader({ deck }: { deck: Deck }) {
         </div>
       </div>
       <div className="flex justify-between items-center gap-4">
-        <h1 className="text-2xl font-semibold">{deck.title}</h1>
+        <div className="flex gap-2 items-center">
+          <h1 className="text-2xl font-semibold">{deck.title}</h1>
+          <Chip size="sm" variant="bordered">
+            {deck.isPublic ? "Public" : "Private"}
+          </Chip>
+        </div>
         <DeckOptionsDropdown deck={deck} />
       </div>
     </header>

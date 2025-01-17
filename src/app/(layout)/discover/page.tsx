@@ -5,7 +5,7 @@ export default async function DiscoverPage() {
   const decks = await prisma.deck.findMany({
     where: { isPublic: true, cards: { isEmpty: false } },
     orderBy: { createdAt: "desc" },
-    take: 100,
+    take: 20,
   });
 
   return (
@@ -17,7 +17,7 @@ export default async function DiscoverPage() {
             <Link
               key={deck.id}
               href={`/play/${deck.id}`}
-              className={`aspect-square h-40 flex items-end justify-start text-left border border-neutral-200 bg-opacity-10 bg-${deck.theme}-500 rounded-xl p-3 hover:bg-opacity-30 transition-colors`}
+              className={`aspect-square w-full flex items-end justify-start text-left border border-neutral-200 bg-opacity-10 bg-${deck.theme}-500 rounded-xl p-3 hover:bg-opacity-30 transition-colors`}
             >
               <span className="text-sm leading-4 font-medium">
                 {deck.title}
