@@ -255,7 +255,7 @@ const ActionButton = ({
     } ${
       disabled
         ? "scale-85 grayscale cursor-default"
-        : "md:hover:-translate-y-6 md:active:scale-95"
+        : "md:hover:-translate-y-6 active:scale-95"
     } rounded-t-full border-2 border-dashed border-neutral-300 transition-all shadow-xl`}
   >
     <div
