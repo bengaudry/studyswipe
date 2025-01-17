@@ -40,8 +40,8 @@ export function DeckPageHeader({ deck }: { deck: Deck }) {
         </div>
       </div>
       <div className="flex justify-between items-center gap-4">
-        <div className="flex gap-2 items-center">
-          <h1 className="text-2xl font-semibold">{deck.title}</h1>
+        <div className="flex gap-1 sm:gap-2 items-center">
+          <h1 className="text-xl sm:text-2xl font-semibold">{deck.title}</h1>
           <Chip size="sm" variant="bordered">
             {deck.isPublic ? "Public" : "Private"}
           </Chip>
