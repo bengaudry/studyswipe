@@ -40,13 +40,32 @@ export function AppNavbar() {
       </NavbarContent>
       <NavbarMenu>
         <NavbarMenuItem>
-          <Link href="/" className="w-full" color="foreground" size="lg">Discover</Link>
+          <Link
+            href="/"
+            className="w-full text-center"
+            color="foreground"
+            size="lg"
+          >
+            Discover
+          </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <Link href="/decks" className="w-full" color="foreground" size="lg">My collections</Link>
+          <Link
+            href="/decks"
+            className="w-full text-center"
+            color="foreground"
+            size="lg"
+          >
+            My collections
+          </Link>
         </NavbarMenuItem>
         <NavbarMenuItem>
-          <ProfileButton />
+          <ProfileButton
+            className="w-full"
+            size="lg"
+            variant="solid"
+            onPress={() => setIsMenuOpen(false)}
+          />
         </NavbarMenuItem>
       </NavbarMenu>
     </Navbar>

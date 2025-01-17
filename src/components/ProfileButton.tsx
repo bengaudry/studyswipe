@@ -1,11 +1,11 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { Button } from "@nextui-org/button";
+import { Button, ButtonProps } from "@nextui-org/button";
 import { User } from "react-feather";
 import { useRouter } from "next/navigation";
 import { SkeletonLoader } from "./SkeletonLoader";
 
-export function ProfileButton() {
+export function ProfileButton({ onPress, ...props }: ButtonProps) {
   const { data: session } = useSession();
   const { push } = useRouter();
 
@@ -14,8 +14,12 @@ export function ProfileButton() {
       <Button
         variant="flat"
         color="primary"
-        onPress={() => push("/auth")}
+        onPress={(e) => {
+          push("/auth");
+          if (onPress) onPress(e);
+        }}
         startContent={<User size={20} />}
+        {...props}
       >
         Sign in
       </Button>
@@ -28,8 +32,12 @@ export function ProfileButton() {
     <Button
       variant="flat"
       color="primary"
-      onPress={() => push("/profile")}
+      onPress={(e) => {
+        push("/profile");
+        if (onPress) onPress(e);
+      }}
       startContent={<User size={20} />}
+      {...props}
     >
       Account
     </Button>
