@@ -90,8 +90,8 @@ export function NewCardModal({
       });
     } finally {
       setLoading(false);
-      refresh();
       onClose();
+      refresh();
     }
   };
 
@@ -435,6 +435,7 @@ function ContentElement({
 
       {content.type === "link" && (
         <Input
+          label="URL"
           placeholder="https://studyswipe.vercel.app/"
           value={content.href}
           classNames={{ inputWrapper: `bg-transparent focus:bg-white` }}

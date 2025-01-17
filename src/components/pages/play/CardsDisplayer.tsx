@@ -1,6 +1,6 @@
 "use client";
 import { shuffleArray } from "@/lib/arrays";
-import { Image } from "@nextui-org/react";
+import { Alert, Image } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
@@ -8,6 +8,7 @@ import { JSX, useState } from "react";
 import { Check, Play, Plus, RefreshCw, Shuffle } from "react-feather";
 import { useSearchParams } from "next/navigation";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
+import { p } from "framer-motion/client";
 
 function ContentElement({ content }: { content: FlashCardContentJSON }) {
   if (content.type === "text") {
@@ -51,7 +52,7 @@ function ContentElement({ content }: { content: FlashCardContentJSON }) {
     try {
       parsedUrl = new URL(content.href);
     } catch (err) {
-      return null;
+      return <Alert color="warning" title="An URL was hidden because it was invalid" />
     }
 
     return (
