@@ -29,6 +29,8 @@ export function AppNavbar() {
           <Link href="/discover" color="foreground">
             Discover
           </Link>
+        </NavbarItem>
+        <NavbarItem>
           <Link href="/decks" color="foreground">
             My collections
           </Link>
