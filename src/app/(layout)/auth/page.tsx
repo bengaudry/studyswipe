@@ -1,5 +1,5 @@
 "use client";
-import { authErrorToMessage } from "@/lib/authErrors";
+import { authErrorToMessage } from "@/lib/errorHandling/authErrors";
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
 import { Alert } from "@nextui-org/react";

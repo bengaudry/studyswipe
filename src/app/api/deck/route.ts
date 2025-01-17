@@ -1,38 +1,28 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
   try {
     const body = await req.json();
-    console.log(body);
 
-    if (
-      !body ||
-      typeof body !== "object" ||
-      !body.title ||
-      !body.collectionId
-    ) {
-      return NextResponse.json(
-        {
-          error: {
-            message: "Invalid payload. Title and collection id are required.",
-          },
-        },
-        { status: 400 }
+    if (!body || typeof body !== "object" || !body.title || !body.collectionId)
+      return serverError(
+        "invalid-payload",
+        "Missing properties: <title> <collectionId>"
       );
-    }
 
     const collection = await prisma.collection.findUnique({
       where: { id: body.collectionId },
     });
 
-    if (collection === null) {
-      return NextResponse.json(
-        { error: { message: "Collection does not exist" } },
-        { status: 401 }
-      );
-    }
+    if (collection === null) return serverError("invalid-collectionid");
+
+    const session = await auth();
+    if (session?.user?.id !== collection.ownerId)
+      return serverError("unauthorized");
 
     await prisma.deck.create({
       data: {
@@ -44,69 +34,59 @@ export const POST = async (req: NextRequest) => {
       },
     });
 
-    return NextResponse.json(null, { status: 200 });
+    return serverOk();
   } catch (err) {
-    console.error("Error while adding deck :\n", err);
-    return NextResponse.json(
-      { error: { message: "failed-adding-to-db" } },
-      { status: 501 }
-    );
+    return serverError("internal-server-error", err);
   }
 };
 
 export const PATCH = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
-    const action = params.get("action");
     const id = params.get("id");
+    if (!id)
+      return serverError("missing-parameters", "Parameter missing: <id>");
 
-    if (!action || !id) {
-      return NextResponse.json(
-        { error: { message: "Properties action, id are needed" } },
-        { status: 400 }
-      );
-    }
+    const action = params.get("action");
+    if (!action)
+      return serverError("missing-parameters", "Parameter missing: <action>");
+
+    const prevDeckValue = await prisma.deck.findUnique({ where: { id } });
+    if (prevDeckValue === null) return serverError("invalid-deckid");
+
+    const session = await auth();
+    if (session?.user?.id !== prevDeckValue.ownerId)
+      return serverError("unauthorized");
 
     if (action === "rename") {
       const newtitle = params.get("newtitle");
 
-      if (!newtitle) {
-        return NextResponse.json(
-          { error: { message: "Property newtitle needed" } },
-          { status: 400 }
+      if (!newtitle)
+        return serverError(
+          "missing-parameters",
+          "Parameter missing: <newtitle>"
         );
-      }
 
       await prisma.deck.update({
         where: { id },
         data: { title: newtitle },
       });
+
+      return serverOk();
     }
 
     if (action === "toggle-visibility") {
-      const prev = await prisma.deck.findUnique({ where: { id } });
-
-      if (prev === null)
-        return NextResponse.json(
-          {
-            error: { message: "Deck not found in db" },
-          },
-          { status: 401 }
-        );
-
       await prisma.deck.update({
         where: { id },
-        data: { isPublic: !prev.isPublic },
+        data: { isPublic: !prevDeckValue.isPublic },
       });
+
+      return serverOk();
     }
 
-    return NextResponse.json(null, { status: 200 });
+    return serverError("invalid-patch-action");
   } catch (err) {
-    console.error("Error while deleting deck :\n", err);
-    return NextResponse.json(
-      { error: { message: "failed-adding-to-db" } },
-      { status: 501 }
-    );
+    return serverError("internal-server-error", err);
   }
 };
 
@@ -114,22 +94,20 @@ export const DELETE = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
     const id = params.get("id");
+    if (!id)
+      return serverError("missing-parameters", "Parameter missing: <id>");
 
-    if (!id) {
-      return NextResponse.json(
-        { error: { message: "missing-parameters" } },
-        { status: 400 }
-      );
-    }
+    const prevDeck = await prisma.deck.findFirst({ where: { id } });
+    if (prevDeck === null) return serverError("invalid-deckid");
+
+    const session = await auth();
+    if (session?.user?.id !== prevDeck.ownerId)
+      return serverError("unauthorized");
 
     await prisma.deck.delete({ where: { id } });
 
-    return NextResponse.json(null, { status: 200 });
+    return serverOk();
   } catch (err) {
-    console.error("Error while deleting category :\n", err);
-    return NextResponse.json(
-      { error: { message: "failed-adding-to-db" } },
-      { status: 501 }
-    );
+    return serverError("internal-server-error", err);
   }
 };

@@ -1,59 +1,41 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
+import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
+import { auth } from "@/lib/auth";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
     const deckid = params.get("deckid");
-
     if (!deckid)
-      return NextResponse.json(
-        { error: { message: "Deck id missing " } },
-        { status: 400 }
-      );
+      return serverError("missing-parameters", "Parameter missing: <deckid>");
 
     const body = await req.json();
-    console.log(body);
 
-    if (!body || typeof body !== "object" || !body.question || !body.answer) {
-      return NextResponse.json(
-        {
-          error: {
-            message: "Invalid payload. Card is not in the correct format.",
-          },
-        },
-        { status: 400 }
+    if (!body || typeof body !== "object" || !body.question || !body.answer)
+      return serverError(
+        "invalid-payload",
+        "Missing properties: <question> <answer>"
       );
-    }
 
-    const deck = await prisma.deck.findFirst({
-      where: {
-        id: deckid,
-      },
-    });
+    const deck = await prisma.deck.findUnique({ where: { id: deckid } });
+    if (!deck) return serverError("invalid-deckid");
 
-    if (!deck)
-      return NextResponse.json(
-        { error: { message: "Deck does not exist" } },
-        { status: 400 }
-      );
+    const session = await auth();
+    if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const cards = deck.cards as FlashCard[];
-    cards.push(body);
+    cards.push({ question: body.question, answer: body.answer });
 
     await prisma.deck.update({
       where: { id: deckid },
-      data: { ...deck, cards },
+      data: { ...deck, cards, updatedAt: new Date() },
     });
 
-    return NextResponse.json(null, { status: 200 });
+    return serverOk();
   } catch (err) {
-    console.error("Error while adding category :\n", err);
-    return NextResponse.json(
-      { error: { message: "failed-adding-to-db" } },
-      { status: 501 }
-    );
+    return serverError("internal-server-error", err);
   }
 };
 
@@ -61,40 +43,28 @@ export const PATCH = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
     const deckid = params.get("deckid");
-    const cardindex = params.get("cardindex");
+    if (!deckid)
+      return serverError("missing-parameters", "Parameter missing: <deckid>");
 
-    if (!deckid || !cardindex) {
-      return NextResponse.json(
-        { error: { message: "Paramz deckid, cardindex are missing" } },
-        { status: 400 }
+    const cardindex = params.get("cardindex");
+    if (!cardindex)
+      return serverError(
+        "missing-parameters",
+        "Parameter missing: <cardindex>"
       );
-    }
 
     const body = await req.json();
-
-    if (!body || typeof body !== "object" || !body.question || !body.answer) {
-      return NextResponse.json(
-        {
-          error: {
-            message: "Invalid payload. Card is not in the correct format.",
-          },
-        },
-        { status: 400 }
+    if (!body || typeof body !== "object" || !body.question || !body.answer)
+      return serverError(
+        "invalid-payload",
+        "Properties missing: <question> <answer>"
       );
-    }
 
-    const deck = await prisma.deck.findFirst({
-      where: {
-        id: deckid,
-      },
-    });
+    const deck = await prisma.deck.findUnique({ where: { id: deckid } });
+    if (!deck) return serverError("invalid-deckid");
 
-    if (!deck) {
-      return NextResponse.json(
-        { error: { message: "Deck does not exist" } },
-        { status: 400 }
-      );
-    }
+    const session = await auth();
+    if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const newCards: FlashCard[] = (deck.cards as FlashCard[]).map(
       (card, idx) => {
@@ -107,16 +77,12 @@ export const PATCH = async (req: NextRequest) => {
 
     await prisma.deck.update({
       where: { id: deck.id },
-      data: { ...deck, cards: newCards },
+      data: { ...deck, cards: newCards, updatedAt: new Date() },
     });
 
-    return NextResponse.json(null, { status: 200 });
+    return serverOk();
   } catch (err) {
-    console.error("Error while adding category :\n", err);
-    return NextResponse.json(
-      { error: { message: "failed-changing-card-data" } },
-      { status: 501 }
-    );
+    return serverError("internal-server-error", err);
   }
 };
 
@@ -124,44 +90,32 @@ export const DELETE = async (req: NextRequest) => {
   const params = req.nextUrl.searchParams;
   try {
     const deckid = params.get("deckid");
+    if (!deckid)
+      return serverError("missing-parameters", "Parameter missing: <deckid>");
+
     const cardindex = params.get("cardindex");
-
-    if (!deckid || !cardindex) {
-      return NextResponse.json(
-        { error: { message: "Paramz deckid, cardindex are missing" } },
-        { status: 400 }
+    if (!cardindex)
+      return serverError(
+        "missing-parameters",
+        "Parameter missing: <cardindex>"
       );
-    }
 
-    const deck = await prisma.deck.findFirst({
-      where: {
-        id: deckid,
-      },
-    });
+    const deck = await prisma.deck.findUnique({ where: { id: deckid } });
+    if (!deck) return serverError("invalid-deckid");
 
-    if (!deck) {
-      return NextResponse.json(
-        { error: { message: "Deck does not exist" } },
-        { status: 400 }
-      );
-    }
+    const session = await auth();
+    if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
-    console.log("Deck cards :", deck.cards);
-    const newCards = (deck.cards as FlashCard[])
+    const newCards = deck.cards as FlashCard[];
     newCards.splice(parseInt(cardindex), 1);
-    console.log("New cards :", newCards);
 
     await prisma.deck.update({
       where: { id: deck.id },
-      data: { ...deck, cards: newCards },
+      data: { ...deck, cards: newCards, updatedAt: new Date() },
     });
 
-    return NextResponse.json(null, { status: 200 });
+    return serverOk();
   } catch (err) {
-    console.error("Error while deleting card :\n", err);
-    return NextResponse.json(
-      { error: { message: "failed-deleting-card-from-db" } },
-      { status: 501 }
-    );
+    return serverError("internal-server-error", err);
   }
 };
