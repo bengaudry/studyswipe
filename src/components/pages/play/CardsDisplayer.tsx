@@ -6,6 +6,7 @@ import { Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
 import { JSX, useState } from "react";
 import { Check, Play, Plus, RefreshCw, Shuffle } from "react-feather";
+import { useSearchParams } from "next/navigation";
 
 function ContentElement({ content }: { content: FlashCardContentJSON }) {
   if (content.type === "text") {
@@ -63,14 +64,14 @@ function FlashcardPreview({
 export function CardsDisplayer({
   deckCards,
   deckTheme,
-  randomize,
 }: {
   deckCards: FlashCard[];
   deckTheme: string;
-  randomize?: boolean;
 }) {
+  const searchParams = useSearchParams();
+  const randomize = searchParams.get("random");
   const [cards, setCards] = useState(
-    randomize ? shuffleArray(deckCards) : deckCards
+    randomize === "true" ? shuffleArray(deckCards) : deckCards
   );
   const [skippedCards, setSkippedCards] = useState<FlashCard[]>([]);
   const [animPlaying, setAnimPlaying] = useState(false);

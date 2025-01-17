@@ -4,10 +4,8 @@ import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
 
 export default async function PlayPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ deckid: string }>;
-  searchParams?: { [key: string]: string | string[] | undefined };
 }) {
   const deck = await prisma.deck.findUnique({
     where: { id: (await params).deckid },
@@ -26,7 +24,6 @@ export default async function PlayPage({
       <CardsDisplayer
         deckCards={cards}
         deckTheme={deck.theme}
-        randomize={searchParams?.["random"] === "true"}
       />
     </div>
   );
