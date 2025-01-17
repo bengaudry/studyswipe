@@ -1,8 +1,6 @@
-import { NewCardModal } from "@/components/pages/deck/NewCardModal";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { DeckPageHeader } from "@/components/pages/deck/DeckPageHeader";
-import { CardPreview } from "@/components/pages/deck/CardPreview";
 import { DeckPageBody } from "@/components/pages/deck/DeckPageBody";
 
 export default async function DeckPage({

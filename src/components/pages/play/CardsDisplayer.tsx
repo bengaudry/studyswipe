@@ -63,11 +63,15 @@ function FlashcardPreview({
 export function CardsDisplayer({
   deckCards,
   deckTheme,
+  randomize,
 }: {
   deckCards: FlashCard[];
   deckTheme: string;
+  randomize?: boolean;
 }) {
-  const [cards, setCards] = useState(deckCards);
+  const [cards, setCards] = useState(
+    randomize ? shuffleArray(deckCards) : deckCards
+  );
   const [skippedCards, setSkippedCards] = useState<FlashCard[]>([]);
   const [animPlaying, setAnimPlaying] = useState(false);
 
