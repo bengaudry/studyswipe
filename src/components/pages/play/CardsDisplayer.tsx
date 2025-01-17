@@ -1,6 +1,6 @@
 "use client";
 import { shuffleArray } from "@/lib/arrays";
-import { Image } from "@nextui-org/react";
+import { Image, Link } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
@@ -30,6 +30,42 @@ function ContentElement({ content }: { content: FlashCardContentJSON }) {
         height={25}
         alt={content.equation || "Equation"}
       />
+    );
+  }
+
+  if (content.type === "quote") {
+    return (
+      <p
+        className={`bg-transparent whitespace-normal px-3 py-1 font-["Imperial_Script",sans-serif] font-medium text-4xl`}
+      >
+        {"« "}
+        {content.content || "Your quote here"}
+        {" »"}
+      </p>
+    );
+  }
+
+  if (content.type === "link") {
+    const parsedUrl = new URL(content.href);
+
+    return (
+      <a
+        href={content.href}
+        target="_blank"
+        className="text-blue-600 underline underline-offset-2"
+        onClick={(e) => {
+          e.preventDefault();
+          if (
+            confirm(
+              "Links are not verified by Studyswipe. Please be sure of what you are doing. Studyswipe will take no responsibility in case of any problem related to this link."
+            )
+          ) {
+            window.open(content.href, "_blank");
+          }
+        }}
+      >
+        {parsedUrl.hostname}
+      </a>
     );
   }
 

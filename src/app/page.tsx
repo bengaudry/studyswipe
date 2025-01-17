@@ -34,11 +34,11 @@ export default function LandingPage() {
         </div>
 
         <Plus
-          className=" absolute top-6 left-6 rotate-[60deg] text-secondary-500 blur-sm"
+          className=" absolute top-6 left-6 rotate-[60deg] text-secondary-200 blur-sm"
           size={200}
         />
         <Check
-          className="absolute -rotate-12 bottom-6 right-6 text-secondary-500 blur-sm"
+          className="absolute -rotate-12 bottom-6 right-6 text-secondary-200 blur-sm"
           size={200}
         />
       </section>

@@ -14,12 +14,20 @@ import {
   Tab,
   Tabs,
   useDisclosure,
-  Image
+  Image,
+  Input,
 } from "@nextui-org/react";
 import { clsx } from "clsx";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Plus, Image as ImageIcon, Type, Zap } from "react-feather";
+import {
+  Plus,
+  Image as ImageIcon,
+  Type,
+  Zap,
+  Feather,
+  Link2,
+} from "react-feather";
 
 /** Provide `card` if this if for editing the card */
 export function NewCardModal({
@@ -299,6 +307,20 @@ function AddElementDropdown({
         >
           Equation
         </DropdownItem>
+        <DropdownItem
+          key="quote"
+          startContent={<Feather />}
+          onPress={() => onAdd({ type: "quote", content: "" })}
+        >
+          Quote
+        </DropdownItem>
+        <DropdownItem
+          key="link"
+          startContent={<Link2 />}
+          onPress={() => onAdd({ type: "link", href: "" })}
+        >
+          Link (soon)
+        </DropdownItem>
         <DropdownItem key="image" startContent={<ImageIcon />}>
           Image (soon)
         </DropdownItem>
@@ -341,12 +363,38 @@ function ContentElement({
           </button>
           {isFocused && (
             <textarea
-              value={content.text || ""}
+              value={content.text || "Your text here"}
               autoFocus
               className={`absolute z-40 top-full left-0 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               onChange={(e) => onUpdate({ ...content, text: e.target.value })}
+            />
+          )}
+        </>
+      )}
+
+      {content.type === "quote" && (
+        <>
+          <button onClick={() => setFocused(true)}>
+            <p
+              className={`bg-transparent whitespace-normal px-3 py-1 font-["Imperial_Script",sans-serif] font-medium text-4xl`}
+            >
+              {"« "}
+              {content.content || "Your quote here"}
+              {" »"}
+            </p>
+          </button>
+          {isFocused && (
+            <textarea
+              value={content.content || ""}
+              autoFocus
+              className={`absolute z-40 top-full left-0 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setFocused(false)}
+              onChange={(e) =>
+                onUpdate({ ...content, content: e.target.value })
+              }
             />
           )}
         </>
@@ -383,6 +431,16 @@ function ContentElement({
             />
           </button>
         </>
+      )}
+
+      {content.type === "link" && (
+        <Input
+          placeholder="https://studyswipe.vercel.app/"
+          value={content.href}
+          classNames={{ inputWrapper: `bg-transparent focus:bg-white` }}
+          className="text-blue-500"
+          onChange={(e) => onUpdate({ ...content, href: e.target.value })}
+        />
       )}
 
       <button
