@@ -1,6 +1,6 @@
 "use client";
 import { shuffleArray } from "@/lib/arrays";
-import { Image, Link } from "@nextui-org/react";
+import { Image } from "@nextui-org/react";
 import { Button } from "@nextui-org/button";
 import { Tooltip } from "@nextui-org/react";
 import clsx from "clsx";
@@ -46,7 +46,13 @@ function ContentElement({ content }: { content: FlashCardContentJSON }) {
   }
 
   if (content.type === "link") {
-    const parsedUrl = new URL(content.href);
+    let parsedUrl: URL | null;
+
+    try {
+      parsedUrl = new URL(content.href);
+    } catch (err) {
+      return null;
+    }
 
     return (
       <a
