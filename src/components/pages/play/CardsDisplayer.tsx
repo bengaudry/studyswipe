@@ -218,7 +218,7 @@ const CardElement = ({
   return (
     <button
       onClick={onFlip}
-      className="w-full h-full hover:scale-95 opacity-100 scale-100 transition-all"
+      className="w-full h-full md:hover:scale-95 opacity-100 scale-100 transition-all"
     >
       <FlashcardPreview
         content={content.question}
@@ -255,7 +255,7 @@ const ActionButton = ({
     } ${
       disabled
         ? "scale-85 grayscale cursor-default"
-        : "hover:-translate-y-6 active:scale-95"
+        : "md:hover:-translate-y-6 md:active:scale-95"
     } rounded-t-full border-2 border-dashed border-neutral-300 transition-all shadow-xl`}
   >
     <div
