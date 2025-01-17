@@ -1,7 +1,7 @@
-import { Spinner } from "@nextui-org/react";
+import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
 
 export default function Loader () {
     return <div className="grid place-content-center w-full h-full">
-        <Spinner />
+        <CardsDisplayer deckCards={undefined} deckTheme="neutral" />
     </div>
 }

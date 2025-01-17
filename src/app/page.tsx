@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight, Check, Plus } from "react-feather";
 
-export default function Home() {
+export default function LandingPage() {
   const { push } = useRouter();
 
   return (
@@ -34,11 +34,11 @@ export default function Home() {
         </div>
 
         <Plus
-          className=" absolute top-6 left-6 rotate-[60deg] text-red-500 blur-sm"
+          className=" absolute top-6 left-6 rotate-[60deg] text-secondary-500 blur-sm"
           size={200}
         />
         <Check
-          className="absolute -rotate-12 bottom-6 right-6 text-green-500 blur-sm"
+          className="absolute -rotate-12 bottom-6 right-6 text-secondary-500 blur-sm"
           size={200}
         />
       </section>

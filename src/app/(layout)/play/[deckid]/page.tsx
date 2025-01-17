@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
+import { wait } from "@/lib/time";
 
 export default async function PlayPage({
   params,

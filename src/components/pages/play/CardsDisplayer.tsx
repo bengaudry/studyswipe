@@ -7,6 +7,7 @@ import clsx from "clsx";
 import { JSX, useState } from "react";
 import { Check, Play, Plus, RefreshCw, Shuffle } from "react-feather";
 import { useSearchParams } from "next/navigation";
+import { SkeletonLoader } from "@/components/SkeletonLoader";
 
 function ContentElement({ content }: { content: FlashCardContentJSON }) {
   if (content.type === "text") {
@@ -61,17 +62,18 @@ function FlashcardPreview({
   );
 }
 
+/** If deckCards === undefined, this means the UI is loading */
 export function CardsDisplayer({
   deckCards,
   deckTheme,
 }: {
-  deckCards: FlashCard[];
+  deckCards: FlashCard[] | undefined;
   deckTheme: string;
 }) {
   const searchParams = useSearchParams();
   const randomize = searchParams.get("random");
-  const [cards, setCards] = useState(
-    randomize === "true" ? shuffleArray(deckCards) : deckCards
+  const [cards, setCards] = useState<FlashCard[]>(
+    randomize === "true" ? shuffleArray(deckCards ?? []) : deckCards ?? []
   );
   const [skippedCards, setSkippedCards] = useState<FlashCard[]>([]);
   const [animPlaying, setAnimPlaying] = useState(false);
@@ -120,7 +122,7 @@ export function CardsDisplayer({
         <Tooltip content="Restart" placement="right">
           <button
             onClick={() => {
-              setCards(deckCards);
+              setCards(deckCards ?? []);
               setSkippedCards([]);
             }}
             className="block p-3 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
@@ -135,7 +137,9 @@ export function CardsDisplayer({
           animPlaying ? "animate-next-card" : ""
         } relative w-full aspect-square max-w-80 mx-auto`}
       >
-        {cards.length > 0 ? (
+        {deckCards === undefined ? (
+          <SkeletonLoader className="rounded-lg w-full h-full absolute inset-0 shadow-xl" />
+        ) : cards.length > 0 ? (
           <CardElement
             content={cards[0]}
             faceShowed={faceShowed}
@@ -160,7 +164,7 @@ export function CardsDisplayer({
                 color="primary"
                 startContent={<RefreshCw />}
                 onPress={() => {
-                  setCards(deckCards);
+                  setCards(deckCards ?? []);
                   setSkippedCards([]);
                 }}
               >
