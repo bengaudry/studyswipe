@@ -363,7 +363,7 @@ function ContentElement({
           </button>
           {isFocused && (
             <textarea
-              value={content.text || "Your text here"}
+              value={content.text || ""}
               autoFocus
               className={`absolute z-40 top-full left-0 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
               onFocus={() => setFocused(true)}
