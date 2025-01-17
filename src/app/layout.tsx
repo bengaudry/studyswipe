@@ -13,6 +13,7 @@ import { ProfileButton } from "@/components/ProfileButton";
 import { PropsWithChildren } from "react";
 import "./globals.css";
 import { AppNavbar } from "@/components/AppNavbar";
+import { Analytics } from "@vercel/analytics/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased light`}
       >
+        <Analytics />
         <AppLayout>
           <AppNavbar />
           {children}
