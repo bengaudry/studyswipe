@@ -2,46 +2,52 @@
 import { Deck } from "@prisma/client";
 import { NewCardModal } from "./NewCardModal";
 import { CardPreview } from "./CardPreview";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useContext, useState } from "react";
+import { DeckDataContext } from "./DeckDataProvider";
 
-export function DeckPageBody({
-  deck,
-  cards,
-}: {
-  deck: Deck;
-  cards: FlashCard[];
-}) {
+export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
   const [cardToEdit, setCardToEdit] = useState<
     { data: FlashCard; index: number } | undefined
   >(undefined);
 
-  const { refresh } = useRouter();
+  const { data: deckState, updateDeckData } = useContext(DeckDataContext);
 
   const handleDeleteCard = async (cardindex: number) => {
+    const prevDeckState = deckState;
+
     try {
-      await fetch(`/api/card?deckid=${deck.id}&cardindex=${cardindex}`, {
+      updateDeckData((prev) => ({
+        ...prev,
+        cards: prev.cards.filter((_, index) => index !== cardindex),
+      }));
+      await fetch(`/api/card?deckid=${initialDeck.id}&cardindex=${cardindex}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
       });
-    } finally {
-      refresh();
+    } catch (err) {
+      if (prevDeckState) updateDeckData(prevDeckState);
     }
   };
 
   return (
     <>
-      <NewCardModal deckid={deck.id} decktheme={deck.theme} card={cardToEdit} />
+      <NewCardModal
+        deckid={initialDeck.id}
+        decktheme={deckState?.theme ?? "neutral"}
+        card={cardToEdit}
+      />
 
-      {cards.map((card, idx) => (
+      {deckState?.cards.map((card, idx) => (
         <CardPreview
           key={idx}
-          card={card}
-          deckTheme={deck.theme}
+          card={card as FlashCard}
+          deckTheme={deckState?.theme}
           onAskDelete={() => handleDeleteCard(idx)}
-          onAskEdit={() => setCardToEdit({ data: card, index: idx })}
+          onAskEdit={() =>
+            setCardToEdit({ data: card as FlashCard, index: idx })
+          }
         />
       ))}
     </>

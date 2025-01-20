@@ -18,8 +18,13 @@ import {
   Input,
 } from "@nextui-org/react";
 import { clsx } from "clsx";
-import { useRouter } from "next/navigation";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import {
   Plus,
   Image as ImageIcon,
@@ -28,6 +33,7 @@ import {
   Feather,
   Link2,
 } from "react-feather";
+import { DeckDataContext } from "./DeckDataProvider";
 
 /** Provide `card` if this if for editing the card */
 export function NewCardModal({
@@ -39,17 +45,18 @@ export function NewCardModal({
   decktheme: string;
   card?: { data: FlashCard; index: number };
 }) {
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const { refresh } = useRouter();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(false);
 
+  const [current, setCurrent] = useState<"question" | "answer">("question");
   const [questionContent, setQuestionContent] = useState<
     FlashCardContentJSON[]
   >([]);
   const [answerContent, setAnswerContent] = useState<FlashCardContentJSON[]>(
     []
   );
-  const [current, setCurrent] = useState<"question" | "answer">("question");
+
+  const { data: deckData, updateDeckData } = useContext(DeckDataContext);
 
   useEffect(() => {
     if (card) {
@@ -59,23 +66,39 @@ export function NewCardModal({
     }
   }, [card]);
 
-  const handleCardChanges = async () => {
-    setLoading(true);
+  const createCard = async (cardBody: FlashCard) => {
+    const prevCardState = deckData;
     try {
-      // Create a card if we are creating a card
-      if (card === undefined) {
-        await fetch(`/api/card?deckid=${deckid}`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            question: questionContent,
-            answer: answerContent,
-          }),
-        });
-        return;
-      }
+      updateDeckData((prevDeck) => ({
+        ...prevDeck,
+        cards: [...prevDeck.cards, cardBody],
+      }));
+
+      await fetch(`/api/card?deckid=${deckid}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(cardBody),
+      });
+    } catch (err) {
+      if (prevCardState) updateDeckData(prevCardState);
+    }
+  };
+
+  const editCard = async (cardBody: FlashCard) => {
+    if (!card) return;
+    const prevDeckState = deckData;
+
+    try {
+      updateDeckData((prevDeck) => ({
+        ...prevDeck,
+        cards: [
+          ...prevDeck.cards.slice(0, card.index),
+          cardBody,
+          ...prevDeck.cards.slice(card.index + 1),
+        ],
+      }));
 
       // Edit the card otherwise
       await fetch(`/api/card?deckid=${deckid}&cardindex=${card.index}`, {
@@ -83,20 +106,35 @@ export function NewCardModal({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          question: questionContent,
-          answer: answerContent,
-        }),
+        body: JSON.stringify(cardBody),
       });
+    } catch (err) {
+      if (prevDeckState) updateDeckData(prevDeckState);
+    }
+  };
+
+  const handleCardChanges = async (onClose: () => void) => {
+    setLoading(true);
+    try {
+      const cardBody = {
+        question: questionContent,
+        answer: answerContent,
+      } as FlashCard;
+
+      // Create a card if we are creating a card
+      if (card === undefined) await createCard(cardBody);
+      else await editCard(cardBody);
     } finally {
       setLoading(false);
       onClose();
-      refresh();
+      setAnswerContent([]);
+      setQuestionContent([]);
+      setCurrent("question");
     }
   };
 
   return (
-    <>
+    <div>
       <Button
         variant="faded"
         className="w-full h-full aspect-square"
@@ -109,13 +147,18 @@ export function NewCardModal({
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
+        isKeyboardDismissDisabled
         placement="center"
-        classNames={{ body: cn("px-2 sm:px-6") }}
+        classNames={{
+          backdrop: !isOpen && "pointer-events-none",
+          body: isOpen ? "px-2 sm:px-6" : "pointer-events-none",
+          wrapper: !isOpen && "pointer-events-none",
+        }}
       >
         <ModalContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
+              <ModalHeader className="flex flex-col gap-1 data-[open=false]:pointer-events-none">
                 Create a new card
               </ModalHeader>
               <ModalBody>
@@ -183,7 +226,7 @@ export function NewCardModal({
                   }
                   color="primary"
                   isLoading={loading}
-                  onPress={handleCardChanges}
+                  onPress={() => handleCardChanges(onClose)}
                 >
                   {card ? "Edit card" : "Create card"}
                 </Button>
@@ -192,7 +235,7 @@ export function NewCardModal({
           )}
         </ModalContent>
       </Modal>
-    </>
+    </div>
   );
 }
 

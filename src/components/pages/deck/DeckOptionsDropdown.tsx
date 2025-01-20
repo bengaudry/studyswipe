@@ -16,8 +16,9 @@ import {
 import { Deck } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { MoreVertical, Edit2, Trash, EyeOff, Eye } from "react-feather";
+import { DeckDataContext } from "./DeckDataProvider";
 
 export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
   const [loading, setLoading] = useState(false);
@@ -25,6 +26,8 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
   const [modalType, setModalType] = useState<"rename" | "delete">("delete");
   const [newtitle, setNewtitle] = useState(deck.title ?? "");
   const { prefetch, replace, refresh } = useRouter();
+
+  const { data: deckState, updateDeckData } = useContext(DeckDataContext);
 
   const handleDeleteDeck = async () => {
     setLoading(true);
@@ -40,7 +43,6 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
     } finally {
       onClose();
       setLoading(false);
-      revalidatePath(`/deck/${deck.id}`);
     }
   };
 
@@ -56,22 +58,26 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
           },
         }
       );
+      updateDeckData((prev) => ({ ...prev, title: newtitle }));
     } finally {
       onClose();
       setLoading(false);
-      revalidatePath(`/deck/${deck.id}`);
     }
   };
 
   const handleToggleVisibility = async () => {
     setLoading(true);
+    const prevDeckState = deckState;
     try {
+      updateDeckData((prev) => ({ ...prev, isPublic: !prev.isPublic }));
       await fetch(`/api/deck?id=${deck.id}&action=toggle-visibility`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
       });
+    } catch (err) {
+      if (prevDeckState) updateDeckData(prevDeckState);
     } finally {
       onClose();
       setLoading(false);
@@ -101,12 +107,12 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
           <DropdownItem
             key="toggleVisibility"
             startContent={
-              deck.isPublic ? <EyeOff size={16} /> : <Eye size={16} />
+              deckState?.isPublic ? <EyeOff size={16} /> : <Eye size={16} />
             }
             showDivider
             onPress={handleToggleVisibility}
           >
-            {deck.isPublic ? "Make private" : "Make public"}
+            {deckState?.isPublic ? "Make private" : "Make public"}
           </DropdownItem>
           <DropdownItem
             key="delete"
