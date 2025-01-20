@@ -16,7 +16,7 @@ export default function ProfilePage() {
             src: session.user.image ?? undefined,
             fallback: (session.user.name ?? "-")[0],
           }}
-          name={session.user.name}
+          name={"@" + session.user.pseudo}
           description={session.user.email ?? undefined}
         />
         <SignOutBtn />

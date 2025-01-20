@@ -16,7 +16,7 @@ import {
 import { Collection } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Edit2, Eye, EyeOff, MoreVertical, Trash } from "react-feather";
+import { Edit2, MoreVertical, Trash } from "react-feather";
 
 export function CollectionOptionsDropdown({
   collection,
@@ -119,6 +119,7 @@ export function CollectionOptionsDropdown({
                     color="danger"
                     isLoading={loading}
                     onPress={handleDeleteCollection}
+                    startContent={!loading && <Trash size={16} />}
                   >
                     Delete collection
                   </Button>
