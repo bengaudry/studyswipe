@@ -98,26 +98,26 @@ export function CardsDisplayer() {
       updateSkippedCards((prev) => [...prev, currCard]);
     }
 
-    setAnimTimeouts((prev) => [
-      ...prev,
-      setTimeout(
-        () => {
-          updateCards((prev) => prev.slice(1));
-        },
-        prevCardsLength === 1
-          ? SWIPE_LAST_CARD_ANIM_DURATION
-          : (40 / 100) * SWIPE_CARD_ANIM_DURATION
-      ),
-    ]);
+    const updateCardsTimeoutRef = setTimeout(
+      () => {
+        updateCards((prev) => prev.slice(1));
+      },
+      prevCardsLength === 1
+        ? SWIPE_LAST_CARD_ANIM_DURATION
+        : (40 / 100) * SWIPE_CARD_ANIM_DURATION
+    );
+
+    const animParamsTimeoutRef = setTimeout(
+      () => setAnimParams({ isPlaying: false, type: "skip" }),
+      prevCardsLength === 1
+        ? SWIPE_LAST_CARD_ANIM_DURATION
+        : SWIPE_CARD_ANIM_DURATION
+    );
 
     setAnimTimeouts((prev) => [
       ...prev,
-      setTimeout(
-        () => setAnimParams({ isPlaying: false, type: "skip" }),
-        prevCardsLength === 1
-          ? SWIPE_LAST_CARD_ANIM_DURATION
-          : SWIPE_CARD_ANIM_DURATION
-      ),
+      updateCardsTimeoutRef,
+      animParamsTimeoutRef,
     ]);
   };
 
