@@ -17,6 +17,9 @@ type PlaygroundContextT = {
   updateSkippedCards: Dispatch<SetStateAction<FlashCard[]>>;
   theme: string;
   resetCardsToDefault: () => void;
+  counter: number;
+  resetCounter: () => void;
+  incrementCounter: () => void;
 };
 
 export const PlaygroundContext = createContext<PlaygroundContextT>({
@@ -27,6 +30,9 @@ export const PlaygroundContext = createContext<PlaygroundContextT>({
   updateSkippedCards: () => {},
   theme: "neutral;",
   resetCardsToDefault: () => {},
+  counter: 0,
+  resetCounter: () => {},
+  incrementCounter: () => {},
 });
 
 export type PlaygroundContextProps = PropsWithChildren<{
@@ -45,12 +51,20 @@ export const PlaygroundContextProvider = ({
   const [cards, setCards] = useState(
     randomize ? shuffleArray(initialCards) : initialCards
   );
+  const [counter, setCounter] = useState(0);
   const [skippedCards, setSkippedCards] = useState<FlashCard[]>([]);
 
+  /** Restarts the game */
   const resetCardsToDefault = () => {
     setSkippedCards([]);
     setCards(initialCards);
+    resetCounter();
   };
+
+  /** Resets the counter of cards swiped to 0 */
+  const resetCounter = () => setCounter(0);
+  /** Increments the counter of cards swiped by one */
+  const incrementCounter = () => setCounter((c) => c + 1);
 
   return (
     <PlaygroundContext.Provider
@@ -62,6 +76,9 @@ export const PlaygroundContextProvider = ({
         updateSkippedCards: setSkippedCards,
         theme,
         resetCardsToDefault,
+        counter,
+        resetCounter,
+        incrementCounter,
       }}
     >
       {children}

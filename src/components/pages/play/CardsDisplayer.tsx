@@ -66,6 +66,10 @@ export function CardsDisplayer() {
     updateCards,
     skippedCards,
     updateSkippedCards,
+    counter,
+    resetCounter,
+    incrementCounter,
+    initialCards,
   } = useContext(PlaygroundContext);
 
   const [animParams, setAnimParams] = useState<AnimParams>({
@@ -76,7 +80,7 @@ export function CardsDisplayer() {
   const [faceShowed, setFaceShowed] = useState<"question" | "answer">(
     "question"
   );
-
+  const [counterOutOf, setCounterOutOf] = useState(initialCards.length);
   const [animTimeouts, setAnimTimeouts] = useState<NodeJS.Timeout[]>([]);
 
   const clearTimeouts = () => {
@@ -103,6 +107,7 @@ export function CardsDisplayer() {
     const updateCardsTimeoutRef = setTimeout(
       () => {
         updateCards((prev) => prev.slice(1));
+        incrementCounter();
       },
       prevCardsLength === 1
         ? SWIPE_LAST_CARD_ANIM_DURATION
@@ -129,7 +134,9 @@ export function CardsDisplayer() {
 
   const playSkipped = () => {
     updateCards(skippedCards);
+    setCounterOutOf(skippedCards.length);
     updateSkippedCards([]);
+    resetCounter();
   };
 
   return (
@@ -141,6 +148,11 @@ export function CardsDisplayer() {
         onSkip={() => swipeCard("skip")}
         onValidate={() => swipeCard("validate")}
       >
+        {cards.length > 0 && (
+          <span className="absolute top-full mt-2 right-1 text-neutral-300">
+            {counter + 1}/{counterOutOf}
+          </span>
+        )}
         {cards.length > 0 ? (
           <CardElement
             content={cards[0]}
