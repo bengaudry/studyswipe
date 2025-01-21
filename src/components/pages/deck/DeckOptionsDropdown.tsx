@@ -25,6 +25,7 @@ import {
   Database,
 } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
+import { validateFlashCardArray } from "@/lib/cardObject";
 
 export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
   const [loading, setLoading] = useState(false);
@@ -229,6 +230,10 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
                     onPress={async () => {
                       try {
                         setLoading(true);
+                        const res = validateFlashCardArray(
+                          JSON.parse(generatedData)
+                        );
+                        if (typeof res === "string") throw res;
                         await fetch(`/api/fill`, {
                           method: "POST",
                           headers: {
@@ -236,14 +241,19 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
                           },
                           body: JSON.stringify({
                             deckId: deck.id,
-                            data: generatedData,
+                            data: res,
                           }),
                         });
-                      } finally {
                         updateDeckData((prev) => ({
                           ...prev,
-                          cards: Array.prototype.concat(deck.cards, JSON.parse(generatedData)),
+                          cards: Array.prototype.concat(
+                            deck.cards,
+                            JSON.parse(generatedData)
+                          ),
                         }));
+                      } catch (err) {
+                        alert("Error in data provided : " + err);
+                      } finally {
                         setLoading(false);
                         onClose();
                       }

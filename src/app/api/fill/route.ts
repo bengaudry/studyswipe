@@ -2,6 +2,7 @@ import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { validateFlashCardArray } from "@/lib/cardObject";
 
 export async function POST(req: NextRequest) {
   try {
@@ -22,9 +23,12 @@ export async function POST(req: NextRequest) {
     const session = await auth();
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
+    const res = validateFlashCardArray(body.data);
+    if (typeof res === "string") return serverError("invalid-payload", res);
+
     const newCards: FlashCard[] = Array.prototype.concat(
       deck.cards as FlashCard[],
-      JSON.parse(body.data) as FlashCard[]
+      res
     );
 
     await prisma.deck.update({
