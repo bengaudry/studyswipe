@@ -3,10 +3,9 @@ import { authErrorToMessage } from "@/lib/errorHandling/authErrors";
 import { Button } from "@nextui-org/button";
 import { Divider } from "@nextui-org/divider";
 import { Alert, Spinner } from "@nextui-org/react";
-import { div } from "framer-motion/client";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { GitHub } from "react-feather";
 
@@ -15,8 +14,11 @@ export default function AuthPage() {
   const authError = params.get("error");
   const [isLoading, setIsLoading] = useState(false);
 
+  const { prefetch } = useRouter();
+
   const handleSignInRequest = (provider: string) => {
     setIsLoading(true);
+    prefetch("/decks");
     signIn(provider, { redirectTo: "/decks" });
   };
 

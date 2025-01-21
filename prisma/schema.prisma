@@ -11,7 +11,7 @@ generator client {
 model User {
   id            String          @id @default(cuid())
   name          String?
-  pseudo        String          @default("unknown") @unique
+  pseudo        String?
   email         String          @unique
   emailVerified DateTime?
   image         String?
@@ -86,8 +86,8 @@ model Authenticator {
 
 // An object grouping Decks of cards
 model Collection {
-  id      String @unique @default(uuid())
-  ownerId String
+  id          String @unique @default(uuid())
+  ownerId     String
 
   title String
   decks Deck[]
@@ -115,5 +115,5 @@ model Deck {
   updatedAt DateTime @default(now())
 
   Collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  Owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade) // Relation to User
+  Owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade) // Relation to User
 }

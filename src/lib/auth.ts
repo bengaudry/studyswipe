@@ -28,6 +28,44 @@ export const authConfig: NextAuthConfig = {
     newUser: "/auth",
     error: "/auth",
   },
+  callbacks: {
+    async signIn({ user, profile }) {
+      try {
+        const dbUser = await prisma.user.findFirst({ where: { id: user.id } });
+        console.info("dbUser pseudo : ", dbUser?.pseudo);
+        if (!dbUser) return false;
+        if (
+          dbUser.pseudo === null ||
+          dbUser.pseudo === undefined ||
+          dbUser.pseudo === "unknown"
+        ) {
+          console.info("Generating pseudo for user...");
+          const pseudo = await generateUserPseudo(
+            user.name ?? profile?.preferred_username ?? profile?.nickname
+          );
+          console.info("Generated :", pseudo);
+          await prisma.user.update({
+            where: { id: user.id },
+            data: { pseudo },
+          });
+        }
+        return true;
+      } catch (err) {
+        return false;
+      }
+    },
+    async session({ session, user }) {
+      try {
+        const dbUser = await prisma.user.findFirst({ where: { id: user.id } });
+        console.info("Session fetched pseudo :", dbUser?.pseudo);
+        session.userPseudo = dbUser?.pseudo ?? undefined;
+        return session;
+      } catch (err) {
+        return session;
+      }
+    },
+  },
+
   session: {
     strategy: "database",
   },
