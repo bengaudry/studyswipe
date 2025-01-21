@@ -1,8 +1,8 @@
 "use client";
+import clsx from "clsx";
 import { BackButton } from "@/components/BackButton";
 import { Button } from "@nextui-org/button";
 import { Deck } from "@prisma/client";
-import clsx from "clsx";
 import { Play, Shuffle } from "react-feather";
 import { DeckOptionsDropdown } from "./DeckOptionsDropdown";
 import { useRouter } from "next/navigation";
@@ -12,7 +12,6 @@ import { DeckDataContext } from "./DeckDataProvider";
 
 export function DeckPageHeader({ deck }: { deck: Deck }) {
   const { push } = useRouter();
-
   const { data: deckState } = useContext(DeckDataContext);
 
   return (
