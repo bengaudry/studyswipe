@@ -15,9 +15,11 @@ const renderDecks = async (collectionId: string) => {
     <>
       <div className="flex flex-col gap-2 overflow-x-scroll px-6 pb-4 -mx-6">
         {decks.map((deck) => (
-          <div className="group flex items-center justify-between py-1 border-b">
+          <div
+            key={deck.id}
+            className="group flex items-center justify-between py-1 border-b"
+          >
             <Link
-              key={deck.id}
               href={`deck/${deck.id}`}
               className={`rounded-xl w-full p-2 transition-colors hover:bg-neutral-100`}
             >

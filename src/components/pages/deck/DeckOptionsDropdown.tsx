@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/react";
+import { Input, Textarea } from "@nextui-org/react";
 import {
   useDisclosure,
   Dropdown,
@@ -14,17 +14,26 @@ import {
   ModalFooter,
 } from "@nextui-org/react";
 import { Deck } from "@prisma/client";
-import { revalidatePath } from "next/cache";
 import { useRouter } from "next/navigation";
 import { useContext, useState } from "react";
-import { MoreVertical, Edit2, Trash, EyeOff, Eye } from "react-feather";
+import {
+  MoreVertical,
+  Edit2,
+  Trash,
+  EyeOff,
+  Eye,
+  Database,
+} from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
 
 export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
   const [loading, setLoading] = useState(false);
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const [modalType, setModalType] = useState<"rename" | "delete">("delete");
+  const [modalType, setModalType] = useState<"rename" | "delete" | "generate">(
+    "delete"
+  );
   const [newtitle, setNewtitle] = useState(deck.title ?? "");
+  const [generatedData, setGeneratedData] = useState("");
   const { prefetch, replace, refresh } = useRouter();
 
   const { data: deckState, updateDeckData } = useContext(DeckDataContext);
@@ -115,6 +124,17 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
             {deckState?.isPublic ? "Make private" : "Make public"}
           </DropdownItem>
           <DropdownItem
+            key="generateData"
+            startContent={<Database size={16} />}
+            showDivider
+            onPress={() => {
+              setModalType("generate");
+              onOpen();
+            }}
+          >
+            Import data
+          </DropdownItem>
+          <DropdownItem
             key="delete"
             className="text-danger"
             color="danger"
@@ -154,7 +174,7 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
                   </Button>
                 </ModalFooter>
               </>
-            ) : (
+            ) : modalType === "rename" ? (
               <>
                 <ModalHeader className="flex flex-col gap-1">
                   Rename deck
@@ -180,6 +200,56 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
                     onPress={handleRenameDeck}
                   >
                     Rename deck
+                  </Button>
+                </ModalFooter>
+              </>
+            ) : (
+              // Generate data modal
+              <>
+                <ModalHeader className="flex flex-col gap-1">
+                  Generate data
+                </ModalHeader>
+                <ModalBody>
+                  <Textarea
+                    label="Data"
+                    labelPlacement="outside"
+                    isRequired
+                    value={generatedData}
+                    onChange={(e) => setGeneratedData(e.target.value)}
+                    placeholder="Type your data here..."
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <Button color="primary" variant="flat" onPress={onClose}>
+                    Close
+                  </Button>
+                  <Button
+                    color="primary"
+                    isLoading={loading}
+                    onPress={async () => {
+                      try {
+                        setLoading(true);
+                        await fetch(`/api/fill`, {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                          },
+                          body: JSON.stringify({
+                            deckId: deck.id,
+                            data: generatedData,
+                          }),
+                        });
+                      } finally {
+                        updateDeckData((prev) => ({
+                          ...prev,
+                          cards: Array.prototype.concat(deck.cards, JSON.parse(generatedData)),
+                        }));
+                        setLoading(false);
+                        onClose();
+                      }
+                    }}
+                  >
+                    Post data
                   </Button>
                 </ModalFooter>
               </>

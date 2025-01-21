@@ -39,7 +39,7 @@ export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
         card={cardToEdit}
       />
 
-      {deckState?.cards.map((card, idx) => (
+      {deckState && deckState.cards.map((card, idx) => (
         <CardPreview
           key={idx}
           card={card as FlashCard}
