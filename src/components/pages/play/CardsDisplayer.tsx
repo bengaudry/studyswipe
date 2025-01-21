@@ -30,11 +30,13 @@ const AnimatedSwiperWrapper = ({
   onValidate,
 }: AnimatedSwiperWrapperProps) => {
   const { cards } = useContext(PlaygroundContext);
+
   const handlers = useSwipeable({
     onSwiped: (e) => {
       if (e.dir === "Left") onSkip();
       if (e.dir === "Right") onValidate();
     },
+    preventScrollOnSwipe: true,
   });
 
   return (
