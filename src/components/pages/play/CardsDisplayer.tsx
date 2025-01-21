@@ -32,7 +32,6 @@ const AnimatedSwiperWrapper = ({
   const { cards } = useContext(PlaygroundContext);
   const handlers = useSwipeable({
     onSwiped: (e) => {
-      console.info(e)
       if (e.dir === "Left") onSkip();
       if (e.dir === "Right") onValidate();
     },
@@ -76,31 +75,50 @@ export function CardsDisplayer() {
     "question"
   );
 
+  const [animTimeouts, setAnimTimeouts] = useState<NodeJS.Timeout[]>([]);
+
+  const clearTimeouts = () => {
+    animTimeouts.forEach((timeout, idx) => {
+      clearTimeout(timeout);
+      setAnimTimeouts((prev) => prev.filter((_, i) => i !== idx));
+    });
+    setAnimParams({ isPlaying: false, type: "skip" });
+  };
+
   const swipeCard = (action: "skip" | "validate") => {
+    clearTimeouts();
+    if (cards.length == 0) return;
+
     const currCard = cards[0];
     const prevCardsLength = cards.length;
     setFaceShowed("question");
     setAnimParams({ isPlaying: true, type: action });
 
-    if (action === "skip") {
+    if (action === "skip" && !skippedCards.includes(currCard)) {
       updateSkippedCards((prev) => [...prev, currCard]);
     }
 
-    setTimeout(
-      () => {
-        updateCards((prev) => prev.slice(1));
-      },
-      prevCardsLength === 1
-        ? SWIPE_LAST_CARD_ANIM_DURATION
-        : (40 / 100) * SWIPE_CARD_ANIM_DURATION
-    );
+    setAnimTimeouts((prev) => [
+      ...prev,
+      setTimeout(
+        () => {
+          updateCards((prev) => prev.slice(1));
+        },
+        prevCardsLength === 1
+          ? SWIPE_LAST_CARD_ANIM_DURATION
+          : (40 / 100) * SWIPE_CARD_ANIM_DURATION
+      ),
+    ]);
 
-    setTimeout(
-      () => setAnimParams({ isPlaying: false, type: "skip" }),
-      prevCardsLength === 1
-        ? SWIPE_LAST_CARD_ANIM_DURATION
-        : SWIPE_CARD_ANIM_DURATION
-    );
+    setAnimTimeouts((prev) => [
+      ...prev,
+      setTimeout(
+        () => setAnimParams({ isPlaying: false, type: "skip" }),
+        prevCardsLength === 1
+          ? SWIPE_LAST_CARD_ANIM_DURATION
+          : SWIPE_CARD_ANIM_DURATION
+      ),
+    ]);
   };
 
   const flipCard = () => {
