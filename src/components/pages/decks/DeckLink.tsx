@@ -95,16 +95,15 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
 
   return (
     <>
-      <Tooltip content="Create a deck of cards" placement="bottom">
-        <Button
-          variant="faded"
-          color="default"
-          className="w-8 h-40"
-          onPress={onOpen}
-        >
-          <Plus />
-        </Button>
-      </Tooltip>
+      <Button
+        variant="flat"
+        color="default"
+        className="w-full"
+        onPress={onOpen}
+        endContent={<Plus />}
+      >
+        New deck
+      </Button>
 
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
         <ModalContent>

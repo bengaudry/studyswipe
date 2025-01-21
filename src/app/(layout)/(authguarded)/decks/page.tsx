@@ -6,23 +6,42 @@ import { Divider } from "@nextui-org/react";
 import { CreateDeckButton } from "@/components/pages/decks/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/decks/CollectionOptionsDropdown";
 import { auth } from "@/lib/auth";
+import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({ where: { collectionId } });
 
   return (
     <>
-      <div className="flex gap-2 overflow-x-scroll px-6 pb-4 -mx-6">
-        <CreateDeckButton collectionId={collectionId} />
+      <div className="flex flex-col gap-2 overflow-x-scroll px-6 pb-4 -mx-6">
         {decks.map((deck) => (
-          <Link
-            key={deck.id}
-            href={`deck/${deck.id}`}
-            className={`aspect-square h-40 flex items-end justify-start text-left border border-neutral-200 bg-opacity-10 bg-${deck.theme}-500 rounded-xl p-3 hover:bg-opacity-30 transition-colors`}
-          >
-            <span className="text-sm leading-4 font-medium">{deck.title}</span>
-          </Link>
+          <div className="group flex items-center justify-between py-1 border-b">
+            <Link
+              key={deck.id}
+              href={`deck/${deck.id}`}
+              className={`rounded-xl w-full p-2 transition-colors hover:bg-neutral-100`}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={`w-8 h-8 bg-${deck.theme}-500 bg-opacity-50 rounded-lg`}
+                />
+                <div className="flex flex-col">
+                  <span className="text-sm leading-4 font-medium">
+                    {deck.title}
+                  </span>
+                  <span className="text-xs leading-4 text-neutral-400">
+                    {deck.cards.length} cards -{" "}
+                    {deck.isPublic ? "Public" : "Private"}
+                  </span>
+                </div>
+              </div>
+            </Link>
+            <div className="opacity-0 transition-opacity group-hover:opacity-100">
+              <DeckOptionsDropdown deck={deck} />
+            </div>
+          </div>
         ))}
+        <CreateDeckButton collectionId={collectionId} />
       </div>
     </>
   );
