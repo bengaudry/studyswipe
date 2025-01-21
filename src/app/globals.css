@@ -9,22 +9,94 @@ body {
   font-family: Poppins, Arial, Helvetica, sans-serif;
 }
 
-.animate-next-card {
-  animation: NextCard 200ms ease-out 0 1 forwards;
+.animate-skip-card {
+  animation: 500ms ease-out 0ms skip-card-anim;
   will-change: transform, opacity;
 }
 
-@keyframes NextCard {
+.animate-validate-card {
+  animation: 500ms ease-out 0ms validate-card-anim;
+  will-change: transform, opacity;
+}
+
+.animate-skip-last-card {
+  animation: 200ms ease-out 0ms skip-last-card-anim;
+  will-change: transform, opacity;
+}
+
+.animate-validate-last-card {
+  animation: 200ms ease-out 0ms validate-last-card-anim;
+  will-change: transform, opacity;
+}
+
+@keyframes skip-card-anim {
   0% {
     transform: rotate(0) translateX(0);
     opacity: 1;
   }
-  50% {
-    transform: rotate(-45deg) translateX(-100%);
+  40% {
+    transform: rotate(-6deg) translateX(-40px);
     opacity: 0;
   }
-  51% {
+  40.0001% {
     transform: rotate(0) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: rotate(0) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0) translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes validate-card-anim {
+  0% {
+    transform: rotate(0) translateX(0);
+    opacity: 1;
+  }
+  40% {
+    transform: rotate(6deg) translateX(40px);
+    opacity: 0;
+  }
+  40.0001% {
+    transform: rotate(0) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: rotate(0) translateX(0) scale(0.8);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0) translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes skip-last-card-anim {
+  0% {
+    transform: rotate(0) translateX(0);
+    opacity: 1;
+  }
+  99.99999999999% {
+    transform: rotate(-6deg) translateX(-40px);
+    opacity: 0;
+  }
+  100% {
+    transform: rotate(0) translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes validate-last-card-anim {
+  0% {
+    transform: rotate(0) translateX(0);
+    opacity: 1;
+  }
+  99.99999999999% {
+    transform: rotate(6deg) translateX(40px);
     opacity: 0;
   }
   100% {

@@ -1,6 +1,7 @@
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
+import { PlaygroundContextProvider } from "@/components/pages/play/PlayerContext";
 
 export default async function PlayPage({
   params,
@@ -23,10 +24,12 @@ export default async function PlayPage({
     <div>
       <header className="mb-6">
         <h1 className="text-center text-2xl">{deck.title}</h1>
-        <h3>@{owner?.pseudo}</h3>
+        <h3 className="text-center text-neutral-400 -mt-1">@{owner?.pseudo}</h3>
       </header>
 
-      <CardsDisplayer deckCards={cards} deckTheme={deck.theme} />
+      <PlaygroundContextProvider initialCards={cards} theme={deck.theme}>
+        <CardsDisplayer />
+      </PlaygroundContextProvider>
     </div>
   );
 }
