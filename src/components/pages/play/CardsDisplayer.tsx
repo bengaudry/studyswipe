@@ -7,6 +7,7 @@ import { shuffleArray } from "@/lib/arrays";
 import { ActionButton } from "./ActionButton";
 import { FlashcardPreview } from "./FlashcardContent";
 import { PlaygroundContext } from "./PlayerContext";
+import { useSwipeable } from "react-swipeable";
 
 const SWIPE_CARD_ANIM_DURATION = 500;
 const SWIPE_LAST_CARD_ANIM_DURATION = 200;
@@ -16,14 +17,30 @@ type AnimParams = {
   type: "skip" | "validate";
 };
 
+type AnimatedSwiperWrapperProps = PropsWithChildren<{
+  animParams: AnimParams;
+  onSkip: () => void;
+  onValidate: () => void;
+}>;
+
 const AnimatedSwiperWrapper = ({
   children,
   animParams,
-}: PropsWithChildren<{ animParams: AnimParams }>) => {
+  onSkip,
+  onValidate,
+}: AnimatedSwiperWrapperProps) => {
   const { cards } = useContext(PlaygroundContext);
+  const handlers = useSwipeable({
+    onSwiped: (e) => {
+      console.info(e)
+      if (e.dir === "Left") onSkip();
+      if (e.dir === "Right") onValidate();
+    },
+  });
 
   return (
     <div
+      {...handlers}
       className={`${
         animParams.isPlaying
           ? animParams.type === "skip"
@@ -99,7 +116,11 @@ export function CardsDisplayer() {
     <>
       <ActionDrawer />
 
-      <AnimatedSwiperWrapper animParams={animParams}>
+      <AnimatedSwiperWrapper
+        animParams={animParams}
+        onSkip={() => swipeCard("skip")}
+        onValidate={() => swipeCard("validate")}
+      >
         {cards.length > 0 ? (
           <CardElement
             content={cards[0]}
