@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { DeckPageHeader } from "@/components/pages/deck/DeckPageHeader";
 import { DeckPageBody } from "@/components/pages/deck/DeckPageBody";
 import { DeckDataProvider } from "@/components/pages/deck/DeckDataProvider";
+import { wait } from "@/lib/time";
 
 export default async function DeckPage({
   params,
@@ -14,6 +15,8 @@ export default async function DeckPage({
   });
 
   if (deck === null) redirect("/");
+
+  await wait(5000);
 
   return (
     <DeckDataProvider initialDeckState={deck}>

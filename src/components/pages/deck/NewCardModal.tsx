@@ -1,7 +1,6 @@
 "use client";
 import {
   Button,
-  cn,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -34,6 +33,26 @@ import {
   Link2,
 } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
+
+export function NewCardModalTrigger({
+  onOpen,
+  isDisabled,
+}: {
+  onOpen?: () => void;
+  isDisabled?: boolean;
+}) {
+  return (
+    <Button
+      isDisabled={isDisabled}
+      variant="faded"
+      className="w-full h-full aspect-square"
+      startContent={<Plus />}
+      onPress={onOpen}
+    >
+      Create a card
+    </Button>
+  );
+}
 
 /** Provide `card` if this if for editing the card */
 export function NewCardModal({
@@ -134,16 +153,8 @@ export function NewCardModal({
   };
 
   return (
-    <div>
-      <Button
-        variant="faded"
-        className="w-full h-full aspect-square"
-        startContent={<Plus />}
-        onPress={onOpen}
-      >
-        Create a card
-      </Button>
-
+    <>
+      <NewCardModalTrigger onOpen={onOpen} />
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -235,7 +246,7 @@ export function NewCardModal({
           )}
         </ModalContent>
       </Modal>
-    </div>
+    </>
   );
 }
 
