@@ -1,6 +1,7 @@
 "use client";
 import {
   Button,
+  ButtonProps,
   Input,
   Modal,
   ModalBody,
@@ -19,7 +20,24 @@ export type PartialCollection = Omit<
   "id" | "createdAt" | "updatedAt" | "ownerId"
 >;
 
-export function NewCategoryModal() {
+export function NewCollectionModalTrigger({
+  color,
+  onPress,
+  ...props
+}: ButtonProps) {
+  return (
+    <Button
+      color={color ?? "primary"}
+      size="sm"
+      startContent={<Plus />}
+      {...props}
+    >
+      New collection
+    </Button>
+  );
+}
+
+export function NewCollectionModal() {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loadingCreation, setLoadingCreation] = useState(false);
   const { refresh } = useRouter();
@@ -52,14 +70,7 @@ export function NewCategoryModal() {
 
   return (
     <>
-      <Button
-        color="primary"
-        size="sm"
-        startContent={<Plus />}
-        onPress={onOpen}
-      >
-        New collection
-      </Button>
+      <NewCollectionModalTrigger onPress={onOpen} />
       <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
         <ModalContent>
           {(onClose) => (

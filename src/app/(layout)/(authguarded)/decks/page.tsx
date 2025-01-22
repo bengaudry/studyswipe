@@ -1,12 +1,13 @@
 import Link from "next/link";
 import prisma from "@/lib/prisma";
 import { Collection } from "@prisma/client";
-import { NewCategoryModal } from "@/components/pages/decks/NewCollectionModal";
+import { NewCollectionModal } from "@/components/pages/decks/NewCollectionModal";
 import { Divider } from "@nextui-org/react";
 import { CreateDeckButton } from "@/components/pages/decks/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/decks/CollectionOptionsDropdown";
 import { auth } from "@/lib/auth";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
+import { wait } from "@/lib/time";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({ where: { collectionId } });
@@ -65,7 +66,7 @@ const renderCollections = (collections: Collection[] | null) => {
           <CollectionOptionsDropdown collection={collection} />
         </div>
 
-        <div className="flex flex-col">{renderDecks(collection.id)}</div>
+        {renderDecks(collection.id)}
       </div>
       {idx < collections.length - 1 && <Divider />}
     </div>
@@ -81,11 +82,13 @@ export default async function DecksPage() {
     where: { ownerId: session.user.id },
   });
 
+  await wait(5000);
+
   return (
     <div>
       <header className="flex items-center justify-between">
         <h1 className="text-3xl font-semibold">Collections</h1>
-        <NewCategoryModal />
+        <NewCollectionModal />
       </header>
       <div className="flex flex-col">{renderCollections(collections)}</div>
     </div>
