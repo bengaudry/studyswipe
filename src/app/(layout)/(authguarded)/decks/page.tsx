@@ -7,7 +7,6 @@ import { CreateDeckButton } from "@/components/pages/decks/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/decks/CollectionOptionsDropdown";
 import { auth } from "@/lib/auth";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
-import { wait } from "@/lib/time";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({ where: { collectionId } });
@@ -81,8 +80,6 @@ export default async function DecksPage() {
   const collections = await prisma.collection.findMany({
     where: { ownerId: session.user.id },
   });
-
-  await wait(5000);
 
   return (
     <div>

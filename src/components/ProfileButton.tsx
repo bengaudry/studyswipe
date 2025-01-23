@@ -15,8 +15,8 @@ export function ProfileButton({ onPress, ...props }: ButtonProps) {
         variant="flat"
         color="primary"
         onPress={(e) => {
-          if (onPress) onPress(e);
           push("/auth");
+          if (onPress) onPress(e);
         }}
         startContent={<User size={20} />}
         {...props}

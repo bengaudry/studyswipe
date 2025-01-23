@@ -1,5 +1,4 @@
 "use client";
-
 import {
   Navbar,
   NavbarBrand,
@@ -17,7 +16,12 @@ export function AppNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <Navbar onMenuOpenChange={setIsMenuOpen} isBordered>
+    <Navbar
+      isMenuOpen={isMenuOpen}
+      onMenuOpenChange={setIsMenuOpen}
+      isBordered
+      disableAnimation
+    >
       <NavbarBrand>
         <Link href="/" color="foreground" className="flex gap-2 items-center">
           <Image src={"/icon-svg.svg"} width={36} height={36} alt="App icon" />
@@ -43,6 +47,7 @@ export function AppNavbar() {
       <NavbarContent justify="end" className="hidden md:flex">
         <ProfileButton />
       </NavbarContent>
+
       <NavbarMenu>
         <NavbarMenuItem>
           <Link
