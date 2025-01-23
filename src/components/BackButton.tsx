@@ -4,25 +4,32 @@ import Link from "next/link";
 import { ChevronLeft } from "react-feather";
 import { useRouter } from "next/navigation";
 
+export type BackButtonProps = {
+  href?: string;
+  className?: string;
+  onlyIcon?: boolean;
+};
+
 export function BackButton({
   href,
   className,
+  onlyIcon,
   ...props
-}: {
-  href?: string;
-  className?: string;
-}) {
-  const { prefetch } = useRouter();
-  
+}: BackButtonProps) {
+  const { prefetch, back } = useRouter();
+
   return (
     <Link
-      href={href ?? ".."}
+      href={href ?? ""}
+      onClick={() => {
+        if (!href) back();
+      }}
       onMouseEnter={() => prefetch(href ?? "..")}
       className={cn("text-neutral-400 flex items-center", className)}
       {...props}
     >
       <ChevronLeft />
-      <span> Back</span>
+      {!onlyIcon && <span> Back</span>}
     </Link>
   );
 }

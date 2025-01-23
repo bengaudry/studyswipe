@@ -2,6 +2,9 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
 import { PlaygroundContextProvider } from "@/components/pages/play/PlayerContext";
+import { ChevronLeft } from "react-feather";
+import { Progress } from "@nextui-org/react";
+import { BackButton } from "@/components/BackButton";
 
 export default async function PlayPage({
   params,
@@ -21,15 +24,16 @@ export default async function PlayPage({
   const cards = deck.cards as FlashCard[];
 
   return (
-    <div>
-      <header className="mb-6">
-        <h1 className="text-center text-2xl">{deck.title}</h1>
-        <h3 className="text-center text-neutral-400 -mt-1">@{owner?.pseudo}</h3>
+    <PlaygroundContextProvider initialCards={cards} theme={deck.theme}>
+      <header className="mb-6 flex items-center gap-2">
+        <BackButton onlyIcon />
+        <div>
+          <h1 className="text-center text-xl font-semibold">{deck.title}</h1>
+          <h3 className="text-sm text-neutral-400 -mt-1">@{owner?.pseudo}</h3>
+        </div>
       </header>
 
-      <PlaygroundContextProvider initialCards={cards} theme={deck.theme}>
-        <CardsDisplayer />
-      </PlaygroundContextProvider>
-    </div>
+      <CardsDisplayer />
+    </PlaygroundContextProvider>
   );
 }

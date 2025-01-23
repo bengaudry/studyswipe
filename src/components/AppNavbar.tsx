@@ -10,10 +10,16 @@ import {
 } from "@nextui-org/navbar";
 import { Image, Link } from "@nextui-org/react";
 import { ProfileButton } from "./ProfileButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 export function AppNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { prefetch } = useRouter();
+
+  useEffect(() => {
+    prefetch("/decks");
+  }, []);
 
   return (
     <Navbar
@@ -65,6 +71,7 @@ export function AppNavbar() {
             className="w-full text-center"
             color="foreground"
             size="lg"
+            onMouseEnter={() => prefetch("/decks")}
           >
             My collections
           </Link>
