@@ -59,10 +59,12 @@ export function NewCardModal({
   deckid,
   decktheme,
   card,
+  onCardChange,
 }: {
   deckid: string;
   decktheme: string;
   card?: { data: FlashCard; index: number };
+  onCardChange?: (newCard: FlashCard) => void;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(false);

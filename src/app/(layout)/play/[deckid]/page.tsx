@@ -2,8 +2,6 @@ import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
 import { PlaygroundContextProvider } from "@/components/pages/play/PlayerContext";
-import { ChevronLeft } from "react-feather";
-import { Progress } from "@nextui-org/react";
 import { BackButton } from "@/components/BackButton";
 
 export default async function PlayPage({

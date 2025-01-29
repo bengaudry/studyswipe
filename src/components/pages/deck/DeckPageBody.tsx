@@ -37,19 +37,21 @@ export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
         deckid={initialDeck.id}
         decktheme={deckState?.theme ?? "neutral"}
         card={cardToEdit}
+        onCardChange={() => setCardToEdit(undefined)}
       />
 
-      {deckState && deckState.cards.map((card, idx) => (
-        <CardPreview
-          key={idx}
-          card={card as FlashCard}
-          deckTheme={deckState?.theme}
-          onAskDelete={() => handleDeleteCard(idx)}
-          onAskEdit={() =>
-            setCardToEdit({ data: card as FlashCard, index: idx })
-          }
-        />
-      ))}
+      {deckState &&
+        deckState.cards.map((card, idx) => (
+          <CardPreview
+            key={idx}
+            card={card as FlashCard}
+            deckTheme={deckState?.theme}
+            onAskDelete={() => handleDeleteCard(idx)}
+            onAskEdit={() =>
+              setCardToEdit({ data: card as FlashCard, index: idx })
+            }
+          />
+        ))}
     </>
   );
 }
