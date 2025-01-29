@@ -1,5 +1,6 @@
 import { Image, Alert } from "@nextui-org/react";
 import clsx from "clsx";
+import Latex from "react-latex-next";
 
 export type FlashcardContentProps = { content: FlashCardContentJSON };
 
@@ -17,12 +18,7 @@ export function FlashcardContent({ content }: FlashcardContentProps) {
       );
     case "equation":
       return (
-        <Image
-          src={`https://latex.codecogs.com/svg.image?${content.equation}`}
-          width={200}
-          height={25}
-          alt={content.equation || "Equation"}
-        />
+        <Latex>${content.equation}$</Latex>
       );
     case "quote":
       return (

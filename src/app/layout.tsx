@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppLayout } from "@/components/AppLayout";
-import {
-  Navbar,
-  NavbarBrand,
-  NavbarContent,
-  NavbarItem,
-} from "@nextui-org/navbar";
-import Link from "next/link";
-import Image from "next/image";
-import { ProfileButton } from "@/components/ProfileButton";
 import { PropsWithChildren } from "react";
-import "./globals.css";
 import { AppNavbar } from "@/components/AppNavbar";
 import { Analytics } from "@vercel/analytics/react";
+
+import "./globals.css";
+import "katex/dist/katex.min.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

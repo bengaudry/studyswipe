@@ -33,6 +33,7 @@ import {
   Link2,
 } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
+import Latex from "react-latex-next";
 
 export function NewCardModalTrigger({
   onOpen,
@@ -458,6 +459,19 @@ function ContentElement({
 
       {content.type === "equation" && (
         <>
+          <button
+            onClick={() => setFocused(true)}
+            className="w-full py-2 grid place-content-center"
+          >
+            {/* <Image
+              src={`https://latex.codecogs.com/svg.image?${content.equation}`}
+              width={200}
+              height={25}
+              className="w-fullrounded-none"
+              alt={content.equation || "Equation preview"}
+            /> */}
+            <Latex>${content.equation || "Your~equation~here"}$</Latex>
+          </button>
           {isFocused && (
             <textarea
               placeholder="Type your equation in LaTex format here"
@@ -474,18 +488,6 @@ function ContentElement({
               }
             />
           )}
-          <button
-            onClick={() => setFocused(true)}
-            className="w-full py-2 grid place-content-center"
-          >
-            <Image
-              src={`https://latex.codecogs.com/svg.image?${content.equation}`}
-              width={200}
-              height={25}
-              className="w-fullrounded-none"
-              alt={content.equation || "Equation preview"}
-            />
-          </button>
         </>
       )}
 

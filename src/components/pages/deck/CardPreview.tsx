@@ -3,6 +3,7 @@ import clsx from "clsx";
 import React from "react";
 import { Image } from "@nextui-org/react";
 import { Edit2, Trash } from "react-feather";
+import Latex from "react-latex-next";
 
 export const CardPreview = React.forwardRef<
   HTMLDivElement,
@@ -28,12 +29,7 @@ export const CardPreview = React.forwardRef<
               <Image src={value.imgUri} alt={value.alt} />
             )}
             {value.type === "equation" && (
-              <Image
-                src={`https://latex.codecogs.com/svg.image?${value.equation}`}
-                width={200}
-                height={12}
-                alt={value.equation || "Equation"}
-              />
+              <Latex>${value.equation}$</Latex>
             )}
           </div>
         ))}
