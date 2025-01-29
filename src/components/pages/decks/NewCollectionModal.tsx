@@ -22,7 +22,6 @@ export type PartialCollection = Omit<
 
 export function NewCollectionModalTrigger({
   color,
-  onPress,
   ...props
 }: ButtonProps) {
   return (
