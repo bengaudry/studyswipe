@@ -34,6 +34,7 @@ import {
 } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
 import Latex from "react-latex-next";
+import { LatexToolbar } from "./LatexToolbar";
 
 export function NewCardModalTrigger({
   onOpen,
@@ -473,20 +474,32 @@ function ContentElement({
             <Latex>${content.equation || "Your~equation~here"}$</Latex>
           </button>
           {isFocused && (
-            <textarea
-              placeholder="Type your equation in LaTex format here"
-              autoFocus
-              autoCorrect="false"
-              autoComplete="false"
-              value={content.equation || ""}
-              onBlur={() => setFocused(false)}
-              wrap="hard"
-              rows={2}
-              className={`absolute z-40 top-full mt-2 bg-white rounded-lg w-full h-fit overflow-y-scroll p-2`}
-              onChange={(e) =>
-                onUpdate({ ...content, equation: e.target.value })
-              }
-            />
+            <>
+              {/* <div className="absolute z-50 bottom-full mb-2 h-fit rounded-lg bg-white p-2 w-fit">
+                <LatexToolbar
+                  onAddElement={(element) =>
+                    onUpdate({
+                      ...content,
+                      equation: content.equation + element,
+                    })
+                  }
+                />
+              </div> */}
+              <textarea
+                placeholder="Type your equation in LaTex format here"
+                autoFocus
+                autoCorrect="false"
+                autoComplete="false"
+                value={content.equation || ""}
+                onBlur={() => setFocused(false)}
+                wrap="hard"
+                rows={2}
+                className={`absolute z-40 top-full mt-2 bg-white rounded-lg w-full h-fit overflow-y-scroll p-2`}
+                onChange={(e) =>
+                  onUpdate({ ...content, equation: e.target.value })
+                }
+              />
+            </>
           )}
         </>
       )}
