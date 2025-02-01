@@ -28,7 +28,7 @@ export default async function PlayPage({
       <header className="mt-4 -mx-2 mb-6 flex items-center gap-2">
         <BackButton onlyIcon />
         <div>
-          <h1 className="text-center text-xl font-semibold">{deck.title}</h1>
+          <h1 className="text-xl leading-6 mb-1 font-semibold">{deck.title}</h1>
           <h3 className="text-sm text-neutral-400 -mt-1">@{owner?.pseudo}</h3>
         </div>
       </header>
