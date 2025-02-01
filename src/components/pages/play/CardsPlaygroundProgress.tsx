@@ -6,14 +6,18 @@ import { clsx } from "clsx";
 import { Deck } from "@prisma/client";
 
 export function CardsPlaygroundProgress({ deck }: { deck: Deck }) {
-  const { cards, counterOutOf } = useContext(PlaygroundContext);
+  const { cards, counterOutOf, counter } = useContext(PlaygroundContext);
 
   return (
     <Progress
-      className="h-1 -mx-6 -mt-6 w-screen"
+      className="fixed left-0 h-1 -mt-6 w-screen"
       classNames={{ indicator: clsx(`bg-${deck.theme}-500`) }}
       radius="none"
-      value={(1- (cards.length - 1) / counterOutOf)*100}
+      value={
+        counter === counterOutOf
+          ? 0
+          : (1 - (cards.length - 1) / counterOutOf) * 100
+      }
     />
   );
 }
