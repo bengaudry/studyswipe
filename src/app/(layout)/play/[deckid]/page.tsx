@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
 import { PlaygroundContextProvider } from "@/components/pages/play/PlayerContext";
 import { BackButton } from "@/components/BackButton";
+import { CardsPlaygroundProgress } from "@/components/pages/play/CardsPlaygroundProgress";
 
 export default async function PlayPage({
   params,
@@ -23,7 +24,8 @@ export default async function PlayPage({
 
   return (
     <PlaygroundContextProvider initialCards={cards} theme={deck.theme}>
-      <header className="mb-6 flex items-center gap-2">
+      <CardsPlaygroundProgress deck={deck} />
+      <header className="mt-4 -mx-2 mb-6 flex items-center gap-2">
         <BackButton onlyIcon />
         <div>
           <h1 className="text-center text-xl font-semibold">{deck.title}</h1>

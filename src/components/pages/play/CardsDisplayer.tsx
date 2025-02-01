@@ -1,7 +1,7 @@
 "use client";
-import { PropsWithChildren, useContext, useState } from "react";
+import { PropsWithChildren, useContext, useEffect, useState } from "react";
 import { Check, Play, Plus, RefreshCw, Shuffle } from "react-feather";
-import { Button, Tooltip } from "@nextui-org/react";
+import { Button, Progress, Tooltip } from "@nextui-org/react";
 
 import { shuffleArray } from "@/lib/arrays";
 import { ActionButton } from "./ActionButton";
@@ -69,8 +69,13 @@ export function CardsDisplayer() {
     counter,
     resetCounter,
     incrementCounter,
-    initialCards,
+    counterOutOf,
+    setCounterOutOf,
   } = useContext(PlaygroundContext);
+
+  useEffect(() => {
+    document.body.style.overflowY = "hidden";
+  });
 
   const [animParams, setAnimParams] = useState<AnimParams>({
     isPlaying: false,
@@ -80,7 +85,6 @@ export function CardsDisplayer() {
   const [faceShowed, setFaceShowed] = useState<"question" | "answer">(
     "question"
   );
-  const [counterOutOf, setCounterOutOf] = useState(initialCards.length);
   const [animTimeouts, setAnimTimeouts] = useState<NodeJS.Timeout[]>([]);
 
   const clearTimeouts = () => {
@@ -161,15 +165,23 @@ export function CardsDisplayer() {
           />
         ) : (
           <div className="flex flex-col gap-2 items-center">
-            <div>
-              <p className="text-neutral-400 text-center">
-                No card left to play.
-              </p>
-              <p className="text-neutral-400 text-center">
-                {skippedCards.length > 0 &&
-                  `${skippedCards.length} card(s) skipped.`}
-              </p>
+            <div className="grid grid-cols-2 my-6">
+              <div className="flex flex-col items-center border-r-2 px-6">
+                <div className="w-4 h-4 rounded-full bg-red-500" />
+                <span className="text-3xl mt-2 font-semibold">
+                  {skippedCards.length}
+                </span>
+                <p className="text-sm leading-3 text-neutral-400">skipped</p>
+              </div>
+              <div className="flex flex-col items-center px-6">
+                <div className="w-4 h-4 rounded-full bg-emerald-500" />
+                <span className="text-3xl mt-2 font-semibold">
+                  {counterOutOf - skippedCards.length}
+                </span>
+                <p className="text-sm leading-3 text-neutral-400">passed</p>
+              </div>
             </div>
+
             <div className="flex flex-row gap-4 items-center">
               <Button
                 variant="flat"
@@ -218,16 +230,11 @@ export function CardsDisplayer() {
 }
 
 const ActionDrawer = () => {
-  const { updateCards, initialCards, updateSkippedCards } =
+  const { updateCards, initialCards, updateSkippedCards, resetCardsToDefault } =
     useContext(PlaygroundContext);
 
   const shuffleCards = () => {
     updateCards((prev) => shuffleArray(prev));
-  };
-
-  const startAgain = () => {
-    updateCards(initialCards ?? []);
-    updateSkippedCards([]);
   };
 
   return (
@@ -243,7 +250,7 @@ const ActionDrawer = () => {
 
       <Tooltip content="Restart" placement="right">
         <button
-          onClick={startAgain}
+          onClick={resetCardsToDefault}
           className="block p-3 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
         >
           <RefreshCw size={24} />

@@ -20,6 +20,8 @@ type PlaygroundContextT = {
   counter: number;
   resetCounter: () => void;
   incrementCounter: () => void;
+  counterOutOf: number,
+  setCounterOutOf: Dispatch<SetStateAction<number>>
 };
 
 export const PlaygroundContext = createContext<PlaygroundContextT>({
@@ -33,6 +35,8 @@ export const PlaygroundContext = createContext<PlaygroundContextT>({
   counter: 0,
   resetCounter: () => {},
   incrementCounter: () => {},
+  counterOutOf: 0,
+  setCounterOutOf: () => {}
 });
 
 export type PlaygroundContextProps = PropsWithChildren<{
@@ -53,12 +57,14 @@ export const PlaygroundContextProvider = ({
   );
   const [counter, setCounter] = useState(0);
   const [skippedCards, setSkippedCards] = useState<FlashCard[]>([]);
+  const [counterOutOf, setCounterOutOf] = useState(initialCards.length);
 
   /** Restarts the game */
   const resetCardsToDefault = () => {
     setSkippedCards([]);
     setCards(initialCards);
     resetCounter();
+    setCounterOutOf(initialCards.length)
   };
 
   /** Resets the counter of cards swiped to 0 */
@@ -79,6 +85,8 @@ export const PlaygroundContextProvider = ({
         counter,
         resetCounter,
         incrementCounter,
+        counterOutOf,
+        setCounterOutOf
       }}
     >
       {children}
