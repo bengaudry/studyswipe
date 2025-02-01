@@ -1,4 +1,5 @@
 "use client";
+import { MAX_COLLECTION_TITLE_LENGTH } from "@/lib/constants";
 import {
   Button,
   Dropdown,
@@ -136,6 +137,7 @@ export function CollectionOptionsDropdown({
                     labelPlacement="outside"
                     isRequired
                     required
+                    maxLength={MAX_COLLECTION_TITLE_LENGTH}
                     value={newtitle}
                     onChange={(e) => setNewtitle(e.target.value)}
                     placeholder="Physics, Philosophy, Computer Science..."

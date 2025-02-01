@@ -25,7 +25,7 @@ const renderDecks = async (collectionId: string) => {
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-8 h-8 bg-${deck.theme}-500 bg-opacity-50 rounded-lg`}
+                  className={`w-8 h-8 aspect-square bg-${deck.theme}-500 bg-opacity-50 rounded-lg`}
                 />
                 <div className="flex flex-col">
                   <span className="text-sm leading-4 font-medium">

@@ -26,6 +26,7 @@ import {
 } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
 import { validateFlashCardArray } from "@/lib/cardObject";
+import { MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
 
 export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
   const [loading, setLoading] = useState(false);
@@ -187,6 +188,7 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
                     isRequired
                     required
                     value={newtitle}
+                    maxLength={MAX_DECK_TITLE_LENGTH}
                     onChange={(e) => setNewtitle(e.target.value)}
                     placeholder="Physics, Philosophy, Computer Science..."
                   />

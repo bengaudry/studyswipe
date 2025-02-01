@@ -1,4 +1,5 @@
 "use client";
+import { MAX_DECK_DESCRIPTION_LENGTH, MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
 import {
   cn,
   Button,
@@ -119,6 +120,7 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
                   isRequired
                   autoFocus
                   labelPlacement="outside"
+                  maxLength={MAX_DECK_TITLE_LENGTH}
                   value={data.title}
                   onChange={(e) =>
                     setData((prev) => ({ ...prev, title: e.target.value }))
@@ -129,6 +131,7 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
                   label="Description"
                   labelPlacement="outside"
                   value={data.description}
+                  maxLength={MAX_DECK_DESCRIPTION_LENGTH}
                   onChange={(e) =>
                     setData((prev) => ({
                       ...prev,

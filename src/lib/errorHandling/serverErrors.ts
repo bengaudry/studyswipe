@@ -6,7 +6,7 @@ export const SERVER_ERROR = {
     status: 500,
   },
   "invalid-payload": {
-    message: "Invalid payload. Some required arguments are missing.",
+    message: "Invalid payload. Some required arguments are missing, or are not in the expected format.",
     status: 400,
   },
   "missing-parameters": {

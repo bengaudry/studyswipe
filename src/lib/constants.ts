@@ -1,0 +1,3 @@
+export const MAX_DECK_TITLE_LENGTH = 30;
+export const MAX_DECK_DESCRIPTION_LENGTH = 300;
+export const MAX_COLLECTION_TITLE_LENGTH = 30;

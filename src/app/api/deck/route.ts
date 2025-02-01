@@ -2,6 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
+import {
+  MAX_DECK_DESCRIPTION_LENGTH,
+  MAX_DECK_TITLE_LENGTH,
+} from "@/lib/constants";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
@@ -12,6 +16,30 @@ export const POST = async (req: NextRequest) => {
       return serverError(
         "invalid-payload",
         "Missing properties: <title> <collectionId>"
+      );
+
+    if (typeof body.title !== "string")
+      return serverError(
+        "invalid-payload",
+        "Property <title> must be of type string"
+      );
+
+    if (body.title.length > MAX_DECK_TITLE_LENGTH)
+      return serverError(
+        "invalid-payload",
+        `Property <title> exceeds the maximum number of characters (${body.title.length}/${MAX_DECK_TITLE_LENGTH})`
+      );
+
+    if (typeof body.description !== "string")
+      return serverError(
+        "invalid-payload",
+        "Property <description> must be of type string"
+      );
+
+    if (body.description.length > MAX_DECK_TITLE_LENGTH)
+      return serverError(
+        "invalid-payload",
+        `Property <description> exceeds the maximum number of characters (${body.description.length}/${MAX_DECK_DESCRIPTION_LENGTH})`
       );
 
     const collection = await prisma.collection.findUnique({
@@ -65,6 +93,12 @@ export const PATCH = async (req: NextRequest) => {
         return serverError(
           "missing-parameters",
           "Parameter missing: <newtitle>"
+        );
+
+      if (newtitle.length > MAX_DECK_TITLE_LENGTH)
+        return serverError(
+          "invalid-payload",
+          `Property <newtitle> exceeds the maximum number of characters (${newtitle.length}/${MAX_DECK_TITLE_LENGTH})`
         );
 
       await prisma.deck.update({

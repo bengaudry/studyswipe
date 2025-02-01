@@ -1,4 +1,5 @@
 "use client";
+import { MAX_COLLECTION_TITLE_LENGTH } from "@/lib/constants";
 import {
   Button,
   ButtonProps,
@@ -84,6 +85,7 @@ export function NewCollectionModal() {
                   autoFocus
                   required
                   isRequired
+                  maxLength={MAX_COLLECTION_TITLE_LENGTH}
                   value={data.title}
                   onChange={(e) =>
                     setData((prev) => ({ ...prev, title: e.target.value }))
