@@ -51,5 +51,5 @@ export default {
     "bg-red-100",
   ],
   darkMode: "class",
-  plugins: [nextui()],
+  plugins: [nextui({})],
 } satisfies Config;

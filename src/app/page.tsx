@@ -10,12 +10,12 @@ export default function LandingPage() {
 
   return (
     <>
-      <section className="relative w-full h-[80vh] bg-gradient-to-b from-sky-100/0 to-sky-100/100 grid place-content-center">
-        <div className="flex flex-col items-center">
+      <section className="relative w-full h-[80vh] p-8 flex items-center justify-center">
+        <div className="flex flex-col items-center justify-center rounded-3xl border flex-1 w-full h-full max-w-screen-2xl dotted-bg">
           <h1 className="text-center text-secondary-950 text-4xl font-semibold sm:text-5xl md:text-6xl md:font-bold lg:text-7xl">
-            <span className="text-secondary-500">Learn</span> your course
+            Learn your course
             <br />
-            like it is a <span className="text-secondary-500">game</span>
+            like it is a game
           </h1>
           <p className="mt-4 text-lg max-w-sm text-center mx-auto text-neutral-500 leading-6">
             Turn your courses into flashcards to memoize more easily all the
@@ -26,7 +26,6 @@ export default function LandingPage() {
             onPress={() => push("/decks")}
             className="mt-6 w-fit mx-auto"
             color="primary"
-            radius="full"
             endContent={<ArrowRight />}
           >
             Create a flashcard
@@ -34,11 +33,11 @@ export default function LandingPage() {
         </div>
 
         <Plus
-          className=" absolute top-6 left-6 rotate-[60deg] text-secondary-200 blur-sm"
+          className=" absolute top-6 left-6 rotate-[60deg] text-neutral-300 blur-sm"
           size={200}
         />
         <Check
-          className="absolute -rotate-12 bottom-6 right-6 text-secondary-200 blur-sm"
+          className="absolute -rotate-12 bottom-6 right-6 text-neutral-300 blur-sm"
           size={200}
         />
       </section>

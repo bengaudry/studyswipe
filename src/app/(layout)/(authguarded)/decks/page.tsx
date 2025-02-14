@@ -82,7 +82,7 @@ export default async function DecksPage() {
   });
 
   return (
-    <div>
+    <div className="max-w-screen-sm mx-auto">
       <header className="flex items-center justify-between">
         <h1 className="text-3xl font-semibold">Collections</h1>
         <NewCollectionModal />

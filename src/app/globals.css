@@ -9,6 +9,16 @@ body {
   font-family: Poppins, Arial, Helvetica, sans-serif;
 }
 
+.dotted-bg {
+  background-color: #fefefe;
+  background-image: repeating-radial-gradient(
+      circle at 0 0,
+      transparent 0,
+      #fefefe 24px
+    ),
+    repeating-linear-gradient(#e6e6e655, #e6e6e6);
+}
+
 .animate-skip-card {
   animation: 500ms ease-out 0ms skip-card-anim;
   will-change: transform, opacity;
