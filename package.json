@@ -24,6 +24,7 @@
     "prisma": "^6.2.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-drag-reorder": "^1.2.0",
     "react-feather": "^2.0.10",
     "react-latex-next": "^3.0.0",
     "react-swipeable": "^7.0.2",

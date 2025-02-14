@@ -10,6 +10,7 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
+  Tooltip,
 } from "@nextui-org/react";
 
 export function ProfileButton({ onPress, ...props }: ButtonProps) {
@@ -32,9 +33,6 @@ export function ProfileButton({ onPress, ...props }: ButtonProps) {
       </Button>
     );
 
-  if (session === undefined)
-    return <SkeletonLoader className="w-20 h-8 rounded-md" />;
-
   return (
     <Dropdown>
       <DropdownTrigger>
@@ -42,7 +40,7 @@ export function ProfileButton({ onPress, ...props }: ButtonProps) {
           <Avatar
             isBordered
             radius="full"
-            src={session.user?.image ?? undefined}
+            src={session?.user?.image ?? undefined}
           />
         </div>
       </DropdownTrigger>

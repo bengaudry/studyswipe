@@ -15,6 +15,14 @@ import {
   useDisclosure,
   Image,
   Input,
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  Accordion,
+  AccordionItem,
+  ButtonGroup,
 } from "@nextui-org/react";
 import { clsx } from "clsx";
 import {
@@ -35,6 +43,7 @@ import {
 import { DeckDataContext } from "./DeckDataProvider";
 import Latex from "react-latex-next";
 import { LatexToolbar } from "./LatexToolbar";
+import { Draggable } from "react-drag-reorder";
 
 export function NewCardModalTrigger({
   onOpen,
@@ -156,27 +165,38 @@ export function NewCardModal({
     }
   };
 
+  const handleAddElement = (newElement: FlashCardContentJSON) => {
+    if (current === "question") {
+      setQuestionContent((prev) => [...prev, newElement]);
+    } else {
+      setAnswerContent((prev) => [...prev, newElement]);
+    }
+  };
+
   return (
     <>
       <NewCardModalTrigger onOpen={onOpen} />
-      <Modal
+      <Drawer
         isOpen={isOpen}
         onOpenChange={onOpenChange}
         isKeyboardDismissDisabled
-        placement="center"
+        placement="bottom"
+        size="5xl"
         classNames={{
           backdrop: !isOpen && "pointer-events-none",
           body: isOpen ? "px-2 sm:px-6" : "pointer-events-none",
-          wrapper: !isOpen && "pointer-events-none",
+          wrapper: `max-w-screen-sm mx-auto ${
+            !isOpen && "pointer-events-none"
+          }`,
         }}
       >
-        <ModalContent>
+        <DrawerContent>
           {(onClose) => (
             <>
-              <ModalHeader className="flex flex-col gap-1 data-[open=false]:pointer-events-none">
+              <DrawerHeader className="flex flex-col gap-1 data-[open=false]:pointer-events-none">
                 Create a new card
-              </ModalHeader>
-              <ModalBody>
+              </DrawerHeader>
+              <DrawerBody>
                 <div className="flex justify-between items-center">
                   <Tabs
                     selectedKey={current}
@@ -187,7 +207,7 @@ export function NewCardModal({
                     <Tab title="Answer" key="answer" />
                   </Tabs>
 
-                  <div className="flex items-center gap-2">
+                  {/* <div className="flex items-center gap-2">
                     <span className="text-sm text-neutral-400">
                       {
                         (current === "question"
@@ -198,13 +218,7 @@ export function NewCardModal({
                       /3
                     </span>
                     <AddElementDropdown
-                      onAdd={(newElement) => {
-                        if (current === "question") {
-                          setQuestionContent((prev) => [...prev, newElement]);
-                        } else {
-                          setAnswerContent((prev) => [...prev, newElement]);
-                        }
-                      }}
+                      onAdd={handleAddElement}
                       disabled={
                         (current === "question"
                           ? questionContent
@@ -212,26 +226,101 @@ export function NewCardModal({
                         ).length >= 3
                       }
                     />
-                  </div>
+                  </div> */}
                 </div>
 
-                <div className="relative w-full max-w-80 aspect-square mx-auto">
-                  <FlashcardPreview
-                    isActive={current === "question"}
-                    content={questionContent}
-                    updateContent={setQuestionContent}
-                    decktheme={decktheme}
-                  />
-
-                  <FlashcardPreview
-                    isActive={current === "answer"}
-                    content={answerContent}
-                    updateContent={setAnswerContent}
-                    decktheme={decktheme}
-                  />
+                <div className="flex flex-col gap-y-1">
+                  <ButtonGroup>
+                    <Button
+                      variant="ghost"
+                      onPress={() =>
+                        handleAddElement({
+                          type: "text",
+                          heading: "title",
+                          text: "",
+                        })
+                      }
+                    >
+                      <span className="text-xl font-bold">H1</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onPress={() =>
+                        handleAddElement({
+                          type: "text",
+                          heading: "subtitle",
+                          text: "",
+                        })
+                      }
+                    >
+                      <span className="text-lg font-semibold">H2</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onPress={() =>
+                        handleAddElement({
+                          type: "text",
+                          heading: "paragraph",
+                          text: "",
+                        })
+                      }
+                    >
+                      <span>Text</span>
+                    </Button>
+                  </ButtonGroup>
+                  <ButtonGroup>
+                    <Button
+                      variant="ghost"
+                      onPress={() =>
+                        handleAddElement({ type: "equation", equation: "" })
+                      }
+                    >
+                      <Latex>$\sqrt{"{x}"}$</Latex>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onPress={() =>
+                        handleAddElement({ type: "quote", content: "" })
+                      }
+                    >
+                      <Feather />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onPress={() =>
+                        handleAddElement({ type: "link", href: "" })
+                      }
+                    >
+                      <Link2 />
+                    </Button>
+                  </ButtonGroup>
                 </div>
-              </ModalBody>
-              <ModalFooter>
+
+                <Accordion defaultExpandedKeys={["question"]}>
+                  <AccordionItem
+                    key="question"
+                    title="Question"
+                    onPress={() => setCurrent("question")}
+                  >
+                    <FlashcardPreview
+                      content={questionContent}
+                      updateContent={setQuestionContent}
+                    />
+                  </AccordionItem>
+
+                  <AccordionItem
+                    key="answer"
+                    title="Answer"
+                    onPress={() => setCurrent("answer")}
+                  >
+                    <FlashcardPreview
+                      content={answerContent}
+                      updateContent={setAnswerContent}
+                    />
+                  </AccordionItem>
+                </Accordion>
+              </DrawerBody>
+              <DrawerFooter>
                 <Button color="primary" variant="flat" onPress={onClose}>
                   Close
                 </Button>
@@ -245,54 +334,60 @@ export function NewCardModal({
                 >
                   {card ? "Edit card" : "Create card"}
                 </Button>
-              </ModalFooter>
+              </DrawerFooter>
             </>
           )}
-        </ModalContent>
-      </Modal>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }
 
 function FlashcardPreview({
-  isActive,
   content,
   updateContent,
-  decktheme,
 }: {
-  isActive: boolean;
   content: FlashCardContentJSON[];
   updateContent: Dispatch<SetStateAction<FlashCardContentJSON[]>>;
-  decktheme: string;
 }) {
   return (
     <div
       className={clsx(
-        `absolute w-full h-full bg-${decktheme}-500/20 rounded-lg p-3 overflow-y-scroll flex flex-col gap-2 ${
-          isActive
-            ? "scale-100 opacity-100 pointer-events-auto"
-            : "scale-85 opacity-0 pointer-events-none"
-        } transition-all`
+        `w-full h-full border rounded-lg mb-3 p-3 flex flex-col gap-2 transition-all`
       )}
     >
-      {content.map((value, idx) => (
-        <ContentElement
-          key={idx}
-          content={value}
-          onUpdate={(updatedValue) =>
-            updateContent((prev) =>
-              prev.map((item, itemIdx) =>
-                itemIdx === idx ? updatedValue : item
-              )
-            )
-          }
-          onDelete={() =>
-            updateContent((prev) =>
-              prev.filter((_, itemIdx) => itemIdx !== idx)
-            )
-          }
-        />
-      ))}
+      {content.length > 0 ? (
+        <Draggable
+          onPosChange={(currentPos, newPos) => {
+            updateContent((prevContent) => {
+              const newContent = [...prevContent];
+              newContent.splice(newPos, 0, newContent.splice(currentPos, 1)[0]);
+              return newContent;
+            });
+          }}
+        >
+          {content.map((value, idx) => (
+            <ContentElement
+              key={idx}
+              content={value}
+              onUpdate={(updatedValue) =>
+                updateContent((prev) =>
+                  prev.map((item, itemIdx) =>
+                    itemIdx === idx ? updatedValue : item
+                  )
+                )
+              }
+              onDelete={() =>
+                updateContent((prev) =>
+                  prev.splice(idx, 1)
+                )
+              }
+            />
+          ))}
+        </Draggable>
+      ) : (
+        <p className="text-neutral-400 text-center text-sm">No content yet.</p>
+      )}
     </div>
   );
 }
@@ -410,13 +505,13 @@ function ContentElement({
     >
       {content.type === "text" && (
         <>
-          <button onClick={() => setFocused(true)}>
+          <button className="block w-full" onClick={() => setFocused(true)}>
             <p
-              className={`bg-transparent whitespace-normal px-3 py-1 ${
+              className={`bg-transparent whitespace-normal px-3 py-1 min-h-4 bg-red-500 block ${
                 content.heading === "title" && "text-2xl font-semibold"
               } ${content.heading === "subtitle" && "text-xl font-medium"}`}
             >
-              {content.text || ""}
+              {content.text || "Your text here..."}
             </p>
           </button>
           {isFocused && (
@@ -516,7 +611,10 @@ function ContentElement({
       )}
 
       <button
-        onClick={onDelete}
+        onClick={() => {
+          console.log("deleting")
+          onDelete()
+        }}
         className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 translate-x-1/2 -translate-y-1/2 rounded-full h-5 w-5 bg-red-500"
       >
         <Plus size={15} color="#fff" className="mx-auto rotate-45" />
