@@ -87,7 +87,7 @@ export default async function DecksPage() {
         <h1 className="text-3xl font-semibold">Collections</h1>
         <NewCollectionModal />
       </header>
-      <div className="flex flex-col">{renderCollections(collections)}</div>
+      <div className="flex flex-col ">{renderCollections(collections)}</div>
     </div>
   );
 }

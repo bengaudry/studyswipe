@@ -44,6 +44,7 @@ import { DeckDataContext } from "./DeckDataProvider";
 import Latex from "react-latex-next";
 import { LatexToolbar } from "./LatexToolbar";
 import { Draggable } from "react-drag-reorder";
+import { Reorder } from "motion/react";
 
 export function NewCardModalTrigger({
   onOpen,
@@ -357,34 +358,24 @@ function FlashcardPreview({
       )}
     >
       {content.length > 0 ? (
-        <Draggable
-          onPosChange={(currentPos, newPos) => {
-            updateContent((prevContent) => {
-              const newContent = [...prevContent];
-              newContent.splice(newPos, 0, newContent.splice(currentPos, 1)[0]);
-              return newContent;
-            });
-          }}
-        >
+        <Reorder.Group values={content} onReorder={updateContent}>
           {content.map((value, idx) => (
-            <ContentElement
-              key={idx}
-              content={value}
-              onUpdate={(updatedValue) =>
-                updateContent((prev) =>
-                  prev.map((item, itemIdx) =>
-                    itemIdx === idx ? updatedValue : item
+            <Reorder.Item value={value} key={idx} index={idx}>
+              <ContentElement
+                key={idx}
+                content={value}
+                onUpdate={(updatedValue) =>
+                  updateContent((prev) =>
+                    prev.map((item, itemIdx) =>
+                      itemIdx === idx ? updatedValue : item
+                    )
                   )
-                )
-              }
-              onDelete={() =>
-                updateContent((prev) =>
-                  prev.splice(idx, 1)
-                )
-              }
-            />
+                }
+                onDelete={() => updateContent((prev) => prev.splice(idx, 1))}
+              />
+            </Reorder.Item>
           ))}
-        </Draggable>
+        </Reorder.Group>
       ) : (
         <p className="text-neutral-400 text-center text-sm">No content yet.</p>
       )}
@@ -612,8 +603,8 @@ function ContentElement({
 
       <button
         onClick={() => {
-          console.log("deleting")
-          onDelete()
+          console.log("deleting");
+          onDelete();
         }}
         className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 translate-x-1/2 -translate-y-1/2 rounded-full h-5 w-5 bg-red-500"
       >
