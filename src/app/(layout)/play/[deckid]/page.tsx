@@ -20,6 +20,17 @@ export default async function PlayPage({
     where: { id: deck.ownerId },
   });
 
+  const parentCollectionDecks = await prisma.deck.findMany({
+    where: { collectionId: deck.collectionId },
+    orderBy: { title: "asc" },
+  });
+
+  const nextDeckToBePlayedIndex = parentCollectionDecks.findIndex(
+    (d) => d.id === deck.id
+  )+1;
+
+  const nextDeckToBePlayed = (nextDeckToBePlayedIndex === parentCollectionDecks.length) ? undefined : parentCollectionDecks[nextDeckToBePlayedIndex];
+
   const cards = deck.cards as FlashCard[];
 
   return (
@@ -33,7 +44,7 @@ export default async function PlayPage({
         </div>
       </header>
 
-      <CardsDisplayer />
+      <CardsDisplayer nextDeckToBePlayed={nextDeckToBePlayed} />
     </PlaygroundContextProvider>
   );
 }

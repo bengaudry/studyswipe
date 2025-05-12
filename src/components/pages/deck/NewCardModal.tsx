@@ -201,27 +201,6 @@ export function NewCardModal({
                     <Tab title="Question" key="question" />
                     <Tab title="Answer" key="answer" />
                   </Tabs>
-
-                  {/* <div className="flex items-center gap-2">
-                    <span className="text-sm text-neutral-400">
-                      {
-                        (current === "question"
-                          ? questionContent
-                          : answerContent
-                        ).length
-                      }
-                      /3
-                    </span>
-                    <AddElementDropdown
-                      onAdd={handleAddElement}
-                      disabled={
-                        (current === "question"
-                          ? questionContent
-                          : answerContent
-                        ).length >= 3
-                      }
-                    />
-                  </div> */}
                 </div>
 
                 <div className="flex flex-col gap-y-1">
@@ -377,96 +356,6 @@ function FlashcardPreview({
   );
 }
 
-function AddElementDropdown({
-  onAdd,
-  disabled,
-}: {
-  onAdd: (element: FlashCardContentJSON) => void;
-  disabled?: boolean;
-}) {
-  return (
-    <Dropdown>
-      <DropdownTrigger>
-        <Button
-          color="primary"
-          size="sm"
-          disabled={disabled}
-          isDisabled={disabled}
-          startContent={<Plus size={18} />}
-        >
-          Add element
-        </Button>
-      </DropdownTrigger>
-      <DropdownMenu variant="flat" disabledKeys={["image"]}>
-        <DropdownItem
-          key="title"
-          startContent={<Type />}
-          onPress={() =>
-            onAdd({
-              type: "text",
-              text: "Click to edit title",
-              heading: "title",
-            })
-          }
-        >
-          Title
-        </DropdownItem>
-        <DropdownItem
-          key="subtitle"
-          startContent={<Type />}
-          onPress={() =>
-            onAdd({
-              type: "text",
-              text: "Click to edit subtitle",
-              heading: "subtitle",
-            })
-          }
-        >
-          Subtitle
-        </DropdownItem>
-        <DropdownItem
-          key="text"
-          startContent={<Type />}
-          showDivider
-          onPress={() =>
-            onAdd({
-              type: "text",
-              text: "Click to edit paragraph",
-              heading: "paragraph",
-            })
-          }
-        >
-          Text
-        </DropdownItem>
-        <DropdownItem
-          key="equation"
-          startContent={<Zap />}
-          onPress={() => onAdd({ type: "equation", equation: "" })}
-        >
-          Equation
-        </DropdownItem>
-        <DropdownItem
-          key="quote"
-          startContent={<Feather />}
-          onPress={() => onAdd({ type: "quote", content: "" })}
-        >
-          Quote
-        </DropdownItem>
-        <DropdownItem
-          key="link"
-          startContent={<Link2 />}
-          onPress={() => onAdd({ type: "link", href: "" })}
-        >
-          Link (soon)
-        </DropdownItem>
-        <DropdownItem key="image" startContent={<ImageIcon />}>
-          Image (soon)
-        </DropdownItem>
-      </DropdownMenu>
-    </Dropdown>
-  );
-}
-
 function ContentElement({
   content,
   onUpdate,
@@ -544,13 +433,6 @@ function ContentElement({
             onClick={() => setFocused(true)}
             className="w-full py-2 grid place-content-center"
           >
-            {/* <Image
-              src={`https://latex.codecogs.com/svg.image?${content.equation}`}
-              width={200}
-              height={25}
-              className="w-fullrounded-none"
-              alt={content.equation || "Equation preview"}
-            /> */}
             <Latex>${content.equation || "Your~equation~here"}$</Latex>
           </button>
           {isFocused && (

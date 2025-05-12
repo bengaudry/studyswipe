@@ -1,13 +1,15 @@
 "use client";
 import { PropsWithChildren, useContext, useEffect, useState } from "react";
-import { Check, Play, Plus, RefreshCw, Shuffle } from "react-feather";
-import { Button, Progress, Tooltip } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
+import { useSwipeable } from "react-swipeable";
 
 import { shuffleArray } from "@/lib/arrays";
+import { Button, Tooltip } from "@nextui-org/react";
+import { Check, Play, Plus, RefreshCw, Shuffle } from "react-feather";
 import { ActionButton } from "./ActionButton";
 import { FlashcardPreview } from "./FlashcardContent";
 import { PlaygroundContext } from "./PlayerContext";
-import { useSwipeable } from "react-swipeable";
+import { Deck } from "@prisma/client";
 
 const SWIPE_CARD_ANIM_DURATION = 500;
 const SWIPE_LAST_CARD_ANIM_DURATION = 200;
@@ -59,7 +61,7 @@ const AnimatedSwiperWrapper = ({
   );
 };
 
-export function CardsDisplayer() {
+export function CardsDisplayer({ nextDeckToBePlayed }: { nextDeckToBePlayed?: Deck }) {
   const {
     cards,
     resetCardsToDefault,
@@ -73,6 +75,9 @@ export function CardsDisplayer() {
     setCounterOutOf,
   } = useContext(PlaygroundContext);
 
+  const { push } = useRouter();
+
+  // Prevent scroll on body
   useEffect(() => {
     document.body.style.overflowY = "hidden";
   });
@@ -190,7 +195,7 @@ export function CardsDisplayer() {
                 startContent={<RefreshCw size={16} />}
                 onPress={resetCardsToDefault}
               >
-                Restart
+                Play again
               </Button>
               {skippedCards.length > 0 && (
                 <Button
@@ -203,6 +208,17 @@ export function CardsDisplayer() {
                 </Button>
               )}
             </div>
+
+            {nextDeckToBePlayed && (
+              <Button
+                className="w-full mt-4"
+                color="primary"
+                startContent={<Play size={16} />}
+                onPress={() => push(`/play/${nextDeckToBePlayed.id}`)}
+              >
+                Next : {nextDeckToBePlayed.title}
+              </Button>
+            )}
           </div>
         )}
       </AnimatedSwiperWrapper>

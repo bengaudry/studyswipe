@@ -1,18 +1,23 @@
 import Link from "next/link";
-import prisma from "@/lib/prisma";
 import { Collection } from "@prisma/client";
-import { NewCollectionModal } from "@/components/pages/decks/NewCollectionModal";
 import { Divider } from "@nextui-org/react";
+
+import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+
+import { NewCollectionModal } from "@/components/pages/decks/NewCollectionModal";
 import { CreateDeckButton } from "@/components/pages/decks/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/decks/CollectionOptionsDropdown";
-import { auth } from "@/lib/auth";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
 
 const renderDecks = async (collectionId: string) => {
-  const decks = await prisma.deck.findMany({ where: { collectionId } });
+  const decks = await prisma.deck.findMany({
+    where: { collectionId },
+    orderBy: { title: "asc" },
+  });
 
   return (
-    <>
+    <div>
       <div className="flex flex-col gap-2 overflow-x-scroll px-6 pb-4 -mx-6">
         {decks.map((deck) => (
           <div
@@ -45,7 +50,7 @@ const renderDecks = async (collectionId: string) => {
         ))}
         <CreateDeckButton collectionId={collectionId} />
       </div>
-    </>
+    </div>
   );
 };
 
@@ -79,6 +84,7 @@ export default async function DecksPage() {
 
   const collections = await prisma.collection.findMany({
     where: { ownerId: session.user.id },
+    orderBy: { updatedAt: "desc" },
   });
 
   return (
