@@ -9,6 +9,7 @@ import { NewCollectionModal } from "@/components/pages/collections/NewCollection
 import { CreateDeckButton } from "@/components/pages/collections/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/collections/CollectionOptionsDropdown";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
+import { AppFooter } from "@/components/AppFooter";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({
@@ -88,12 +89,15 @@ export default async function DecksPage() {
   });
 
   return (
-    <div className="max-w-screen-sm mx-auto">
-      <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold">Collections</h1>
-        <NewCollectionModal />
-      </header>
-      <div className="flex flex-col ">{renderCollections(collections)}</div>
-    </div>
+    <>
+      <div className="max-w-screen-sm mx-auto">
+        <header className="flex items-center justify-between">
+          <h1 className="text-3xl font-semibold">Collections</h1>
+          <NewCollectionModal />
+        </header>
+        <div className="flex flex-col ">{renderCollections(collections)}</div>
+      </div>
+      <AppFooter />
+    </>
   );
 }

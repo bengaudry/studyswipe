@@ -6,7 +6,7 @@ import { Collection } from "@prisma/client";
 import { Divider } from "@nextui-org/react";
 
 import { auth } from "@/lib/auth";
-
+import { AppFooter } from "@/components/AppFooter";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({
@@ -56,7 +56,9 @@ const renderDecks = async (collectionId: string) => {
 
 const renderCollections = (collections: Collection[] | null) => {
   if (collections === null || collections.length < 1)
-    return <p className="mt-2 text-neutral-400">No collection for this user.</p>;
+    return (
+      <p className="mt-2 text-neutral-400">No collection for this user.</p>
+    );
 
   return collections.map((collection, idx) => (
     <div key={collection.id}>
@@ -78,7 +80,7 @@ export default async function DecksPage({
   const session = await auth();
 
   const username = (await params).username;
-  console.info(username)
+  console.info(username);
 
   const user = await prisma.user.findFirst({
     where: { name: username },
@@ -93,9 +95,12 @@ export default async function DecksPage({
   });
 
   return (
-    <div className="max-w-screen-sm mx-auto">
-      <h1 className="text-3xl font-semibold">@{user.name}'s collections</h1>
-      <div className="flex flex-col ">{renderCollections(collections)}</div>
-    </div>
+    <>
+      <div className="max-w-screen-sm mx-auto">
+        <h1 className="text-3xl font-semibold">@{user.name}'s collections</h1>
+        <div className="flex flex-col ">{renderCollections(collections)}</div>
+      </div>
+      <AppFooter />
+    </>
   );
 }
