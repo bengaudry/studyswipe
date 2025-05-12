@@ -5,15 +5,9 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   Tab,
   Tabs,
   useDisclosure,
-  Image,
   Input,
   Drawer,
   DrawerBody,
@@ -371,7 +365,7 @@ function FlashcardPreview({
                     )
                   )
                 }
-                onDelete={() => updateContent((prev) => prev.splice(idx, 1))}
+                onDelete={() => updateContent((prev) => { prev.splice(idx, 1); return prev })}
               />
             </Reorder.Item>
           ))}
@@ -601,6 +595,7 @@ function ContentElement({
         />
       )}
 
+      {/* Delete element button */}
       <button
         onClick={() => {
           console.log("deleting");
