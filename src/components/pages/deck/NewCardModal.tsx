@@ -365,7 +365,7 @@ function FlashcardPreview({
                     )
                   )
                 }
-                onDelete={() => updateContent((prev) => { prev.splice(idx, 1); return prev })}
+                onDelete={() => updateContent((prev) => { return prev.filter((_, i) => i !== idx); })}
               />
             </Reorder.Item>
           ))}
