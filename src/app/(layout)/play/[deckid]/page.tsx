@@ -4,6 +4,7 @@ import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
 import { PlaygroundContextProvider } from "@/components/pages/play/PlayerContext";
 import { BackButton } from "@/components/BackButton";
 import { CardsPlaygroundProgress } from "@/components/pages/play/CardsPlaygroundProgress";
+import Link from "next/link";
 
 export default async function PlayPage({
   params,
@@ -40,7 +41,9 @@ export default async function PlayPage({
         <BackButton onlyIcon />
         <div>
           <h1 className="text-xl leading-6 mb-1 font-semibold">{deck.title}</h1>
-          <h3 className="text-sm text-neutral-400 -mt-1">@{owner?.pseudo}</h3>
+          <Link href={`/collections/${owner?.name}`}>
+            <h3 className="text-sm text-neutral-400 -mt-1">@{owner?.pseudo}</h3>
+          </Link>
         </div>
       </header>
 

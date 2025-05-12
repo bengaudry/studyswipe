@@ -18,7 +18,7 @@ export function AppNavbar() {
   const { prefetch } = useRouter();
 
   useEffect(() => {
-    prefetch("/decks");
+    prefetch("/collections");
   }, []);
 
   return (
@@ -41,7 +41,7 @@ export function AppNavbar() {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Link href="/decks" color="foreground">
+          <Link href="/collections" color="foreground">
             My collections
           </Link>
         </NavbarItem>
@@ -67,7 +67,7 @@ export function AppNavbar() {
         </NavbarMenuItem>
         <NavbarMenuItem>
           <Link
-            href="/decks"
+            href="/collections"
             className="w-full text-center"
             color="foreground"
             size="lg"

@@ -1,5 +1,5 @@
-import { CreateDeckButton } from "@/components/pages/decks/DeckLink";
-import { NewCollectionModalTrigger } from "@/components/pages/decks/NewCollectionModal";
+import { CreateDeckButton } from "@/components/pages/collections/DeckLink";
+import { NewCollectionModalTrigger } from "@/components/pages/collections/NewCollectionModal";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 
 export default function DecksLoader() {

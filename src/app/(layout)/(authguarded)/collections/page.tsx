@@ -5,9 +5,9 @@ import { Divider } from "@nextui-org/react";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 
-import { NewCollectionModal } from "@/components/pages/decks/NewCollectionModal";
-import { CreateDeckButton } from "@/components/pages/decks/DeckLink";
-import { CollectionOptionsDropdown } from "@/components/pages/decks/CollectionOptionsDropdown";
+import { NewCollectionModal } from "@/components/pages/collections/NewCollectionModal";
+import { CreateDeckButton } from "@/components/pages/collections/DeckLink";
+import { CollectionOptionsDropdown } from "@/components/pages/collections/CollectionOptionsDropdown";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
 
 const renderDecks = async (collectionId: string) => {
