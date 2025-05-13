@@ -60,7 +60,11 @@ const AnimatedSwiperWrapper = ({
   );
 };
 
-export function CardsDisplayer({ nextDeckToBePlayed }: { nextDeckToBePlayed?: Deck }) {
+export function CardsDisplayer({
+  nextDeckToBePlayed,
+}: {
+  nextDeckToBePlayed?: Deck;
+}) {
   const {
     cards,
     resetCardsToDefault,
@@ -247,19 +251,18 @@ export function CardsDisplayer({ nextDeckToBePlayed }: { nextDeckToBePlayed?: De
 }
 
 const ActionDrawer = () => {
-  const { updateCards, initialCards, updateSkippedCards, resetCardsToDefault } =
-    useContext(PlaygroundContext);
+  const { updateCards, resetCardsToDefault } = useContext(PlaygroundContext);
 
   const shuffleCards = () => {
     updateCards((prev) => shuffleArray(prev));
   };
 
   return (
-    <div className="absolute flex items-center z-30 bottom-3 left-1/2 -translate-x-1/2 rounded-full border shadow-xl bg-white">
+    <div className="absolute flex items-center z-30 bottom-3 left-1/2 -translate-x-1/2 rounded-full border shadow-xl bg-white dark:bg-neutral-900">
       <Tooltip content="Shuffle cards" placement="left">
         <button
           onClick={shuffleCards}
-          className="block p-3 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+          className="block p-3 rounded-full aspect-square hover:bg-neutral-100 dark:hover:bg-neutral-800 active:scale-80 transition-all"
         >
           <Shuffle size={24} />
         </button>
@@ -268,7 +271,7 @@ const ActionDrawer = () => {
       <Tooltip content="Restart" placement="right">
         <button
           onClick={resetCardsToDefault}
-          className="block p-3 rounded-full aspect-square hover:bg-neutral-100 active:scale-80 transition-all"
+          className="block p-3 rounded-full aspect-square hover:bg-neutral-100 dark:hover:bg-neutral-800 active:scale-80 transition-all"
         >
           <RefreshCw size={24} />
         </button>

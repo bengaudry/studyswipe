@@ -42,7 +42,7 @@ const CustomRadio = ({ color }: { color: string }) => (
     size="lg"
     classNames={{
       wrapper: cn(
-        `bg-${color}-500/20 group-data-[selected=true]:border-${color}-500`
+        `bg-${color}-500 bg-opacity-20 dark:bg-opacity-50 group-data-[selected=true]:border-${color}-500`
       ),
       control: cn(`bg-${color}-500`),
     }}

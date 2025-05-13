@@ -18,7 +18,7 @@ export const CardPreview = React.forwardRef<
     <div
       ref={ref}
       className={clsx(
-        `group relative border-2 aspect-square border-neutral-200 bg-${deckTheme}-500/20 transition-colors rounded-lg overflow-hidden p-2 sm:p-3 cursor-default`
+        `group relative border-2 aspect-square bg-${deckTheme}-500 bg-opacity-20 dark:bg-opacity-40 transition-colors rounded-lg overflow-hidden p-2 sm:p-3 cursor-default`
       )}
     >
       <div className="flex flex-col items-center justify-center gap-2 w-full h-full">
@@ -37,13 +37,13 @@ export const CardPreview = React.forwardRef<
       <div className="px-2 absolute left-0 bottom-0 flex items-center justify-end gap-2 translate-y-full group-hover:translate-y-0 transition-transform w-full bg-gradient-to-b from-black/0 to-black/20 backdrop-blur-md py-1">
         <button
           onClick={onAskDelete}
-          className="rounded-xl p-2 hover:bg-neutral-100/70 active:scale-90 transition-all"
+          className="rounded-xl p-2 hover:bg-neutral-100/70 dark:hover:bg-neutral-900 active:scale-90 transition-all"
         >
           <Trash size={22} />
         </button>
         <button
           onClick={onAskEdit}
-          className="rounded-xl p-2 hover:bg-neutral-100/70 active:scale-90 transition-all"
+          className="rounded-xl p-2 hover:bg-neutral-100/70 dark:hover:bg-neutral-900 active:scale-90 transition-all"
         >
           <Edit2 size={22} />
         </button>

@@ -130,19 +130,24 @@ function ToolSelector({
           // Get the screen resolution for tailwind (sm, md, ...)
           const hasRightNeighbour = (idx + 1) % elPerRow !== 0;
           const nbElementsOnBottomLine = tools.length % elPerRow || elPerRow;
-          const nbElementsWithoutBottomLine = tools.length - nbElementsOnBottomLine;
+          const nbElementsWithoutBottomLine =
+            tools.length - nbElementsOnBottomLine;
           const hasBottomNeighbour = idx < nbElementsWithoutBottomLine;
-          /* const isTopRight = idx + 1 === elPerRow;
+          const isTopRight = idx + 1 === elPerRow;
           const isBottomRight = idx === tools.length - 1 && !hasRightNeighbour;
           const isTopLeft = idx === 0;
-          const isBottomLeft = idx % elPerRow === 0; */
+          const isBottomLeft = idx % elPerRow === 0;
 
           return (
             <button
               key={tool.el.type}
-              className={`flex items-center justify-center p-2 hover:bg-neutral-100/50 active:scale-95 transition-all
+              className={`flex items-center justify-center p-2 hover:bg-neutral-100/50 dark:hover:bg-neutral-800 active:scale-95 transition-all
               ${hasRightNeighbour ? "border-r-1" : "border-r-0"}
               ${hasBottomNeighbour ? "border-b-1" : "border-b-0"}
+              ${isTopLeft ? "rounded-tl-lg" : ""}
+              ${isBottomLeft ? "rounded-bl-lg" : ""}
+              ${isTopRight ? "rounded-tr-lg" : ""}
+              ${isBottomRight ? "rounded-br-lg" : ""}
             `}
               onClick={() => onAddElement(tool.el)}
             >
@@ -158,14 +163,10 @@ function ToolSelector({
 /** Provide `card` if this if for editing the card */
 export function NewCardModal({
   deckid,
-  decktheme,
   card,
-  onCardChange,
 }: {
   deckid: string;
-  decktheme: string;
   card?: { data: FlashCard; index: number };
-  onCardChange?: (newCard: FlashCard) => void;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(false);
@@ -284,10 +285,10 @@ export function NewCardModal({
               <DrawerHeader className="flex flex-col gap-1 data-[open=false]:pointer-events-none">
                 Create a new card
               </DrawerHeader>
-              <DrawerBody>
+              <DrawerBody >
                 <ToolSelector onAddElement={handleAddElement} />
 
-                <Accordion isCompact defaultExpandedKeys={["question"]}>
+                <Accordion variant="splitted" isCompact defaultExpandedKeys={["question"]}>
                   <AccordionItem
                     key="question"
                     title="Question"

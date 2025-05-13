@@ -26,11 +26,11 @@ export function ActionButton({
         disabled
           ? "scale-85 grayscale cursor-default"
           : "md:hover:-translate-y-6 active:scale-95"
-      } rounded-t-full border-2 border-dashed border-neutral-300 transition-all shadow-xl`}
+      } rounded-t-full border-2 border-dashed border-neutral-300 dark:border-neutral-600 transition-all shadow-xl`}
     >
       <div
         className={clsx(
-          `w-full aspect-square bg-${color}-100 rounded-full grid place-content-center`
+          `w-full aspect-square bg-${color}-100 dark:bg-${color}-300 rounded-full grid place-content-center`
         )}
       >
         {Icon}

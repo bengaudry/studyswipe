@@ -35,9 +35,7 @@ export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
     <>
       <NewCardModal
         deckid={initialDeck.id}
-        decktheme={deckState?.theme ?? "neutral"}
         card={cardToEdit}
-        onCardChange={() => setCardToEdit(undefined)}
       />
 
       {deckState &&

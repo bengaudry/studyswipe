@@ -27,11 +27,11 @@ const renderDecks = async (collectionId: string) => {
           >
             <Link
               href={`deck/${deck.id}`}
-              className={`rounded-xl w-full p-2 transition-colors hover:bg-neutral-100`}
+              className={`rounded-xl w-full p-2 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800`}
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-8 h-8 aspect-square bg-${deck.theme}-500 bg-opacity-50 rounded-lg`}
+                  className={`w-8 h-8 aspect-square bg-${deck.theme}-500 bg-opacity-50 dark:bg-opacity-70 rounded-lg`}
                 />
                 <div className="flex flex-col">
                   <span className="text-sm leading-4 font-medium">
