@@ -32,7 +32,7 @@ export function DeckPageHeader({ deck }: { deck: Deck }) {
             isDisabled={(deckState?.cards.length ?? 0) < 1}
             color="primary"
             size="sm"
-            className={clsx(`bg-${deckState?.theme}-500`)}
+            className={deckState?.theme === "neutral" ? "bg-neutral-800" : clsx(`bg-${deckState?.theme}-500`)}
             onPress={() => push(`/play/${deck.id}`)}
             startContent={<Play fill="#fff" size={18} />}
           >

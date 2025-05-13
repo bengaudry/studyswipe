@@ -5,8 +5,6 @@ import {
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Tab,
-  Tabs,
   useDisclosure,
   Input,
   Drawer,
@@ -21,19 +19,13 @@ import {
 import { clsx } from "clsx";
 import {
   Dispatch,
+  ReactNode,
   SetStateAction,
   useContext,
   useEffect,
   useState,
 } from "react";
-import {
-  Plus,
-  Image as ImageIcon,
-  Type,
-  Zap,
-  Feather,
-  Link2,
-} from "react-feather";
+import { Plus, Feather, Link2 } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
 import Latex from "react-latex-next";
 import { LatexToolbar } from "./LatexToolbar";
@@ -57,6 +49,115 @@ export function NewCardModalTrigger({
     >
       Create a card
     </Button>
+  );
+}
+
+function useTailwindBreakpoint() {
+  const [breakpoint, setBreakpoint] = useState("base");
+
+  useEffect(() => {
+    function handleResize() {
+      const width = window.innerWidth;
+      if (width < 640) setBreakpoint("base");
+      else if (width < 768) setBreakpoint("sm");
+      else if (width < 1024) setBreakpoint("md");
+      else if (width < 1280) setBreakpoint("lg");
+      else if (width < 1536) setBreakpoint("xl");
+      else setBreakpoint("2xl");
+    }
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  return breakpoint;
+}
+
+function ToolSelector({
+  onAddElement,
+}: {
+  onAddElement: (newElement: FlashCardContentJSON) => void;
+}) {
+  const twBreakpoint = useTailwindBreakpoint();
+  const tools: { el: FlashCardContentJSON; representingElement: ReactNode }[] =
+    [
+      {
+        el: {
+          type: "text",
+          heading: "title",
+          text: "",
+        },
+        representingElement: <span className="text-xl font-bold">H1</span>,
+      },
+      {
+        el: {
+          type: "text",
+          heading: "subtitle",
+          text: "",
+        },
+        representingElement: <span className="text-lg font-semibold">H2</span>,
+      },
+      {
+        el: {
+          type: "text",
+          heading: "paragraph",
+          text: "",
+        },
+        representingElement: <span>Text</span>,
+      },
+      {
+        el: { type: "equation", equation: "" },
+        representingElement: <Latex>$\sqrt{"{x}"}$</Latex>,
+      },
+      {
+        el: { type: "quote", content: "" },
+        representingElement: <Feather />,
+      },
+      {
+        el: { type: "link", href: "" },
+        representingElement: <Link2 />,
+      },
+    ];
+
+  let elPerRow = 6;
+  switch (twBreakpoint) {
+    case "base":
+      elPerRow = 3;
+      break;
+    default:
+      elPerRow = 6;
+      break;
+  }
+
+  return (
+    <div className="flex flex-col gap-y-1 mx-2">
+      <div className="grid grid-cols-3 sm:grid-cols-6 mx-auto w-full border rounded-lg">
+        {tools.map((tool, idx) => {
+          // Get the screen resolution for tailwind (sm, md, ...)
+          const hasRightNeighbour = (idx + 1) % elPerRow !== 0;
+          const nbElementsOnBottomLine = tools.length % elPerRow || elPerRow;
+          const nbElementsWithoutBottomLine = tools.length - nbElementsOnBottomLine;
+          const hasBottomNeighbour = idx < nbElementsWithoutBottomLine;
+          /* const isTopRight = idx + 1 === elPerRow;
+          const isBottomRight = idx === tools.length - 1 && !hasRightNeighbour;
+          const isTopLeft = idx === 0;
+          const isBottomLeft = idx % elPerRow === 0; */
+
+          return (
+            <button
+              key={tool.el.type}
+              className={`flex items-center justify-center p-2 hover:bg-neutral-100/50 active:scale-95 transition-all
+              ${hasRightNeighbour ? "border-r-1" : "border-r-0"}
+              ${hasBottomNeighbour ? "border-b-1" : "border-b-0"}
+            `}
+              onClick={() => onAddElement(tool.el)}
+            >
+              {tool.representingElement}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -161,11 +262,9 @@ export function NewCardModal({
   };
 
   const handleAddElement = (newElement: FlashCardContentJSON) => {
-    if (current === "question") {
+    if (current === "question")
       setQuestionContent((prev) => [...prev, newElement]);
-    } else {
-      setAnswerContent((prev) => [...prev, newElement]);
-    }
+    else setAnswerContent((prev) => [...prev, newElement]);
   };
 
   return (
@@ -192,85 +291,9 @@ export function NewCardModal({
                 Create a new card
               </DrawerHeader>
               <DrawerBody>
-                <div className="flex justify-between items-center">
-                  <Tabs
-                    selectedKey={current}
-                    // @ts-ignore
-                    onSelectionChange={setCurrent}
-                  >
-                    <Tab title="Question" key="question" />
-                    <Tab title="Answer" key="answer" />
-                  </Tabs>
-                </div>
+                <ToolSelector onAddElement={handleAddElement} />
 
-                <div className="flex flex-col gap-y-1">
-                  <ButtonGroup>
-                    <Button
-                      variant="ghost"
-                      onPress={() =>
-                        handleAddElement({
-                          type: "text",
-                          heading: "title",
-                          text: "",
-                        })
-                      }
-                    >
-                      <span className="text-xl font-bold">H1</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onPress={() =>
-                        handleAddElement({
-                          type: "text",
-                          heading: "subtitle",
-                          text: "",
-                        })
-                      }
-                    >
-                      <span className="text-lg font-semibold">H2</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onPress={() =>
-                        handleAddElement({
-                          type: "text",
-                          heading: "paragraph",
-                          text: "",
-                        })
-                      }
-                    >
-                      <span>Text</span>
-                    </Button>
-                  </ButtonGroup>
-                  <ButtonGroup>
-                    <Button
-                      variant="ghost"
-                      onPress={() =>
-                        handleAddElement({ type: "equation", equation: "" })
-                      }
-                    >
-                      <Latex>$\sqrt{"{x}"}$</Latex>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onPress={() =>
-                        handleAddElement({ type: "quote", content: "" })
-                      }
-                    >
-                      <Feather />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      onPress={() =>
-                        handleAddElement({ type: "link", href: "" })
-                      }
-                    >
-                      <Link2 />
-                    </Button>
-                  </ButtonGroup>
-                </div>
-
-                <Accordion defaultExpandedKeys={["question"]}>
+                <Accordion isCompact defaultExpandedKeys={["question"]}>
                   <AccordionItem
                     key="question"
                     title="Question"
@@ -344,7 +367,11 @@ function FlashcardPreview({
                     )
                   )
                 }
-                onDelete={() => updateContent((prev) => { return prev.filter((_, i) => i !== idx); })}
+                onDelete={() =>
+                  updateContent((prev) => {
+                    return prev.filter((_, i) => i !== idx);
+                  })
+                }
               />
             </Reorder.Item>
           ))}

@@ -1,3 +1,4 @@
+"use client";
 import { Link, Image } from "@nextui-org/react";
 
 export function AppFooter() {
