@@ -75,7 +75,7 @@ export function CardsDisplayer({ nextDeckToBePlayed }: { nextDeckToBePlayed?: De
     setCounterOutOf,
   } = useContext(PlaygroundContext);
 
-  const { push } = useRouter();
+  const { push, prefetch } = useRouter();
 
   // Prevent scroll on body
   useEffect(() => {
@@ -102,7 +102,9 @@ export function CardsDisplayer({ nextDeckToBePlayed }: { nextDeckToBePlayed?: De
 
   const swipeCard = (action: "skip" | "validate") => {
     clearTimeouts();
-    if (cards.length == 0) return;
+    if (cards.length === 0) return;
+    if (cards.length === 1 && nextDeckToBePlayed)
+      prefetch(`/play/${nextDeckToBePlayed.id}`);
 
     const currCard = cards[0];
     const prevCardsLength = cards.length;
