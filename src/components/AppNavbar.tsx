@@ -1,4 +1,7 @@
 "use client";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { ProfileButton } from "./ProfileButton";
 import {
   Navbar,
   NavbarBrand,
@@ -7,11 +10,9 @@ import {
   NavbarMenu,
   NavbarMenuItem,
   NavbarMenuToggle,
-} from "@nextui-org/navbar";
-import { Image, Link } from "@nextui-org/react";
-import { ProfileButton } from "./ProfileButton";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+  Image,
+  Link,
+} from "@/components/ui";
 
 export function AppNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);

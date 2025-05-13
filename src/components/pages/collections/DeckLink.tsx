@@ -1,7 +1,10 @@
 "use client";
+import React, { PropsWithChildren, useState } from "react";
+import { useRouter } from "next/navigation";
 import { MAX_DECK_DESCRIPTION_LENGTH, MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
+import { Plus } from "react-feather";
+import { cn } from "@nextui-org/react";
 import {
-  cn,
   Button,
   Divider,
   Input,
@@ -13,14 +16,8 @@ import {
   Radio,
   RadioGroup,
   Textarea,
-  Tooltip,
   useDisclosure,
-  Switch,
-} from "@nextui-org/react";
-import { Deck } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import React, { PropsWithChildren, useState } from "react";
-import { Plus } from "react-feather";
+} from "@/components/ui";
 
 export function DeckButton({ title }: { title: string; id: string }) {}
 

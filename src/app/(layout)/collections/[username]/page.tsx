@@ -1,11 +1,9 @@
-import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
-
-import Link from "next/link";
 import { Collection } from "@prisma/client";
-import { Divider } from "@nextui-org/react";
-
+import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
+import Link from "next/link";
+import { Divider } from "@/components/ui";
 import { AppFooter } from "@/components/AppFooter";
 
 const renderDecks = async (collectionId: string) => {

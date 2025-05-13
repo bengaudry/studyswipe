@@ -1,9 +1,7 @@
 "use client";
-import { AppFooter } from "@/components/AppFooter";
-import { Button } from "@nextui-org/button";
-import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AppFooter } from "@/components/AppFooter";
+import { Button } from "@/components/ui";
 import { ArrowRight, Check, Plus } from "react-feather";
 
 export default function LandingPage() {

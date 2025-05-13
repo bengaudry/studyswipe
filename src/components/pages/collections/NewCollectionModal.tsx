@@ -1,4 +1,7 @@
 "use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Collection } from "@prisma/client";
 import { MAX_COLLECTION_TITLE_LENGTH } from "@/lib/constants";
 import {
   Button,
@@ -10,10 +13,7 @@ import {
   ModalFooter,
   ModalHeader,
   useDisclosure,
-} from "@nextui-org/react";
-import { Collection } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+} from "@/components/ui";
 import { Plus } from "react-feather";
 
 export type PartialCollection = Omit<

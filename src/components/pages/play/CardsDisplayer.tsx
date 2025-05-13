@@ -1,15 +1,14 @@
 "use client";
 import { PropsWithChildren, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Deck } from "@prisma/client";
 import { useSwipeable } from "react-swipeable";
-
 import { shuffleArray } from "@/lib/arrays";
-import { Button, Tooltip } from "@nextui-org/react";
+import { Button, Tooltip } from "@/components/ui";
 import { Check, Play, Plus, RefreshCw, Shuffle } from "react-feather";
 import { ActionButton } from "./ActionButton";
 import { FlashcardPreview } from "./FlashcardContent";
 import { PlaygroundContext } from "./PlayerContext";
-import { Deck } from "@prisma/client";
 
 const SWIPE_CARD_ANIM_DURATION = 500;
 const SWIPE_LAST_CARD_ANIM_DURATION = 200;

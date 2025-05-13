@@ -1,5 +1,5 @@
 import { SkeletonLoader } from "@/components/SkeletonLoader";
-import { Divider } from "@nextui-org/divider";
+import { Divider } from "@/components/ui";
 
 export default function AuthLoading() {
   return (

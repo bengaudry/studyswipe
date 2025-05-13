@@ -1,13 +1,13 @@
 "use client";
 import clsx from "clsx";
+import { useContext } from "react";
+import { useRouter } from "next/navigation";
+import { Deck } from "@prisma/client";
 import { BackButton } from "@/components/BackButton";
 import { Button } from "@nextui-org/button";
-import { Deck } from "@prisma/client";
 import { Play, Shuffle } from "react-feather";
 import { DeckOptionsDropdown } from "./DeckOptionsDropdown";
-import { useRouter } from "next/navigation";
-import { Chip, Tooltip } from "@nextui-org/react";
-import { useContext } from "react";
+import { Chip, Tooltip } from "@/components/ui";
 import { DeckDataContext } from "./DeckDataProvider";
 
 export function DeckPageHeader({ deck }: { deck: Deck }) {

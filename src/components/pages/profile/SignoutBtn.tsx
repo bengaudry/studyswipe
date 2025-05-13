@@ -1,8 +1,8 @@
 "use client";
-import { Button } from "@nextui-org/button";
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { signOut } from "next-auth/react";
+import { Button } from "@/components/ui";
 import { LogOut } from "react-feather";
 
 export function SignOutBtn() {

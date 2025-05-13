@@ -1,5 +1,4 @@
-"use client";
-import { Link, Image } from "@nextui-org/react";
+import { Link, Image } from "@/components/ui";
 
 export function AppFooter() {
   return (

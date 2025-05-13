@@ -1,6 +1,6 @@
-import { Image, Alert } from "@nextui-org/react";
 import clsx from "clsx";
 import Latex from "react-latex-next";
+import { Image, Alert } from "@/components/ui";
 
 export type FlashcardContentProps = { content: FlashCardContentJSON };
 
