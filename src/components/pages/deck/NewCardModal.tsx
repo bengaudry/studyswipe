@@ -433,7 +433,7 @@ function ContentElement({
             onClick={() => setFocused(true)}
             className="w-full py-2 grid place-content-center"
           >
-            <Latex>${content.equation || "Your~equation~here"}$</Latex>
+            <Latex>$ {content.equation || "$Your equation here$"} $</Latex>
           </button>
           {isFocused && (
             <>
@@ -448,7 +448,7 @@ function ContentElement({
                 />
               </div> */}
               <textarea
-                placeholder="Type your equation in LaTex format here"
+                placeholder="Type your equation in LaTex format here. The text can be placed either with \text{...} or with $...$."
                 autoFocus
                 autoCorrect="false"
                 autoComplete="false"
