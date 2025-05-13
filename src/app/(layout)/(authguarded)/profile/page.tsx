@@ -1,7 +1,7 @@
 "use client";
+import { useSession } from "next-auth/react";
 import { SignOutBtn } from "@/components/pages/profile/SignoutBtn";
 import { Divider, User } from "@/components/ui";
-import { useSession } from "next-auth/react";
 
 export default function ProfilePage() {
   const { data: session } = useSession();

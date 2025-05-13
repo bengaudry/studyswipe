@@ -1,4 +1,3 @@
-"use client";
 import { Link, Image } from "@/components/ui";
 
 export function AppFooter() {
