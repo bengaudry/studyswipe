@@ -83,6 +83,10 @@ export function CardsDisplayer({
   // Prevent scroll on body
   useEffect(() => {
     document.body.style.overflowY = "hidden";
+
+    return () => {
+      document.body.style.overflowY = "auto";
+    };
   });
 
   const [animParams, setAnimParams] = useState<AnimParams>({
