@@ -1,9 +1,9 @@
 "use client";
-import { Progress } from "@nextui-org/react";
 import { useContext } from "react";
-import { PlaygroundContext } from "./PlayerContext";
 import { clsx } from "clsx";
 import { Deck } from "@prisma/client";
+import { PlaygroundContext } from "./PlayerContext";
+import { Progress } from "@/components/ui";
 
 export function CardsPlaygroundProgress({ deck }: { deck: Deck }) {
   const { cards, counterOutOf, counter } = useContext(PlaygroundContext);

@@ -1,5 +1,5 @@
 "use client";
-import { Skeleton, SkeletonProps } from "@nextui-org/react";
+import { Skeleton, SkeletonProps } from "@/components/ui";
 
 export function SkeletonLoader(props: SkeletonProps) {
     return <Skeleton {...props} />

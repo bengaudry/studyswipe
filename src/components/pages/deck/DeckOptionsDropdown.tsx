@@ -1,7 +1,14 @@
 "use client";
-import { Button } from "@nextui-org/button";
-import { Input, Textarea } from "@nextui-org/react";
+import { useContext, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Deck } from "@prisma/client";
+import { validateFlashCardArray } from "@/lib/cardObject";
+import { MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
+import { DeckDataContext } from "./DeckDataProvider";
 import {
+  Button,
+  Input,
+  Textarea,
   useDisclosure,
   Dropdown,
   DropdownTrigger,
@@ -12,10 +19,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
-} from "@nextui-org/react";
-import { Deck } from "@prisma/client";
-import { useRouter } from "next/navigation";
-import { useContext, useState } from "react";
+} from "@/components/ui";
 import {
   MoreVertical,
   Edit2,
@@ -24,9 +28,6 @@ import {
   Eye,
   Database,
 } from "react-feather";
-import { DeckDataContext } from "./DeckDataProvider";
-import { validateFlashCardArray } from "@/lib/cardObject";
-import { MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
 
 export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
   const [loading, setLoading] = useState(false);

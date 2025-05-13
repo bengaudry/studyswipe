@@ -1,13 +1,11 @@
 "use client";
-import { authErrorToMessage } from "@/lib/errorHandling/authErrors";
-import { Button } from "@nextui-org/button";
-import { Divider } from "@nextui-org/divider";
-import { Alert, Spinner } from "@nextui-org/react";
-import { signIn } from "next-auth/react";
-import Image from "next/image";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { GitHub } from "react-feather";
+import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
+import { signIn } from "next-auth/react";
+import { authErrorToMessage } from "@/lib/errorHandling/authErrors";
+import { Button, Divider, Alert, Spinner } from "@/components/ui";
+import { GitHub as GitHubIcon } from "react-feather";
 
 export default function AuthPage() {
   const params = useSearchParams();
@@ -61,7 +59,7 @@ export default function AuthPage() {
               <Button
                 variant="solid"
                 startContent={
-                  <GitHub fill="white" size={22} className="mx-1 block" />
+                  <GitHubIcon fill="white" size={22} className="mx-1 block" />
                 }
                 className="font-medium w-full bg-gradient-to-b from-zinc-700 to-zinc-900 text-white"
                 onPress={() => handleSignInRequest("github")}

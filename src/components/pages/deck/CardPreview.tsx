@@ -1,9 +1,9 @@
 "use client";
 import clsx from "clsx";
 import React from "react";
-import { Image } from "@nextui-org/react";
-import { Edit2, Trash } from "react-feather";
 import Latex from "react-latex-next";
+import { Image } from "@/components/ui";
+import { Edit2, Trash } from "react-feather";
 
 export const CardPreview = React.forwardRef<
   HTMLDivElement,

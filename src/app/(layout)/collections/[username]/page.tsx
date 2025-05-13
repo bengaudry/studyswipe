@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 
 import Link from "next/link";
 import { Collection } from "@prisma/client";
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@/components/ui";
 
 import { auth } from "@/lib/auth";
 import { AppFooter } from "@/components/AppFooter";

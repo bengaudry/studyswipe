@@ -1,17 +1,16 @@
 "use client";
 import { signOut, useSession } from "next-auth/react";
-import { Button, ButtonProps } from "@nextui-org/button";
-import { LogOut, User } from "react-feather";
 import { useRouter } from "next/navigation";
-import { SkeletonLoader } from "./SkeletonLoader";
 import {
   Avatar,
+  Button,
+  ButtonProps,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-  Tooltip,
-} from "@nextui-org/react";
+} from "@/components/ui";
+import { LogOut, User } from "react-feather";
 
 export function ProfileButton({ onPress, ...props }: ButtonProps) {
   const { data: session } = useSession();

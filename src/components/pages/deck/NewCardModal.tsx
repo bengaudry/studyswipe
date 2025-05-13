@@ -1,10 +1,12 @@
 "use client";
+import { clsx } from "clsx";
+import { Reorder } from "motion/react";
+import Latex from "react-latex-next";
+import { LatexToolbar } from "./LatexToolbar";
+import { Plus, Feather, Link2 } from "react-feather";
+import { DeckDataContext } from "./DeckDataProvider";
 import {
   Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
   useDisclosure,
   Input,
   Drawer,
@@ -14,9 +16,7 @@ import {
   DrawerHeader,
   Accordion,
   AccordionItem,
-  ButtonGroup,
-} from "@nextui-org/react";
-import { clsx } from "clsx";
+} from "@/components/ui";
 import {
   Dispatch,
   ReactNode,
@@ -25,12 +25,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Plus, Feather, Link2 } from "react-feather";
-import { DeckDataContext } from "./DeckDataProvider";
-import Latex from "react-latex-next";
-import { LatexToolbar } from "./LatexToolbar";
-import { Draggable } from "react-drag-reorder";
-import { Reorder } from "motion/react";
 
 export function NewCardModalTrigger({
   onOpen,

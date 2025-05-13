@@ -13,7 +13,7 @@ import {
   ModalFooter,
   ModalHeader,
   useDisclosure,
-} from "@nextui-org/react";
+} from "@/components/ui";
 import { Collection } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
