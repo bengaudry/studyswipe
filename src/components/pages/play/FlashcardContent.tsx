@@ -81,11 +81,11 @@ export function FlashcardPreview({
   return (
     <div
       className={clsx(
-        `absolute inset-0 w-full h-full bg-${decktheme}-500/20 shadow-xl rounded-lg p-6 overflow-y-scroll grid place-content-center gap-2 ${
+        `absolute inset-0 w-full h-full bg-${decktheme}-500 bg-opacity-20 dark:bg-opacity-50 shadow-xl rounded-lg p-6 overflow-y-scroll grid place-content-center gap-2 ${
           isActive
-            ? "scale-100 opacity-100 shadow-neutral-500/20"
-            : "scale-85 opacity-0 shadow-neutral-500/0"
-        } transition-all`
+            ? "scale-100 opacity-100 shadow-neutral-500/20 dark:shadow-neutral-700/30"
+            : "scale-85 opacity-0 shadow-neutral-500/0 dark:shadow-neutral-700/0"
+        }  transition-all`
       )}
     >
       {content.map((value, idx) => (

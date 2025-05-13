@@ -1,12 +1,20 @@
-@import url('https://fonts.googleapis.com/css2?family=Imperial+Script&family=Poppins:wght@400;500;600;700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Imperial+Script&family=Poppins:wght@400;500;600;700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+html {
+    @apply text-neutral-900 bg-white dark:text-neutral-100 dark:bg-neutral-950;
+}
+
 body {
-  @apply text-neutral-900 bg-white dark:text-neutral-100 dark:bg-neutral-950;
+  @apply text-neutral-900 bg-white dark:text-neutral-100 dark:bg-neutral-950 border-neutral-200;
   min-height: 100vh;
   font-family: Poppins, Arial, Helvetica, sans-serif;
+}
+
+* {
+  @apply dark:border-neutral-800;
 }
 
 .dotted-bg {
@@ -17,6 +25,18 @@ body {
       #fefefe 24px
     ),
     repeating-linear-gradient(#e6e6e655, #e6e6e6);
+}
+
+@media screen and (prefers-color-scheme: dark) {
+  .dotted-bg {
+    background-color: #121212;
+    background-image: repeating-radial-gradient(
+        circle at 0 0,
+        transparent 0,
+        #121212 24px
+      ),
+      repeating-linear-gradient(#26262655, #262626);
+  }
 }
 
 .animate-skip-card {
