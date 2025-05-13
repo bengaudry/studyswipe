@@ -18,7 +18,7 @@ export function FlashcardContent({ content }: FlashcardContentProps) {
       );
     case "equation":
       return (
-        <Latex>${content.equation}$</Latex>
+        <Latex>$ {content.equation} $</Latex>
       );
     case "quote":
       return (
