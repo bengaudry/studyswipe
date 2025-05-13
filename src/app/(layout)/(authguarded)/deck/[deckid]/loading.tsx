@@ -1,8 +1,7 @@
 import { BackButton } from "@/components/BackButton";
-import { NewCardModal, NewCardModalTrigger } from "@/components/pages/deck/NewCardModal";
+import { NewCardModalTrigger } from "@/components/pages/deck/NewCardModal";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { Button } from "@nextui-org/button";
-import { Chip } from "@nextui-org/react";
 import { Play, Shuffle } from "react-feather";
 
 export default async function DeckPageLoader() {

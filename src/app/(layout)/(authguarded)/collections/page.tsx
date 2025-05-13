@@ -78,7 +78,7 @@ const renderCollections = (collections: Collection[] | null) => {
   ));
 };
 
-export default async function DecksPage() {
+export default async function CollectionsPage() {
   const session = await auth();
 
   if (session?.user?.id === undefined) return null;
@@ -87,6 +87,7 @@ export default async function DecksPage() {
     where: { ownerId: session.user.id },
     orderBy: { updatedAt: "desc" },
   });
+
 
   return (
     <>
