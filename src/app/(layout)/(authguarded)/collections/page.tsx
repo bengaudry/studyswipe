@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Collection } from "@prisma/client";
-import { Divider } from "@/components/ui";
+import { Divider } from "@nextui-org/react";
 
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
@@ -9,8 +9,9 @@ import { NewCollectionModal } from "@/components/pages/collections/NewCollection
 import { CreateDeckButton } from "@/components/pages/collections/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/collections/CollectionOptionsDropdown";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
+import { AppFooter } from "@/components/AppFooter";
 
-async function CollectionDecksList({ collectionId }: { collectionId: string }) {
+const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({
     where: { collectionId },
     orderBy: { title: "asc" },
@@ -26,18 +27,18 @@ async function CollectionDecksList({ collectionId }: { collectionId: string }) {
           >
             <Link
               href={`deck/${deck.id}`}
-              className={`rounded-xl w-full p-2 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800`}
+              className={`rounded-xl w-full p-2 transition-colors hover:bg-neutral-100`}
             >
               <div className="flex items-center gap-3">
                 <div
-                  className={`w-8 h-8 aspect-square bg-${deck.theme}-500 bg-opacity-50 dark:bg-opacity-70 rounded-lg`}
+                  className={`w-8 h-8 aspect-square bg-${deck.theme}-500 bg-opacity-50 rounded-lg`}
                 />
                 <div className="flex flex-col">
                   <span className="text-sm leading-4 font-medium">
                     {deck.title}
                   </span>
                   <span className="text-xs leading-4 text-neutral-400">
-                    {deck.cards?.length} cards -{" "}
+                    {deck.cards.length} cards -{" "}
                     {deck.isPublic ? "Public" : "Private"}
                   </span>
                 </div>
@@ -52,13 +53,9 @@ async function CollectionDecksList({ collectionId }: { collectionId: string }) {
       </div>
     </div>
   );
-}
+};
 
-async function CollectionsList({
-  collections,
-}: {
-  collections: Collection[] | null;
-}) {
+const renderCollections = (collections: Collection[] | null) => {
   if (collections === null || collections.length < 1)
     return (
       <p className="mt-2 text-neutral-400">
@@ -66,7 +63,7 @@ async function CollectionsList({
       </p>
     );
 
-  return collections.map(async(collection, idx) => (
+  return collections.map((collection, idx) => (
     <div key={collection.id}>
       <div className="pt-4 pb-6">
         <div className="flex flex-row items-center justify-between mb-2">
@@ -74,12 +71,12 @@ async function CollectionsList({
           <CollectionOptionsDropdown collection={collection} />
         </div>
 
-        {await CollectionDecksList({ collectionId: collection.id })}
+        {renderDecks(collection.id)}
       </div>
       {idx < collections.length - 1 && <Divider />}
     </div>
   ));
-}
+};
 
 export default async function CollectionsPage() {
   const session = await auth();
@@ -91,15 +88,17 @@ export default async function CollectionsPage() {
     orderBy: { updatedAt: "desc" },
   });
 
+
   return (
-    <div className="max-w-screen-sm mx-auto">
-      <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold">Collections</h1>
-        <NewCollectionModal />
-      </header>
-      <div className="flex flex-col ">
-        <CollectionsList collections={collections} />
+    <>
+      <div className="max-w-screen-sm mx-auto">
+        <header className="flex items-center justify-between">
+          <h1 className="text-3xl font-semibold">Collections</h1>
+          <NewCollectionModal />
+        </header>
+        <div className="flex flex-col ">{renderCollections(collections)}</div>
       </div>
-    </div>
+      <AppFooter />
+    </>
   );
 }
