@@ -66,7 +66,7 @@ async function CollectionsList({
       </p>
     );
 
-  return collections.map((collection, idx) => (
+  return collections.map(async(collection, idx) => (
     <div key={collection.id}>
       <div className="pt-4 pb-6">
         <div className="flex flex-row items-center justify-between mb-2">
@@ -74,7 +74,7 @@ async function CollectionsList({
           <CollectionOptionsDropdown collection={collection} />
         </div>
 
-        <CollectionDecksList collectionId={collection.id} />
+        {await CollectionDecksList({ collectionId: collection.id })}
       </div>
       {idx < collections.length - 1 && <Divider />}
     </div>
