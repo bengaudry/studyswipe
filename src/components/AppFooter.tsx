@@ -1,3 +1,4 @@
+"use client"
 import { FooterLinks } from "./FooterLinks";
 import { AppIcon } from "./AppIcon";
 
