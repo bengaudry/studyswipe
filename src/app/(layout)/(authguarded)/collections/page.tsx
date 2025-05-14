@@ -10,7 +10,7 @@ import { CreateDeckButton } from "@/components/pages/collections/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/collections/CollectionOptionsDropdown";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
 
-const renderDecks = async (collectionId: string) => {
+async function CollectionDecksList({ collectionId }: { collectionId: string }) {
   const decks = await prisma.deck.findMany({
     where: { collectionId },
     orderBy: { title: "asc" },
@@ -37,7 +37,7 @@ const renderDecks = async (collectionId: string) => {
                     {deck.title}
                   </span>
                   <span className="text-xs leading-4 text-neutral-400">
-                    {deck.cards.length} cards -{" "}
+                    {deck.cards?.length} cards -{" "}
                     {deck.isPublic ? "Public" : "Private"}
                   </span>
                 </div>
@@ -52,9 +52,13 @@ const renderDecks = async (collectionId: string) => {
       </div>
     </div>
   );
-};
+}
 
-const renderCollections = (collections: Collection[] | null) => {
+async function CollectionsList({
+  collections,
+}: {
+  collections: Collection[] | null;
+}) {
   if (collections === null || collections.length < 1)
     return (
       <p className="mt-2 text-neutral-400">
@@ -70,12 +74,12 @@ const renderCollections = (collections: Collection[] | null) => {
           <CollectionOptionsDropdown collection={collection} />
         </div>
 
-        {renderDecks(collection.id)}
+        <CollectionDecksList collectionId={collection.id} />
       </div>
       {idx < collections.length - 1 && <Divider />}
     </div>
   ));
-};
+}
 
 export default async function CollectionsPage() {
   const session = await auth();
@@ -93,7 +97,9 @@ export default async function CollectionsPage() {
         <h1 className="text-3xl font-semibold">Collections</h1>
         <NewCollectionModal />
       </header>
-      <div className="flex flex-col ">{renderCollections(collections)}</div>
+      <div className="flex flex-col ">
+        <CollectionsList collections={collections} />
+      </div>
     </div>
   );
 }
