@@ -457,7 +457,7 @@
     "@react-types/breadcrumbs" "3.7.9"
     "@react-types/shared" "3.26.0"
 
-"@nextui-org/button@2.2.9", "@nextui-org/button@^2.2.9":
+"@nextui-org/button@2.2.9":
   version "2.2.9"
   resolved "https://registry.npmjs.org/@nextui-org/button/-/button-2.2.9.tgz"
   integrity sha512-RrfjAZHoc6nmaqoLj40M0Qj3tuDdv2BMGCgggyWklOi6lKwtOaADPvxEorDwY3GnN54Xej+9SWtUwE8Oc3SnOg==
@@ -790,7 +790,7 @@
     "@react-stately/overlays" "3.6.12"
     "@react-types/overlays" "3.8.11"
 
-"@nextui-org/navbar@2.2.8", "@nextui-org/navbar@^2.2.8":
+"@nextui-org/navbar@2.2.8":
   version "2.2.8"
   resolved "https://registry.npmjs.org/@nextui-org/navbar/-/navbar-2.2.8.tgz"
   integrity sha512-XutioQ75jonZk6TBtjFdV6N3eLe8y85tetjOdOg6X3mKTPZlQuBb+rtb6pVNOOvcuQ7zKigWIq2ammvF9VNKaQ==
