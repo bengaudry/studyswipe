@@ -16,15 +16,15 @@ export default function AuthPage() {
 
   const handleSignInRequest = (provider: string) => {
     setIsLoading(true);
-    prefetch("/decks");
-    signIn(provider, { redirectTo: "/decks" });
+    prefetch("/collections");
+    signIn(provider, { redirectTo: "/collections" });
   };
 
   return (
     <>
       {isLoading && (
-        <div className="fixed inset-0 w-screen h-screen z-50 grid place-content-center bg-white/50">
-          <Spinner />
+        <div className="fixed inset-0 w-screen h-screen z-50 grid place-content-center bg-white/50 dark:bg-neutral-800/50">
+          <Spinner size="lg" />
         </div>
       )}
       <div className="grid place-content-center w-full h-full">
@@ -61,7 +61,7 @@ export default function AuthPage() {
                 startContent={
                   <GitHubIcon fill="white" size={22} className="mx-1 block" />
                 }
-                className="font-medium w-full bg-gradient-to-b from-zinc-700 to-zinc-900 text-white"
+                className="font-medium w-full bg-gradient-to-b from-zinc-700 to-zinc-900 dark:to-zinc-800 text-white"
                 onPress={() => handleSignInRequest("github")}
               >
                 Continue with GitHub

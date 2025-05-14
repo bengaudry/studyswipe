@@ -395,12 +395,12 @@ function ContentElement({
     <div
       className={`group relative border-2 border-dashed rounded-lg transition-colors ${
         isFocused
-          ? "border-black shadow-md"
-          : "border-neutral-300 hover:border-neutral-500"
+          ? "border-black dark:border-neutral-200 shadow-md"
+          : "border-neutral-300 hover:border-neutral-500 dark:border-neutral-600"
       }`}
     >
       {content.type === "text" && (
-        <>
+        <div>
           <button className="block w-full" onClick={() => setFocused(true)}>
             <p
               className={`bg-transparent whitespace-normal px-3 py-1 min-h-4 bg-red-500 block ${
@@ -414,13 +414,13 @@ function ContentElement({
             <textarea
               value={content.text || ""}
               autoFocus
-              className={`absolute z-40 top-full left-0 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
+              className={`absolute z-40 top-full left-0 bg-white dark:bg-neutral-800 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               onChange={(e) => onUpdate({ ...content, text: e.target.value })}
             />
           )}
-        </>
+        </div>
       )}
 
       {content.type === "quote" && (
@@ -438,7 +438,7 @@ function ContentElement({
             <textarea
               value={content.content || ""}
               autoFocus
-              className={`absolute z-40 top-full left-0 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
+              className={`absolute z-40 top-full left-0 bg-white dark:bg-neutral-800 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               onChange={(e) =>
@@ -478,7 +478,7 @@ function ContentElement({
                 onBlur={() => setFocused(false)}
                 wrap="hard"
                 rows={2}
-                className={`absolute z-40 top-full mt-2 bg-white rounded-lg w-full h-fit overflow-y-scroll p-2`}
+                className={`absolute z-40 top-full mt-2 bg-white dark:bg-neutral-800 rounded-lg w-full h-fit overflow-y-scroll p-2`}
                 onChange={(e) =>
                   onUpdate({ ...content, equation: e.target.value })
                 }
@@ -493,7 +493,7 @@ function ContentElement({
           label="URL"
           placeholder="https://studyswipe.vercel.app/"
           value={content.href}
-          classNames={{ inputWrapper: `bg-transparent focus:bg-white` }}
+          classNames={{ inputWrapper: `bg-transparent focus:bg-white dark:focus:bg-neutral-900` }}
           className="text-blue-500"
           onChange={(e) => onUpdate({ ...content, href: e.target.value })}
         />

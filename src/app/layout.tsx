@@ -1,9 +1,9 @@
+import { PropsWithChildren } from "react";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppLayout } from "@/components/AppLayout";
-import { PropsWithChildren } from "react";
 import { AppNavbar } from "@/components/AppNavbar";
-import { Analytics } from "@vercel/analytics/react";
 
 import "./globals.css";
 import "katex/dist/katex.min.css";
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: Readonly<PropsWithChildren>) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Analytics />
         <AppLayout>
