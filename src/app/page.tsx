@@ -29,7 +29,6 @@ export default function LandingPage() {
         />
       </section>
 
-      <AppFooter />
     </>
   );
 }
