@@ -1,12 +1,8 @@
-"use client";
-import { useRouter } from "next/navigation";
 import { AppFooter } from "@/components/AppFooter";
-import { Button } from "@/components/ui";
-import { ArrowRight, Check, Plus } from "react-feather";
+import { LandingCta } from "@/components/pages/landing/cta"
+import { Check, Plus } from "react-feather";
 
 export default function LandingPage() {
-  const { push } = useRouter();
-
   return (
     <>
       <section className="relative w-full h-[80vh] p-8 flex items-center justify-center">
@@ -20,15 +16,7 @@ export default function LandingPage() {
             Turn your courses into flashcards to memoize more easily all the
             topics of it
           </p>
-          <Button
-            size="lg"
-            onPress={() => push("/decks")}
-            className="mt-6 w-fit mx-auto"
-            color="primary"
-            endContent={<ArrowRight />}
-          >
-            Create a flashcard
-          </Button>
+          <LandingCta />
         </div>
 
         <Plus
