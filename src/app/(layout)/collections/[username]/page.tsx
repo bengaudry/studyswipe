@@ -4,7 +4,6 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { Divider } from "@/components/ui";
-import { AppFooter } from "@/components/AppFooter";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({
@@ -93,12 +92,9 @@ export default async function DecksPage({
   });
 
   return (
-    <>
-      <div className="max-w-screen-sm mx-auto">
-        <h1 className="text-3xl font-semibold">@{user.name}'s collections</h1>
-        <div className="flex flex-col ">{renderCollections(collections)}</div>
-      </div>
-      <AppFooter />
-    </>
+    <div className="max-w-screen-sm mx-auto">
+      <h1 className="text-3xl font-semibold">@{user.name}'s collections</h1>
+      <div className="flex flex-col ">{renderCollections(collections)}</div>
+    </div>
   );
 }
