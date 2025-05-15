@@ -32,7 +32,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import { useAiCardGeneration } from "@/app/hooks/useAiCardGeneration";
+import { useAiCardGeneration } from "@/hooks/useAiCardGeneration";
 
 export function NewCardModalTrigger({
   onOpen,
