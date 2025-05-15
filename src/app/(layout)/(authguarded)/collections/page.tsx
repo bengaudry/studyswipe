@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Collection } from "@prisma/client";
-import { Divider } from "@nextui-org/react";
+import { Divider } from "@/components/ui";
 
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
