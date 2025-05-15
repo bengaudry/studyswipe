@@ -28,7 +28,7 @@ export default function LandingPage() {
           size={200}
         />
       </section>
-
+      <AppFooter />
     </>
   );
 }

@@ -4,7 +4,7 @@
 @tailwind utilities;
 
 html {
-    @apply text-neutral-900 bg-white dark:text-neutral-100 dark:bg-neutral-950;
+  @apply text-neutral-900 bg-white dark:text-neutral-100 dark:bg-neutral-950;
 }
 
 body {
