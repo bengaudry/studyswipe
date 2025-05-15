@@ -232,9 +232,13 @@ export function AiPromptModal({
 export function NewCardModal({
   deckid,
   card,
+  onAiGenerateCard,
+  onAiStopGeneration
 }: {
   deckid: string;
   card?: { data: FlashCard; index: number };
+  onAiGenerateCard: () => void;
+  onAiStopGeneration: () => void;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(false);
@@ -249,10 +253,16 @@ export function NewCardModal({
 
   // AI GENERATION
   const {
-    data: generatedCards,
     generateCards,
     isAskingGeneration,
+    isGenerating
   } = useAiCardGeneration();
+
+  useEffect(() => {
+    if (isGenerating) onAiGenerateCard()
+    else onAiStopGeneration()
+  }, [isGenerating])
+
   const {
     isOpen: aiPromptModalIsOpen,
     onOpen: onOpenAiPromptModal,

@@ -4,6 +4,7 @@ import { NewCardModal } from "./NewCardModal";
 import { CardPreview } from "./CardPreview";
 import { useContext, useState } from "react";
 import { DeckDataContext } from "./DeckDataProvider";
+import { SkeletonLoader } from "@/components/SkeletonLoader";
 
 export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
   const [cardToEdit, setCardToEdit] = useState<
@@ -11,6 +12,7 @@ export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
   >(undefined);
 
   const { data: deckState, updateDeckData } = useContext(DeckDataContext);
+  const [isAiGeneratingCard, setIsAiGeneratingCard] = useState(false);
 
   const handleDeleteCard = async (cardindex: number) => {
     const prevDeckState = deckState;
@@ -36,6 +38,8 @@ export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
       <NewCardModal
         deckid={initialDeck.id}
         card={cardToEdit}
+        onAiGenerateCard={() => setIsAiGeneratingCard(true)}
+        onAiStopGeneration={() => setIsAiGeneratingCard(false)}
       />
 
       {deckState &&
@@ -50,6 +54,9 @@ export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
             }
           />
         ))}
+      {isAiGeneratingCard && (
+        <SkeletonLoader className="w-full aspect-square border-2 rounded-lg h-full" />
+      )}
     </>
   );
 }
