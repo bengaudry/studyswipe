@@ -9,7 +9,7 @@ export function LandingCta() {
     <Button
       size="lg"
       onPress={() => push("/decks")}
-      className="mt-6 w-fit mx-auto"
+      className="z-20 mt-6 w-fit mx-auto"
       color="primary"
       endContent={<ArrowRight />}
     >

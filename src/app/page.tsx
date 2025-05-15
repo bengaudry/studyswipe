@@ -7,12 +7,12 @@ export default function LandingPage() {
     <>
       <section className="relative w-full h-[80vh] p-2 sm:p-4 md:p-8 flex items-center justify-center">
         <div className="flex flex-col items-center justify-center rounded-3xl border dark:border-neutral-700 flex-1 w-full h-full max-w-screen-2xl dotted-bg">
-          <h1 className="text-center text-secondary-950 text-4xl font-semibold sm:text-5xl md:text-6xl md:font-bold lg:text-7xl">
+          <h1 className="z-20 text-center text-secondary-950 text-4xl font-semibold sm:text-5xl md:text-6xl md:font-bold lg:text-7xl">
             Learn your course
             <br />
             like it is a game
           </h1>
-          <p className="mt-4 text-lg max-w-sm text-center mx-auto text-neutral-500 dark:text-neutral-400 leading-6">
+          <p className="z-20 mt-4 text-lg max-w-sm text-center mx-auto text-neutral-500 dark:text-neutral-400 leading-6">
             Turn your courses into flashcards to memoize more easily all the
             topics of it
           </p>
@@ -20,11 +20,11 @@ export default function LandingPage() {
         </div>
 
         <Plus
-          className=" absolute top-6 left-6 rotate-[60deg] text-neutral-300 blur-sm"
+          className=" absolute z-10 top-6 left-6 rotate-[60deg] text-neutral-300 blur-sm"
           size={200}
         />
         <Check
-          className="absolute -rotate-12 bottom-6 right-6 text-neutral-300 blur-sm"
+          className="absolute z-10 -rotate-12 bottom-6 right-6 text-neutral-300 blur-sm"
           size={200}
         />
       </section>
