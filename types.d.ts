@@ -1,3 +1,8 @@
+/* +====== IMPORTANT ======+ */
+/* UPDATE THE GEMINI RESPONSE
+ * SCHEMA WHEN UPDATING THESE
+ * TYPES !!!!!               */
+
 type FlashCardContentJSON =
   | {
       type: "text";

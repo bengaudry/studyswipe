@@ -2,13 +2,11 @@
 import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Deck } from "@prisma/client";
-import { validateFlashCardArray } from "@/lib/cardObject";
 import { MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
 import { DeckDataContext } from "./DeckDataProvider";
 import {
   Button,
   Input,
-  Textarea,
   useDisclosure,
   Dropdown,
   DropdownTrigger,
@@ -20,14 +18,7 @@ import {
   ModalBody,
   ModalFooter,
 } from "@/components/ui";
-import {
-  MoreVertical,
-  Edit2,
-  Trash,
-  EyeOff,
-  Eye,
-  Database,
-} from "react-feather";
+import { MoreVertical, Edit2, Trash, EyeOff, Eye } from "react-feather";
 
 export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
   const [loading, setLoading] = useState(false);
@@ -36,22 +27,20 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
     "delete"
   );
   const [newtitle, setNewtitle] = useState(deck.title ?? "");
-  const [generatedData, setGeneratedData] = useState("");
-  const { prefetch, replace, refresh } = useRouter();
+  const { replace, refresh } = useRouter();
 
   const { data: deckState, updateDeckData } = useContext(DeckDataContext);
 
   const handleDeleteDeck = async () => {
     setLoading(true);
     try {
-      prefetch("/decks");
       await fetch(`/api/deck?id=${deck.id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
       });
-      replace("/decks");
+      replace("/collections");
     } finally {
       onClose();
       setLoading(false);
@@ -127,17 +116,6 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
             {deckState?.isPublic ? "Make private" : "Make public"}
           </DropdownItem>
           <DropdownItem
-            key="generateData"
-            startContent={<Database size={16} />}
-            showDivider
-            onPress={() => {
-              setModalType("generate");
-              onOpen();
-            }}
-          >
-            Import data
-          </DropdownItem>
-          <DropdownItem
             key="delete"
             className="text-danger"
             color="danger"
@@ -207,66 +185,7 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
                   </Button>
                 </ModalFooter>
               </>
-            ) : (
-              // Generate data modal
-              <>
-                <ModalHeader className="flex flex-col gap-1">
-                  Generate data
-                </ModalHeader>
-                <ModalBody>
-                  <Textarea
-                    label="Data"
-                    labelPlacement="outside"
-                    isRequired
-                    value={generatedData}
-                    onChange={(e) => setGeneratedData(e.target.value)}
-                    placeholder="Type your data here..."
-                  />
-                </ModalBody>
-                <ModalFooter>
-                  <Button color="primary" variant="flat" onPress={onClose}>
-                    Close
-                  </Button>
-                  <Button
-                    color="primary"
-                    isLoading={loading}
-                    onPress={async () => {
-                      try {
-                        setLoading(true);
-                        const res = validateFlashCardArray(
-                          JSON.parse(generatedData)
-                        );
-                        if (typeof res === "string") throw res;
-                        await fetch(`/api/fill`, {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                          },
-                          body: JSON.stringify({
-                            deckId: deck.id,
-                            data: res,
-                          }),
-                        });
-                        updateDeckData((prev) => ({
-                          ...prev,
-                          cards: Array.prototype.concat(
-                            deck.cards,
-                            JSON.parse(generatedData)
-                          ),
-                        }));
-                      } catch (err) {
-                        alert("Error in data provided : " + err);
-                      } finally {
-                        setLoading(false);
-                        onClose();
-                      }
-                    }}
-                  >
-                    Post data
-                  </Button>
-                </ModalFooter>
-              </>
-            )
+            ) : null
           }
         </ModalContent>
       </Modal>

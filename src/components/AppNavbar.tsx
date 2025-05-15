@@ -72,7 +72,7 @@ export function AppNavbar() {
             className="w-full text-center"
             color="foreground"
             size="lg"
-            onMouseEnter={() => prefetch("/decks")}
+            onMouseEnter={() => prefetch("/collections")}
           >
             My collections
           </Link>

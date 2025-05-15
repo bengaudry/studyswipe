@@ -3,7 +3,7 @@ import { clsx } from "clsx";
 import { Reorder } from "motion/react";
 import Latex from "react-latex-next";
 import { LatexToolbar } from "./LatexToolbar";
-import { Plus, Feather, Link2 } from "react-feather";
+import { Plus, Feather, Link2, Circle } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
 import {
   Button,
@@ -16,6 +16,13 @@ import {
   DrawerHeader,
   Accordion,
   AccordionItem,
+  Modal,
+  ModalContent,
+  ModalFooter,
+  ModalBody,
+  ModalHeader,
+  Textarea,
+  ModalProps,
 } from "@/components/ui";
 import {
   Dispatch,
@@ -25,24 +32,38 @@ import {
   useEffect,
   useState,
 } from "react";
+import { useAiCardGeneration } from "@/app/hooks/useAiCardGeneration";
 
 export function NewCardModalTrigger({
   onOpen,
+  onGenerate,
   isDisabled,
 }: {
   onOpen?: () => void;
+  onGenerate?: () => void;
   isDisabled?: boolean;
 }) {
   return (
-    <Button
-      isDisabled={isDisabled}
-      variant="faded"
-      className="w-full h-full aspect-square"
-      startContent={<Plus />}
-      onPress={onOpen}
-    >
-      Create a card
-    </Button>
+    <div className="flex flex-col h-full w-full aspect-square">
+      <Button
+        isDisabled={isDisabled}
+        variant="faded"
+        className="w-full flex-1 aspect-square border-b-0 rounded-b-none"
+        startContent={<Plus />}
+        onPress={onOpen}
+      >
+        Create a card
+      </Button>
+      <Button
+        isDisabled={isDisabled}
+        variant="faded"
+        className="w-full flex-1 aspect-square rounded-t-none bg-gradient-to-tr from-pink-600/40 to-indigo-500/40"
+        startContent={<Circle />}
+        onPress={onGenerate}
+      >
+        Generate with AI
+      </Button>
+    </div>
   );
 }
 
@@ -160,6 +181,53 @@ function ToolSelector({
   );
 }
 
+export function AiPromptModal({
+  isAskingGeneration,
+  onAskGeneration,
+  ...props
+}: Omit<ModalProps, "children"> & {
+  isAskingGeneration: boolean;
+  onAskGeneration: (prompt: string, onClose: () => void) => void;
+}) {
+  const [prompt, setPrompt] = useState("");
+
+  return (
+    <Modal {...props}>
+      <ModalContent>
+        {(onClose) => (
+          <>
+            <ModalHeader className="flex flex-col gap-1">
+              Generate data
+            </ModalHeader>
+            <ModalBody>
+              <Textarea
+                label="Topic"
+                labelPlacement="outside"
+                isRequired
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Enter the topic you want to generate cards about here..."
+              />
+            </ModalBody>
+            <ModalFooter>
+              <Button color="primary" variant="flat" onPress={onClose}>
+                Close
+              </Button>
+              <Button
+                color="primary"
+                isLoading={isAskingGeneration}
+                onPress={() => onAskGeneration(prompt, onClose)}
+              >
+                Generate flashcards
+              </Button>
+            </ModalFooter>
+          </>
+        )}
+      </ModalContent>
+    </Modal>
+  );
+}
+
 /** Provide `card` if this if for editing the card */
 export function NewCardModal({
   deckid,
@@ -178,6 +246,18 @@ export function NewCardModal({
   const [answerContent, setAnswerContent] = useState<FlashCardContentJSON[]>(
     []
   );
+
+  // AI GENERATION
+  const {
+    data: generatedCards,
+    generateCards,
+    isAskingGeneration,
+  } = useAiCardGeneration();
+  const {
+    isOpen: aiPromptModalIsOpen,
+    onOpen: onOpenAiPromptModal,
+    onOpenChange: onOpenChangeAiPromptModal,
+  } = useDisclosure();
 
   const { data: deckData, updateDeckData } = useContext(DeckDataContext);
 
@@ -264,7 +344,32 @@ export function NewCardModal({
 
   return (
     <>
-      <NewCardModalTrigger onOpen={onOpen} />
+      <NewCardModalTrigger
+        onOpen={onOpen}
+        onGenerate={() => {
+          onOpenAiPromptModal();
+        }}
+      />
+
+      <AiPromptModal
+        isOpen={aiPromptModalIsOpen}
+        onOpenChange={onOpenChangeAiPromptModal}
+        isAskingGeneration={isAskingGeneration}
+        onAskGeneration={(prompt, onClose) =>
+          generateCards(
+            prompt,
+            deckid,
+            (generatedCard) => {
+              updateDeckData((prevDeck) => ({
+                ...prevDeck,
+                cards: [...prevDeck.cards, generatedCard],
+              }));
+            },
+            onClose
+          )
+        }
+      />
+
       <Drawer
         isOpen={isOpen}
         onOpenChange={onOpenChange}
@@ -285,10 +390,14 @@ export function NewCardModal({
               <DrawerHeader className="flex flex-col gap-1 data-[open=false]:pointer-events-none">
                 Create a new card
               </DrawerHeader>
-              <DrawerBody >
+              <DrawerBody>
                 <ToolSelector onAddElement={handleAddElement} />
 
-                <Accordion variant="splitted" isCompact defaultExpandedKeys={["question"]}>
+                <Accordion
+                  variant="splitted"
+                  isCompact
+                  defaultExpandedKeys={["question"]}
+                >
                   <AccordionItem
                     key="question"
                     title="Question"
@@ -493,7 +602,9 @@ function ContentElement({
           label="URL"
           placeholder="https://studyswipe.vercel.app/"
           value={content.href}
-          classNames={{ inputWrapper: `bg-transparent focus:bg-white dark:focus:bg-neutral-900` }}
+          classNames={{
+            inputWrapper: `bg-transparent focus:bg-white dark:focus:bg-neutral-900`,
+          }}
           className="text-blue-500"
           onChange={(e) => onUpdate({ ...content, href: e.target.value })}
         />
