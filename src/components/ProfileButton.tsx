@@ -10,40 +10,55 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@/components/ui";
-import { LogOut, User } from "react-feather";
+import { Image } from "@/components/ui";
+import { LogOut, User, Zap } from "react-feather";
+import Link from "next/link";
 
-export function ProfileButton({ onPress, ...props }: ButtonProps) {
+export function ProfileButton(props: ButtonProps) {
   const { data: session } = useSession();
   const { push } = useRouter();
 
   if (session === null)
     return (
-      <Button
-        size="sm"
-        variant="flat"
-        onPress={(e) => {
-          push("/auth");
-          if (onPress) onPress(e);
-        }}
-        startContent={<User size={20} />}
-        {...props}
-      >
-        Sign in
-      </Button>
+      <Link href="/auth">
+        <Button
+          size="sm"
+          variant="flat"
+          startContent={<User size={20} />}
+          {...props}
+        >
+          Sign in
+        </Button>
+      </Link>
     );
 
   return (
     <Dropdown>
       <DropdownTrigger>
-        <div className="border-2 rounded-full p-0.5 cursor-pointer">
-          <Avatar
-            isBordered
-            radius="full"
-            src={session?.user?.image ?? undefined}
-          />
-        </div>
+        <Avatar
+          isBordered
+          radius="full"
+          ImgComponent={(props) => (
+            <Image
+              src={props.src}
+              width={props.width}
+              height={props.height}
+              className="cursor-pointer"
+            />
+          )}
+          src={session?.user?.image ?? undefined}
+        />
       </DropdownTrigger>
       <DropdownMenu>
+        <DropdownItem
+          key="subscription-link"
+          variant="flat"
+          showDivider
+          startContent={<Zap size={16} />}
+          onPress={() => push("/subscription")}
+        >
+          Subscription
+        </DropdownItem>
         <DropdownItem
           key="logout"
           variant="flat"
@@ -55,20 +70,5 @@ export function ProfileButton({ onPress, ...props }: ButtonProps) {
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  );
-
-  return (
-    <Button
-      size="sm"
-      variant="flat"
-      onPress={(e) => {
-        push("/profile");
-        if (onPress) onPress(e);
-      }}
-      startContent={<User size={20} />}
-      {...props}
-    >
-      Account
-    </Button>
   );
 }

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
 import { auth } from "@/lib/auth";
+import { authCache } from "@/lib/cache";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
@@ -22,7 +23,7 @@ export const POST = async (req: NextRequest) => {
     const deck = await prisma.deck.findUnique({ where: { id: deckid } });
     if (!deck) return serverError("invalid-deckid");
 
-    const session = await auth();
+    const session = await authCache();
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const cards = deck.cards as FlashCard[];
@@ -63,7 +64,7 @@ export const PATCH = async (req: NextRequest) => {
     const deck = await prisma.deck.findUnique({ where: { id: deckid } });
     if (!deck) return serverError("invalid-deckid");
 
-    const session = await auth();
+    const session = await authCache();
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const newCards: FlashCard[] = (deck.cards as FlashCard[]).map(
@@ -103,7 +104,7 @@ export const DELETE = async (req: NextRequest) => {
     const deck = await prisma.deck.findUnique({ where: { id: deckid } });
     if (!deck) return serverError("invalid-deckid");
 
-    const session = await auth();
+    const session = await authCache();
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const newCards = deck.cards as FlashCard[];

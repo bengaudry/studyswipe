@@ -94,10 +94,10 @@ export function NewCollectionModal() {
                 />
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" variant="flat" onPress={onClose}>
+                <Button size="sm" color="primary" variant="flat" onPress={onClose}>
                   Close
                 </Button>
-                <Button
+                <Button size="sm"
                   color="primary"
                   isLoading={loadingCreation}
                   onPress={() => handleSubmit(onClose)}
