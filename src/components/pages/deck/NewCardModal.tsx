@@ -192,7 +192,7 @@ export function AiPromptModal({
   const [prompt, setPrompt] = useState("");
 
   return (
-    <Modal {...props}>
+    <Modal placement="center" {...props}>
       <ModalContent>
         {(onClose) => (
           <>
