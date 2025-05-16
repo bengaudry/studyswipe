@@ -6,6 +6,7 @@ import {
   MAX_DECK_DESCRIPTION_LENGTH,
   MAX_DECK_TITLE_LENGTH,
 } from "@/lib/constants";
+import { authCache } from "@/lib/cache";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
