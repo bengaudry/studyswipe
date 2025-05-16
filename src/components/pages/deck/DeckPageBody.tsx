@@ -2,9 +2,42 @@
 import { Deck } from "@prisma/client";
 import { NewCardModal } from "./NewCardModal";
 import { CardPreview } from "./CardPreview";
-import { useContext, useState } from "react";
+import { useContext, useState, useRef } from "react";
 import { DeckDataContext } from "./DeckDataProvider";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
+
+function useDeleteQueue(deckId: string, updateDeckData: any) {
+  const queue = useRef<string[]>([]);
+  const [processing, setProcessing] = useState(false);
+
+  const processQueue = async () => {
+    if (processing || queue.current.length === 0) return;
+    setProcessing(true);
+
+    while (queue.current.length > 0) {
+      const cardId = queue.current[0];
+      try {
+        const res = await fetch(`/api/card?deckid=${deckId}&cardid=${cardId}`, {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch {}
+      queue.current.shift();
+    }
+    setProcessing(false);
+  };
+
+  const enqueueDelete = (cardId: string) => {
+    updateDeckData((prev: any) => ({
+      ...prev,
+      cards: prev.cards.filter((card: any) => card.id !== cardId),
+    }));
+    queue.current.push(cardId);
+    processQueue();
+  };
+
+  return enqueueDelete;
+}
 
 export function DeckPageBody({
   deck: initialDeck,
@@ -20,23 +53,9 @@ export function DeckPageBody({
   const { data: deckState, updateDeckData } = useContext(DeckDataContext);
   const [isAiGeneratingCard, setIsAiGeneratingCard] = useState(false);
 
-  const handleDeleteCard = (cardid: string) => {
-    const prevDeckState = deckState;
+  const enqueueDelete = useDeleteQueue(initialDeck.id, updateDeckData);
 
-    updateDeckData((prev) => ({
-      ...prev,
-      cards: prev.cards.filter((card) => (card as FlashCard).id !== cardid),
-    }));
-
-    fetch(`/api/card?deckid=${initialDeck.id}&cardid=${cardid}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }).catch(() => {
-      if (prevDeckState) updateDeckData(prevDeckState);
-    });
-  };
+  const handleDeleteCard = (cardid: string) => enqueueDelete(cardid);
 
   return (
     <>
