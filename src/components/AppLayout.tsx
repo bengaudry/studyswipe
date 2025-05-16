@@ -34,11 +34,19 @@ export function AppLayout({ children }: PropsWithChildren) {
   const colorScheme = usePrefersColorScheme();
 
   useEffect(() => {
-    if (colorScheme === "dark") {
+    if (
+      colorScheme === "dark" &&
+      (!document.body.classList.contains("dark") ||
+        document.body.classList.contains("light"))
+    ) {
       document.body.classList.add("dark");
       document.body.classList.remove("light");
     }
-    if (colorScheme === "light") {
+    if (
+      colorScheme === "light" &&
+      (!document.body.classList.contains("light") ||
+        document.body.classList.contains("dark"))
+    ) {
       document.body.classList.add("light");
       document.body.classList.remove("dark");
     }

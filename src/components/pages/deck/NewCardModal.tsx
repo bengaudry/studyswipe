@@ -58,7 +58,7 @@ export function NewCardModalTrigger({
       <Button
         isDisabled={isDisabled}
         variant="faded"
-        className="w-full flex-1 aspect-square border-none bg-gradient-to-tr from-pink-700 to-indigo-600"
+        className="w-full flex-1 aspect-square border-none bg-gradient-to-tr from-pink-400 to-indigo-500 dark:from-pink-700 dark:to-indigo-600 text-white"
         startContent={<Circle size={22} />}
         onPress={onGenerate}
       >
@@ -365,7 +365,7 @@ export function NewCardModal({
         onOpen={onOpen}
         onGenerate={() => {
           if (canUseAiGeneration) onOpenAiPromptModal();
-          else push("/premium?from_feature=ai-gen");
+          else push("/subscription?from_feature=ai-gen");
         }}
       />
 

@@ -4,17 +4,17 @@
 @tailwind utilities;
 
 html {
-  @apply text-neutral-900 bg-white dark:text-neutral-100 dark:bg-neutral-950;
+  overscroll-behavior: none;
 }
 
 body {
-  @apply text-neutral-900 bg-white dark:text-neutral-100 dark:bg-neutral-950 border-neutral-200;
+  @apply text-neutral-900 bg-white dark:text-neutral-100 dark:bg-neutral-950;
   min-height: 100vh;
   font-family: Poppins, Arial, Helvetica, sans-serif;
 }
 
 * {
-  @apply dark:border-neutral-800;
+  @apply border-neutral-200 dark:border-neutral-800;
 }
 
 .dotted-bg {
