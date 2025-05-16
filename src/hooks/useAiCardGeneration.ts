@@ -139,7 +139,7 @@ export function useAiCardGeneration() {
                     .replaceAll("\\)", "$");
                   const newElement: FlashCardContentJSON = {
                     type: "equation",
-                    equation: LaTeXformatted,
+                    equation: `$${LaTeXformatted}$`,
                   };
                   return newElement;
                 }

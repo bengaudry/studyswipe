@@ -87,7 +87,6 @@ export default async function PremiumPage() {
         Manage your plan
       </h1>
       <div className="flex flex-col-reverse md:flex-row gap-6">
-        
         <div className="flex-1 border-1 p-2 rounded-[3rem]">
           <div className="relative h-full flex flex-col justify-between overflow-hidden rounded-[2.5rem] p-3">
             <div className="px-8 py-16">
@@ -109,9 +108,21 @@ export default async function PremiumPage() {
                   / month
                 </span>
               </div>
-              <Button color="default" isDisabled={userPlan === "FREE"}>
-                {userPlan === "FREE" ? "Your current plan" : "Switch to free"}
-              </Button>
+              <form>
+                <Button
+                  type="submit"
+                  color="default"
+                  isDisabled={userPlan === "FREE"}
+                  formAction={async () => {
+                    "use server";
+                    redirect("/cancelsubscription");
+                  }}
+                >
+                  {userPlan === "FREE"
+                    ? "Your current plan"
+                    : "End my subscription"}
+                </Button>
+              </form>
             </div>
           </div>
         </div>
