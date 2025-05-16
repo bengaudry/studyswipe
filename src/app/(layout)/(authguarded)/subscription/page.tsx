@@ -89,7 +89,7 @@ export default async function PremiumPage() {
       <div className="flex flex-col-reverse md:flex-row gap-6">
         
         <div className="flex-1 border-1 p-2 rounded-[3rem]">
-          <div className="relative h-full flex flex-col justify-between overflow-hidden rounded-[2.25rem] p-3">
+          <div className="relative h-full flex flex-col justify-between overflow-hidden rounded-[2.5rem] p-3">
             <div className="px-8 py-16">
               <h2 className="text-3xl font-semibold mb-4">Free</h2>
               <ul>
@@ -102,7 +102,7 @@ export default async function PremiumPage() {
               </ul>
             </div>
 
-            <div className="relative z-20 border-1 bg-gradient-to-br from-white dark:from-neutral-900 to-neutral-100 dark:to-neutral-900/10 rounded-[1.5rem] px-8 py-8 shadow-md">
+            <div className="relative z-20 border-1 bg-gradient-to-br from-white dark:from-neutral-900 to-neutral-100 dark:to-neutral-900/10 rounded-[1.75rem] px-8 py-8 shadow-md">
               <div className="mb-4 flex items-center gap-2">
                 <span className="text-3xl font-semibold">0€</span>
                 <span className="text-medium font-medium text-neutral-400">
@@ -117,7 +117,7 @@ export default async function PremiumPage() {
         </div>
 
         <div className="flex-1 border-1 bg-neutral-100 dark:bg-neutral-800 p-2 rounded-[3rem]">
-          <div className="relative flex flex-col justify-between overflow-hidden rounded-[2.25rem] light:bg-gradient-to-br from-white to-neutral-100/70  dark:bg-neutral-900 shadow-xl p-3">
+          <div className="relative flex flex-col justify-between overflow-hidden rounded-[2.5rem] light:bg-gradient-to-br from-white to-neutral-100/70  dark:bg-neutral-900 shadow-xl p-3">
             <div className="px-8 py-16">
               <h2 className="text-3xl font-semibold mb-4">Premium</h2>
               <ul>
@@ -130,7 +130,7 @@ export default async function PremiumPage() {
               </ul>
             </div>
 
-            <div className="relative z-20 border-1 bg-gradient-to-br from-white dark:from-neutral-800 to-neutral-100 dark:to-neutral-900 rounded-[1.5rem] px-8 py-8 shadow-md">
+            <div className="relative z-20 border-1 bg-gradient-to-br from-white dark:from-neutral-800 to-neutral-100 dark:to-neutral-900 rounded-[1.75rem] px-8 py-8 shadow-md">
               <div className="mb-4 flex items-center gap-2">
                 <span className="text-3xl font-semibold">2.99€</span>
                 <span className="text-medium font-medium text-neutral-400">
