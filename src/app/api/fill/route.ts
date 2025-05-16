@@ -3,7 +3,6 @@ import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { validateFlashCardArray } from "@/lib/cardObject";
-import { authCache } from "@/lib/cache";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +20,7 @@ export async function POST(req: NextRequest) {
 
     if (deck === null) return serverError("invalid-deckid");
 
-    const session = await authCache();
+    const session = await auth();
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const res = validateFlashCardArray(body.data);

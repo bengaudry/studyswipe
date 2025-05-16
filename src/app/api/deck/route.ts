@@ -48,7 +48,7 @@ export const POST = async (req: NextRequest) => {
 
     if (collection === null) return serverError("invalid-collectionid");
 
-    const session = await authCache();
+    const session = await auth();
     if (session?.user?.id !== collection.ownerId)
       return serverError("unauthorized");
 
@@ -82,7 +82,7 @@ export const PATCH = async (req: NextRequest) => {
     const prevDeckValue = await prisma.deck.findUnique({ where: { id } });
     if (prevDeckValue === null) return serverError("invalid-deckid");
 
-    const session = await authCache();
+    const session = await auth();
     if (session?.user?.id !== prevDeckValue.ownerId)
       return serverError("unauthorized");
 
@@ -134,7 +134,7 @@ export const DELETE = async (req: NextRequest) => {
     const prevDeck = await prisma.deck.findFirst({ where: { id } });
     if (prevDeck === null) return serverError("invalid-deckid");
 
-    const session = await authCache();
+    const session = await auth();
     if (session?.user?.id !== prevDeck.ownerId)
       return serverError("unauthorized");
 

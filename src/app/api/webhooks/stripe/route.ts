@@ -74,10 +74,10 @@ export const POST = async (req: NextRequest) => {
       break;
   }
 
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true }, { status: 200 })
 };
 
-export const findUserFromStripeCustomerId = async (
+const findUserFromStripeCustomerId = async (
   stripeCustomerId: unknown
 ) => {
   if (typeof stripeCustomerId !== "string") return null;
