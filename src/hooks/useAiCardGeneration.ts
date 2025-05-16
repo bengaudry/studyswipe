@@ -127,8 +127,10 @@ export function useAiCardGeneration() {
             buffer = buffer.slice(charIdx + 1);
             try {
               const obj = JSON.parse(strObj) as FlashCard;
-              
-              const convertAiTextToLaTeX = (element: FlashCardContentJSON): FlashCardContentJSON => {
+
+              const convertAiTextToLaTeX = (
+                element: FlashCardContentJSON
+              ): FlashCardContentJSON => {
                 if (element.type !== "text") return element;
                 if (
                   element.text.includes("\\(") &&
@@ -149,7 +151,7 @@ export function useAiCardGeneration() {
               obj.aiGenerated = true;
               obj.question = obj.question.map(convertAiTextToLaTeX);
               obj.answer = obj.answer.map(convertAiTextToLaTeX);
-              
+
               setData((prev) => (prev ? [...prev, obj] : [obj]));
               onUpdate(obj);
               generatedCards.push(obj);
@@ -160,6 +162,8 @@ export function useAiCardGeneration() {
           }
         }
       }
+      setIsGenerating(false);
+      setIsAskingGeneration(false);
 
       // Upload cards onto the server
       await fetch(`/api/fill`, {
