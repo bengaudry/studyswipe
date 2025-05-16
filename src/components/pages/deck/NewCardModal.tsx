@@ -23,6 +23,7 @@ import {
   ModalHeader,
   Textarea,
   ModalProps,
+  Divider,
 } from "@/components/ui";
 import {
   Dispatch,
@@ -32,6 +33,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { FileUploader } from "react-drag-drop-files";
 import { useAiCardGeneration } from "@/hooks/useAiCardGeneration";
 import { useRouter } from "next/navigation";
 
@@ -188,9 +190,21 @@ export function AiPromptModal({
   ...props
 }: Omit<ModalProps, "children"> & {
   isAskingGeneration: boolean;
-  onAskGeneration: (prompt: string, onClose: () => void) => void;
+  onAskGeneration: (
+    prompt: string,
+    file: File | null,
+    onClose: () => void
+  ) => void;
 }) {
   const [prompt, setPrompt] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+
+  const handleChange = (file: File | null) => {
+    setFile(file);
+    console.log(file?.name);
+  };
+
+  const fileTypes = ["jpg", "jpeg", "png", "pdf"];
 
   return (
     <Modal placement="center" {...props}>
@@ -204,10 +218,19 @@ export function AiPromptModal({
               <Textarea
                 label="Topic"
                 labelPlacement="outside"
-                isRequired
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Enter the topic you want to generate cards about here..."
+              />
+              <Divider />
+              <FileUploader
+                handleChange={handleChange}
+                name="file"
+                multiple={false}
+                uploadLabel="Upload a file or an image"
+                uploadedLabel={file?.name}
+                maxSize={1}
+                types={fileTypes}
               />
             </ModalBody>
             <ModalFooter>
@@ -222,8 +245,12 @@ export function AiPromptModal({
               <Button
                 size="sm"
                 color="primary"
+                isDisabled={!file && prompt.length < 3}
                 isLoading={isAskingGeneration}
-                onPress={() => onAskGeneration(prompt, onClose)}
+                onPress={() => {
+                  if (!file && prompt.length < 3) return;
+                  onAskGeneration(prompt, file, onClose);
+                }}
               >
                 Generate flashcards
               </Button>
@@ -373,9 +400,10 @@ export function NewCardModal({
         isOpen={aiPromptModalIsOpen}
         onOpenChange={onOpenChangeAiPromptModal}
         isAskingGeneration={isAskingGeneration}
-        onAskGeneration={(prompt, onClose) =>
+        onAskGeneration={(prompt, file, onClose) =>
           generateCards(
             prompt,
+            file,
             deckid,
             (generatedCard) => {
               updateDeckData((prevDeck) => ({

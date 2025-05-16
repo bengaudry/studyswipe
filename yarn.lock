@@ -3475,7 +3475,7 @@ postcss@8.4.38:
     picocolors "^1.0.0"
     source-map-js "^1.2.0"
 
-postcss@^8, postcss@^8.4.47:
+postcss@8.4.49, postcss@^8, postcss@^8.4.47:
   version "8.4.49"
   resolved "https://registry.npmjs.org/postcss/-/postcss-8.4.49.tgz"
   integrity sha512-OCVPnIObs4N29kxTjzLfUryOkvZEq+pf8jTF0lg8E7uETuWHA+v7j3c/xJmiqpX450191LlmZfUKkXxkTry7nA==
@@ -3560,6 +3560,14 @@ react-dom@^19.0.0:
   integrity sha512-4GV5sHFG0e/0AD4X+ySy6UJd3jVl1iNsNHdpad0qhABJ11twS3TTBnseqsKurKcsNqCEFeGL3uLpVChpIO3QfQ==
   dependencies:
     scheduler "^0.25.0"
+
+react-drag-drop-files@^3.0.1:
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/react-drag-drop-files/-/react-drag-drop-files-3.0.1.tgz#82d5e449cb02089bb3c6fd3505c22997832b1062"
+  integrity sha512-gSx6QJJnStkTet8LExeqH520KA1agnUWgd78SXxggMmuhJi/cCH9OOvdnmiMBm1GkTM5fWUTNyIi/jD5PPhG8g==
+  dependencies:
+    prop-types "^15.7.2"
+    styled-components "^6.1.11"
 
 react-drag-reorder@^1.2.0:
   version "1.2.0"
@@ -3828,6 +3836,21 @@ stripe@^18.1.0:
   integrity sha512-MLDiniPTHqcfIT3anyBPmOEcaiDhYa7/jRaNypQ3Rt2SJnayQZBvVbFghIziUCZdltGAndm/ZxVOSw6uuSCDig==
   dependencies:
     qs "^6.11.0"
+
+styled-components@^6.1.11:
+  version "6.1.18"
+  resolved "https://registry.yarnpkg.com/styled-components/-/styled-components-6.1.18.tgz#9647497a92326ba9d758051c914f15004d524bb9"
+  integrity sha512-Mvf3gJFzZCkhjY2Y/Fx9z1m3dxbza0uI9H1CbNZm/jSHCojzJhQ0R7bByrlFJINnMzz/gPulpoFFGymNwrsMcw==
+  dependencies:
+    "@emotion/is-prop-valid" "1.2.2"
+    "@emotion/unitless" "0.8.1"
+    "@types/stylis" "4.2.5"
+    css-to-react-native "3.2.0"
+    csstype "3.1.3"
+    postcss "8.4.49"
+    shallowequal "1.1.0"
+    stylis "4.3.2"
+    tslib "2.6.2"
 
 styled-components@^6.1.14:
   version "6.1.14"
