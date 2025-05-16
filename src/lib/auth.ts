@@ -3,6 +3,7 @@ import { PrismaAdapter } from "@auth/prisma-adapter";
 import prisma from "./prisma";
 import Google from "next-auth/providers/google";
 import GitHub from "next-auth/providers/github";
+import { stripe } from "./stripe";
 
 export async function generateUserPseudo(username: string | null | undefined) {
   const base = username || "user";
@@ -29,31 +30,6 @@ export const authConfig: NextAuthConfig = {
     error: "/auth",
   },
   callbacks: {
-    async signIn({ user, profile }) {
-      try {
-        const dbUser = await prisma.user.findFirst({ where: { id: user.id } });
-        console.info("dbUser pseudo : ", dbUser?.pseudo);
-        if (!dbUser) return false;
-        if (
-          dbUser.pseudo === null ||
-          dbUser.pseudo === undefined ||
-          dbUser.pseudo === "unknown"
-        ) {
-          console.info("Generating pseudo for user...");
-          const pseudo = await generateUserPseudo(
-            user.name ?? profile?.preferred_username ?? profile?.nickname
-          );
-          console.info("Generated :", pseudo);
-          await prisma.user.update({
-            where: { id: user.id },
-            data: { pseudo },
-          });
-        }
-        return true;
-      } catch (err) {
-        return false;
-      }
-    },
     async session({ session, user }) {
       try {
         const dbUser = await prisma.user.findFirst({ where: { id: user.id } });
@@ -65,7 +41,65 @@ export const authConfig: NextAuthConfig = {
       }
     },
   },
+  events: {
+    async createUser(message) {
+      const userId = message.user.id;
+      const email = message.user.email;
+      const name = message.user.name;
+      if (!userId || !email) return;
 
+      const stripeCustomer = await stripe.customers.create({
+        email,
+        name: name ?? undefined,
+      });
+
+      await prisma.user.update({
+        where: { id: userId },
+        data: { stripeCustomerId: stripeCustomer.id },
+      });
+    },
+    async signIn(message) {
+      const user = message.user;
+      const profile = message.profile;
+      if (!user.id) return;
+      const dbUser = await prisma.user.findFirst({ where: { id: user.id } });
+      console.info("dbUser pseudo : ", dbUser?.pseudo);
+      if (!dbUser) throw "User does not exist in database";
+      if (
+        dbUser?.pseudo === null ||
+        dbUser?.pseudo === undefined ||
+        dbUser?.pseudo === "unknown"
+      ) {
+        console.info("Generating pseudo for user...");
+        const pseudo = await generateUserPseudo(
+          user.name ?? profile?.preferred_username ?? profile?.nickname
+        );
+        console.info("Generated :", pseudo);
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { pseudo },
+        });
+      }
+      //   const email = message.user.email;
+      //   if (!userId || !email) return;
+
+      //   const user = await prisma.user.findUnique({
+      //     where: { id: userId },
+      //   });
+      //   if (
+      //     user?.stripeCustomerId === undefined ||
+      //     user?.stripeCustomerId === null
+      //   ) {
+      //     const stripeCustomer = await stripe.customers.create({
+      //       email,
+      //     });
+      //     await prisma.user.update({
+      //       where: { id: userId },
+      //       data: { stripeCustomerId: stripeCustomer.id },
+      //     });
+      //   }
+    },
+  },
   session: {
     strategy: "database",
   },

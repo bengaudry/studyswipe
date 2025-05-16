@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { Divider } from "@/components/ui";
+import { authCache } from "@/lib/cache";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({
@@ -74,7 +75,7 @@ export default async function DecksPage({
 }: {
   params: Promise<{ username: string }>;
 }) {
-  const session = await auth();
+  const session = await authCache();
 
   const username = (await params).username;
   console.info(username);

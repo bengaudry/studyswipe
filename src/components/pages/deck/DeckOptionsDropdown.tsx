@@ -143,10 +143,16 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
                   and cannot be recovered
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="danger" variant="flat" onPress={onClose}>
+                  <Button
+                    size="sm"
+                    color="danger"
+                    variant="flat"
+                    onPress={onClose}
+                  >
                     Close
                   </Button>
                   <Button
+                    size="sm"
                     color="danger"
                     isLoading={loading}
                     onPress={handleDeleteDeck}
@@ -173,10 +179,16 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
                   />
                 </ModalBody>
                 <ModalFooter>
-                  <Button color="primary" variant="flat" onPress={onClose}>
+                  <Button
+                    size="sm"
+                    color="primary"
+                    variant="flat"
+                    onPress={onClose}
+                  >
                     Close
                   </Button>
                   <Button
+                    size="sm"
                     color="primary"
                     isLoading={loading}
                     onPress={handleRenameDeck}

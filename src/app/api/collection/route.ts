@@ -3,11 +3,12 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
 import { MAX_COLLECTION_TITLE_LENGTH } from "@/lib/constants";
+import { authCache } from "@/lib/cache";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
   try {
-    const session = await auth();
+    const session = await authCache();
     if (session?.user?.id === undefined) return serverError("unauthenticated");
 
     const body = await req.json();
@@ -95,7 +96,7 @@ export const DELETE = async (req: NextRequest) => {
 
     const collection = await prisma.collection.findUnique({ where: { id } });
 
-    const session = await auth();
+    const session = await authCache();
     if (session?.user?.id !== collection?.ownerId)
       return serverError("unauthorized");
 

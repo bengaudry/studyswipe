@@ -2,11 +2,17 @@
 import { Deck } from "@prisma/client";
 import { NewCardModal } from "./NewCardModal";
 import { CardPreview } from "./CardPreview";
-import { useContext, useState } from "react";
+import { Suspense, useContext, useState } from "react";
 import { DeckDataContext } from "./DeckDataProvider";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 
-export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
+export function DeckPageBody({
+  deck: initialDeck,
+  hasAccessToPremiumFeatures,
+}: {
+  deck: Deck;
+  hasAccessToPremiumFeatures: boolean;
+}) {
   const [cardToEdit, setCardToEdit] = useState<
     { data: FlashCard; index: number } | undefined
   >(undefined);
@@ -38,21 +44,24 @@ export function DeckPageBody({ deck: initialDeck }: { deck: Deck }) {
       <NewCardModal
         deckid={initialDeck.id}
         card={cardToEdit}
+        canUseAiGeneration={hasAccessToPremiumFeatures}
         onAiGenerateCard={() => setIsAiGeneratingCard(true)}
         onAiStopGeneration={() => setIsAiGeneratingCard(false)}
       />
 
       {deckState &&
         deckState.cards.map((card, idx) => (
-          <CardPreview
-            key={idx}
-            card={card as FlashCard}
-            deckTheme={deckState?.theme}
-            onAskDelete={() => handleDeleteCard(idx)}
-            onAskEdit={() =>
-              setCardToEdit({ data: card as FlashCard, index: idx })
-            }
-          />
+          <Suspense>
+            <CardPreview
+              key={idx}
+              card={card as FlashCard}
+              deckTheme={deckState?.theme}
+              onAskDelete={() => handleDeleteCard(idx)}
+              onAskEdit={() =>
+                setCardToEdit({ data: card as FlashCard, index: idx })
+              }
+            />
+          </Suspense>
         ))}
       {isAiGeneratingCard && (
         <SkeletonLoader className="w-full aspect-square border-2 rounded-lg h-full" />

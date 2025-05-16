@@ -33,6 +33,7 @@ import {
   useState,
 } from "react";
 import { useAiCardGeneration } from "@/hooks/useAiCardGeneration";
+import { useRouter } from "next/navigation";
 
 export function NewCardModalTrigger({
   onOpen,
@@ -44,12 +45,12 @@ export function NewCardModalTrigger({
   isDisabled?: boolean;
 }) {
   return (
-    <div className="flex flex-col h-full w-full aspect-square">
+    <div className="flex flex-col gap-2 h-full w-full aspect-square">
       <Button
         isDisabled={isDisabled}
         variant="faded"
-        className="w-full flex-1 aspect-square border-b-0 rounded-b-none"
-        startContent={<Plus />}
+        className="w-full flex-1 aspect-square border-none"
+        startContent={<Plus size={22} />}
         onPress={onOpen}
       >
         Create a card
@@ -57,11 +58,11 @@ export function NewCardModalTrigger({
       <Button
         isDisabled={isDisabled}
         variant="faded"
-        className="w-full flex-1 aspect-square rounded-t-none bg-gradient-to-tr from-pink-600/40 to-indigo-500/40"
-        startContent={<Circle />}
+        className="w-full flex-1 aspect-square border-none bg-gradient-to-tr from-pink-700 to-indigo-600"
+        startContent={<Circle size={22} />}
         onPress={onGenerate}
       >
-        Generate with AI
+        Generate cards
       </Button>
     </div>
   );
@@ -210,10 +211,16 @@ export function AiPromptModal({
               />
             </ModalBody>
             <ModalFooter>
-              <Button color="primary" variant="flat" onPress={onClose}>
+              <Button
+                size="sm"
+                color="primary"
+                variant="flat"
+                onPress={onClose}
+              >
                 Close
               </Button>
               <Button
+                size="sm"
                 color="primary"
                 isLoading={isAskingGeneration}
                 onPress={() => onAskGeneration(prompt, onClose)}
@@ -232,11 +239,13 @@ export function AiPromptModal({
 export function NewCardModal({
   deckid,
   card,
+  canUseAiGeneration,
   onAiGenerateCard,
-  onAiStopGeneration
+  onAiStopGeneration,
 }: {
   deckid: string;
   card?: { data: FlashCard; index: number };
+  canUseAiGeneration: boolean;
   onAiGenerateCard: () => void;
   onAiStopGeneration: () => void;
 }) {
@@ -250,18 +259,16 @@ export function NewCardModal({
   const [answerContent, setAnswerContent] = useState<FlashCardContentJSON[]>(
     []
   );
+  const { push } = useRouter();
 
   // AI GENERATION
-  const {
-    generateCards,
-    isAskingGeneration,
-    isGenerating
-  } = useAiCardGeneration();
+  const { generateCards, isAskingGeneration, isGenerating } =
+    useAiCardGeneration();
 
   useEffect(() => {
-    if (isGenerating) onAiGenerateCard()
-    else onAiStopGeneration()
-  }, [isGenerating])
+    if (isGenerating) onAiGenerateCard();
+    else onAiStopGeneration();
+  }, [isGenerating]);
 
   const {
     isOpen: aiPromptModalIsOpen,
@@ -357,7 +364,8 @@ export function NewCardModal({
       <NewCardModalTrigger
         onOpen={onOpen}
         onGenerate={() => {
-          onOpenAiPromptModal();
+          if (canUseAiGeneration) onOpenAiPromptModal();
+          else push("/premium?from_feature=ai-gen");
         }}
       />
 

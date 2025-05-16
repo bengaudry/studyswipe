@@ -8,6 +8,11 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum UserPlan {
+  FREE
+  PREMIUM
+}
+
 model User {
   id            String          @id @default(cuid())
   name          String?
@@ -19,6 +24,10 @@ model User {
   sessions      Session[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
+
+  // Payments
+  stripeCustomerId String?
+  plan             UserPlan @default(FREE)
 
   collections Collection[]
   decks       Deck[]
@@ -86,8 +95,8 @@ model Authenticator {
 
 // An object grouping Decks of cards
 model Collection {
-  id          String @unique @default(uuid())
-  ownerId     String
+  id      String @unique @default(uuid())
+  ownerId String
 
   title String
   decks Deck[]

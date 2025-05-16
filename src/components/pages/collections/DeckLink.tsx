@@ -1,7 +1,10 @@
 "use client";
 import React, { PropsWithChildren, useState } from "react";
 import { useRouter } from "next/navigation";
-import { MAX_DECK_DESCRIPTION_LENGTH, MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
+import {
+  MAX_DECK_DESCRIPTION_LENGTH,
+  MAX_DECK_TITLE_LENGTH,
+} from "@/lib/constants";
 import { Plus } from "react-feather";
 import { cn } from "@nextui-org/react";
 import {
@@ -175,10 +178,16 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
                 </RadioGroup>
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" variant="flat" onPress={onClose}>
+                <Button
+                  size="sm"
+                  color="primary"
+                  variant="flat"
+                  onPress={onClose}
+                >
                   Close
                 </Button>
                 <Button
+                  size="sm"
                   color="primary"
                   isLoading={loading}
                   onPress={() => handleSubmit(onClose)}
