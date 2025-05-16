@@ -271,7 +271,7 @@ export function NewCardModal({
   onAiStopGeneration,
 }: {
   deckid: string;
-  card?: { data: FlashCard; index: number };
+  card?: { data: FlashCard };
   canUseAiGeneration: boolean;
   onAiGenerateCard: () => void;
   onAiStopGeneration: () => void;
@@ -340,15 +340,14 @@ export function NewCardModal({
     try {
       updateDeckData((prevDeck) => ({
         ...prevDeck,
-        cards: [
-          ...prevDeck.cards.slice(0, card.index),
-          cardBody,
-          ...prevDeck.cards.slice(card.index + 1),
-        ],
+        cards: (prevDeck.cards as FlashCard[]).map((card) => {
+          if (card.id === cardBody.id) return cardBody;
+          return card;
+        }),
       }));
 
       // Edit the card otherwise
-      await fetch(`/api/card?deckid=${deckid}&cardindex=${card.index}`, {
+      await fetch(`/api/card?deckid=${deckid}&cardid=${cardBody.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",

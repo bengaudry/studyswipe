@@ -30,7 +30,8 @@
     "react-latex-next": "^3.0.0",
     "react-swipeable": "^7.0.2",
     "stripe": "^18.1.0",
-    "styled-components": "^6.1.14"
+    "styled-components": "^6.1.14",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",

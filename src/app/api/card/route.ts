@@ -1,3 +1,4 @@
+import { v4 as uuidv4 } from "uuid";
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
@@ -26,7 +27,8 @@ export const POST = async (req: NextRequest) => {
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const cards = deck.cards as FlashCard[];
-    cards.push({ question: body.question, answer: body.answer });
+    const id = uuidv4();
+    cards.push({ id, question: body.question, answer: body.answer });
 
     await prisma.deck.update({
       where: { id: deckid },
@@ -46,12 +48,9 @@ export const PATCH = async (req: NextRequest) => {
     if (!deckid)
       return serverError("missing-parameters", "Parameter missing: <deckid>");
 
-    const cardindex = params.get("cardindex");
-    if (!cardindex)
-      return serverError(
-        "missing-parameters",
-        "Parameter missing: <cardindex>"
-      );
+    const cardid = params.get("cardid");
+    if (!cardid)
+      return serverError("missing-parameters", "Parameter missing: <cardid>");
 
     const body = await req.json();
     if (!body || typeof body !== "object" || !body.question || !body.answer)
@@ -66,14 +65,12 @@ export const PATCH = async (req: NextRequest) => {
     const session = await auth();
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
-    const newCards: FlashCard[] = (deck.cards as FlashCard[]).map(
-      (card, idx) => {
-        if (idx === parseInt(cardindex)) {
-          return { question: body.question, answer: body.answer };
-        }
-        return card;
+    const newCards: FlashCard[] = (deck.cards as FlashCard[]).map((card) => {
+      if (card.id === cardid) {
+        return { id: cardid, question: body.question, answer: body.answer };
       }
-    );
+      return card;
+    });
 
     await prisma.deck.update({
       where: { id: deck.id },
@@ -93,12 +90,9 @@ export const DELETE = async (req: NextRequest) => {
     if (!deckid)
       return serverError("missing-parameters", "Parameter missing: <deckid>");
 
-    const cardindex = params.get("cardindex");
-    if (!cardindex)
-      return serverError(
-        "missing-parameters",
-        "Parameter missing: <cardindex>"
-      );
+    const cardid = params.get("cardid");
+    if (!cardid)
+      return serverError("missing-parameters", "Parameter missing: <cardid>");
 
     const deck = await prisma.deck.findUnique({ where: { id: deckid } });
     if (!deck) return serverError("invalid-deckid");
@@ -106,8 +100,9 @@ export const DELETE = async (req: NextRequest) => {
     const session = await auth();
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
-    const newCards = deck.cards as FlashCard[];
-    newCards.splice(parseInt(cardindex), 1);
+    const newCards = (deck.cards as FlashCard[]).filter(
+      (card) => card.id != cardid
+    );
 
     await prisma.deck.update({
       where: { id: deck.id },

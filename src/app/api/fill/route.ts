@@ -3,6 +3,7 @@ import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { validateFlashCardArray } from "@/lib/cardObject";
+import { v4 as uuidv4 } from "uuid"
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,9 +27,11 @@ export async function POST(req: NextRequest) {
     const res = validateFlashCardArray(body.data);
     if (typeof res === "string") return serverError("invalid-payload", res);
 
+    const resWithIds = res.map((fl) => ({ ...fl, id: uuidv4() }))
+
     const newCards: FlashCard[] = Array.prototype.concat(
       deck.cards as FlashCard[],
-      res
+      resWithIds
     );
 
     await prisma.deck.update({

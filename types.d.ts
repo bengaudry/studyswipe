@@ -32,6 +32,7 @@ type FlashCardContentJSON =
     };
 
 type FlashCard = {
+  id: string;
   aiGenerated?: boolean;
   question: FlashCardContentJSON[];
   answer: FlashCardContentJSON[];
