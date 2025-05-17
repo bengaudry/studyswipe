@@ -232,7 +232,9 @@ export function AiPromptModal({
                 uploadedLabel={file?.name}
                 maxSize={1}
                 fileTypes={fileTypes}
-                onTypeError={alert}
+                onTypeError={(err: any) => {
+                  alert(JSON.stringify(err))
+                }}
               />
             </ModalBody>
             <ModalFooter>
