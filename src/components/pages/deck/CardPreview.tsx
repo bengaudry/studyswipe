@@ -45,7 +45,7 @@ export function CardPreview({
         <Checkbox
           radius="full"
           size="lg"
-          classNames={{ wrapper: "shadow-xl border-2 border-white" }}
+          classNames={{ wrapper: "shadow-xl border-2 border-neutral-400" }}
           isSelected={isSelected}
           onValueChange={(v) => {
             if (v) {
