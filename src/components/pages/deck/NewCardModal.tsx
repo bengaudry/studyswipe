@@ -164,7 +164,7 @@ function ToolSelector({
 
           return (
             <button
-              key={tool.el.type}
+              key={idx}
               className={`flex items-center justify-center p-2 hover:bg-neutral-100/50 dark:hover:bg-neutral-800 active:scale-95 transition-all
               ${hasRightNeighbour ? "border-r-1" : "border-r-0"}
               ${hasBottomNeighbour ? "border-b-1" : "border-b-0"}
@@ -204,7 +204,6 @@ export function AiPromptModal({
     alert("File " + file?.name + file?.type);
   };
 
-
   const fileTypes = ["pdf", "jpg", "png", "heic", "heif", "jpeg"];
 
   return (
@@ -233,7 +232,7 @@ export function AiPromptModal({
                 maxSize={1}
                 fileTypes={fileTypes}
                 onTypeError={(err: any) => {
-                  alert(JSON.stringify(err))
+                  alert(JSON.stringify(err));
                 }}
               />
             </ModalBody>
@@ -273,12 +272,14 @@ export function NewCardModal({
   canUseAiGeneration,
   onAiGenerateCard,
   onAiStopGeneration,
+  onCancel,
 }: {
   deckid: string;
   card?: { data: FlashCard };
   canUseAiGeneration: boolean;
   onAiGenerateCard: () => void;
   onAiStopGeneration: () => void;
+  onCancel: () => void;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [loading, setLoading] = useState(false);
@@ -314,8 +315,17 @@ export function NewCardModal({
       setQuestionContent(card.data.question);
       setAnswerContent(card.data.answer);
       onOpen();
+    } else {
+      setQuestionContent([]);
+      setAnswerContent([]);
     }
   }, [card]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setCurrent("question");
+    }
+  }, [isOpen]);
 
   const createCard = async (cardBody: FlashCard) => {
     const prevCardState = deckData;
@@ -342,6 +352,15 @@ export function NewCardModal({
     const prevDeckState = deckData;
 
     try {
+      // Avoid api call and ui refresh if card has not changed
+      if (
+        JSON.stringify(newCardData.question) ===
+          JSON.stringify(card.data.question) &&
+        JSON.stringify(newCardData.answer) === JSON.stringify(card.data.answer)
+      ) {
+        return;
+      }
+
       // Update the ui state
       updateDeckData((prevDeck) => ({
         ...prevDeck,
@@ -422,6 +441,7 @@ export function NewCardModal({
 
       <Drawer
         isOpen={isOpen}
+        onClose={onCancel}
         onOpenChange={onOpenChange}
         isKeyboardDismissDisabled
         placement="bottom"
@@ -472,7 +492,11 @@ export function NewCardModal({
                 </Accordion>
               </DrawerBody>
               <DrawerFooter>
-                <Button color="primary" variant="flat" onPress={onClose}>
+                <Button
+                  color="primary"
+                  variant="flat"
+                  onPress={onClose}
+                >
                   Close
                 </Button>
                 <Button
@@ -552,7 +576,7 @@ function ContentElement({
 
   return (
     <div
-      className={`group relative border-2 border-dashed rounded-lg transition-colors ${
+      className={`group relative border border-dashed rounded-lg transition-colors px-6 ${
         isFocused
           ? "border-black dark:border-neutral-200 shadow-md"
           : "border-neutral-300 hover:border-neutral-500 dark:border-neutral-600"

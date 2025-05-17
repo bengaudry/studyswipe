@@ -138,12 +138,13 @@ export function DeckPageBody({
           canUseAiGeneration={hasAccessToPremiumFeatures}
           onAiGenerateCard={() => setIsAiGeneratingCard(true)}
           onAiStopGeneration={() => setIsAiGeneratingCard(false)}
+          onCancel={() => setCardToEdit(undefined)}
         />
 
         {deckState &&
           (deckState.cards as FlashCard[]).map((card, idx) => (
             <CardPreview
-              key={card.id}
+              key={idx}
               card={card as FlashCard}
               deckTheme={deckState?.theme}
               onAskEdit={() =>

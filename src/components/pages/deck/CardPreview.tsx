@@ -26,7 +26,7 @@ export function CardPreview({
       onClick={onAskEdit}
       className={clsx(
         `group relative border-2 aspect-square bg-${deckTheme}-500 bg-opacity-20 dark:bg-opacity-40 transition-all rounded-lg overflow-hidden p-2 sm:p-3 ${
-          isBeingDeleted && "opacity-30"
+          isBeingDeleted && "opacity-30 scale-90"
         }`
       )}
     >
