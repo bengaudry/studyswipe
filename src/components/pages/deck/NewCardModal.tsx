@@ -201,7 +201,7 @@ export function AiPromptModal({
 
   const handleChange = (file: File | null) => {
     setFile(file);
-    console.log(file?.name);
+    alert("File " + file?.name + file?.type);
   };
 
 
