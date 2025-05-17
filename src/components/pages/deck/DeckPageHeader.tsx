@@ -15,7 +15,7 @@ export function DeckPageHeader({ deck }: { deck: Deck }) {
   const { data: deckState } = useContext(DeckDataContext);
 
   return (
-    <header className="flex flex-col gap-3 mb-6">
+    <header className="flex flex-col gap-3 mb-3">
       <div className="flex justify-between items-center gap-4">
         <BackButton />
         <div className="flex gap-2">

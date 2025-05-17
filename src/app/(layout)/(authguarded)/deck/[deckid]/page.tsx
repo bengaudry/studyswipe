@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { DeckPageHeader } from "@/components/pages/deck/DeckPageHeader";
 import { DeckPageBody } from "@/components/pages/deck/DeckPageBody";
 import { DeckDataProvider } from "@/components/pages/deck/DeckDataProvider";
-import { auth } from "@/lib/auth";
 import { authCache } from "@/lib/cache";
 
 export default async function DeckPage({
@@ -31,12 +30,10 @@ export default async function DeckPage({
     <DeckDataProvider initialDeckState={deck}>
       <DeckPageHeader deck={deck} />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        <DeckPageBody
-          deck={deck}
-          hasAccessToPremiumFeatures={hasAccessToPremiumFeatures}
-        />
-      </div>
+      <DeckPageBody
+        deck={deck}
+        hasAccessToPremiumFeatures={hasAccessToPremiumFeatures}
+      />
     </DeckDataProvider>
   );
 }

@@ -2,23 +2,32 @@
 import clsx from "clsx";
 import React from "react";
 import Latex from "react-latex-next";
-import { Image } from "@/components/ui";
-import { Edit2, Trash } from "react-feather";
+import { Checkbox, Image } from "@/components/ui";
 
-export const CardPreview = React.forwardRef<
-  HTMLDivElement,
-  {
-    card: FlashCard;
-    deckTheme: string;
-    onAskEdit: () => void;
-    onAskDelete: () => void;
-  }
->(({ card, deckTheme, onAskEdit, onAskDelete }, ref) => {
+export function CardPreview({
+  card,
+  deckTheme,
+  onAskEdit,
+  isBeingDeleted,
+  isSelected,
+  onSelect,
+  onUnSelect,
+}: {
+  card: FlashCard;
+  deckTheme: string;
+  onAskEdit: () => void;
+  isBeingDeleted: boolean;
+  isSelected: boolean;
+  onSelect: () => void;
+  onUnSelect: () => void;
+}) {
   return (
-    <div
-      ref={ref}
+    <button
+      onClick={onAskEdit}
       className={clsx(
-        `group relative border-2 aspect-square bg-${deckTheme}-500 bg-opacity-20 dark:bg-opacity-40 transition-colors rounded-lg overflow-hidden p-2 sm:p-3 cursor-default`
+        `group relative border-2 aspect-square bg-${deckTheme}-500 bg-opacity-20 dark:bg-opacity-40 transition-all rounded-lg overflow-hidden p-2 sm:p-3 ${
+          isBeingDeleted && "opacity-30"
+        }`
       )}
     >
       <div className="flex flex-col items-center justify-center gap-2 w-full h-full">
@@ -28,14 +37,26 @@ export const CardPreview = React.forwardRef<
             {value.type === "image" && (
               <Image src={value.imgUri} alt={value.alt} />
             )}
-            {value.type === "equation" && (
-              <Latex>$ {value.equation} $</Latex>
-            )}
+            {value.type === "equation" && <Latex>$ {value.equation} $</Latex>}
           </div>
         ))}
       </div>
-      <div className="px-2 absolute left-0 bottom-0 flex items-center justify-end gap-2 translate-y-full group-hover:translate-y-0 transition-transform w-full bg-gradient-to-b from-black/0 to-black/20 backdrop-blur-md py-1">
-        <button
+      <div className="p-3 left-0 top-0 absolute">
+        <Checkbox
+          radius="full"
+          size="lg"
+          classNames={{ wrapper: "shadow-xl border-2 border-white" }}
+          isSelected={isSelected}
+          onValueChange={(v) => {
+            if (v) {
+              onSelect();
+            } else onUnSelect();
+          }}
+        />
+      </div>
+      <div className="px-2 absolute left-0 bottom-0 flex items-center justify-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform w-full bg-gradient-to-b from-black/0 to-black/20 backdrop-blur-md py-1">
+        <span className="text-sm text-neutral-400">Click to edit</span>
+        {/* <button
           onClick={onAskDelete}
           className="rounded-xl p-2 hover:bg-neutral-100/70 dark:hover:bg-neutral-900 active:scale-90 transition-all"
         >
@@ -46,8 +67,8 @@ export const CardPreview = React.forwardRef<
           className="rounded-xl p-2 hover:bg-neutral-100/70 dark:hover:bg-neutral-900 active:scale-90 transition-all"
         >
           <Edit2 size={22} />
-        </button>
+        </button> */}
       </div>
-    </div>
+    </button>
   );
-});
+}

@@ -2,6 +2,7 @@
 import { PropsWithChildren, useEffect, useState } from "react";
 import { SessionProvider } from "next-auth/react";
 import { NextUIProvider } from "@nextui-org/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 type ColorScheme = "light" | "dark";
 
@@ -30,6 +31,8 @@ export function usePrefersColorScheme(): ColorScheme {
   return colorScheme;
 }
 
+const queryClient = new QueryClient();
+
 export function AppLayout({ children }: PropsWithChildren) {
   const colorScheme = usePrefersColorScheme();
 
@@ -54,7 +57,9 @@ export function AppLayout({ children }: PropsWithChildren) {
 
   return (
     <SessionProvider>
-      <NextUIProvider>{children}</NextUIProvider>
+      <QueryClientProvider client={queryClient}>
+        <NextUIProvider>{children}</NextUIProvider>
+      </QueryClientProvider>
     </SessionProvider>
   );
 }

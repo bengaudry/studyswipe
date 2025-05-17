@@ -90,9 +90,19 @@ export const DELETE = async (req: NextRequest) => {
     if (!deckid)
       return serverError("missing-parameters", "Parameter missing: <deckid>");
 
-    const cardid = params.get("cardid");
-    if (!cardid)
-      return serverError("missing-parameters", "Parameter missing: <cardid>");
+    const body = await req.json();
+    if (!body || typeof body !== "object" || !body.cardIds)
+      return serverError("invalid-payload", "Properties missing: <cardIds>");
+
+    const cardIds = body.cardIds;
+    if (
+      !Array.isArray(cardIds) ||
+      !cardIds.every((val) => typeof val === "string")
+    )
+      return serverError(
+        "invalid-payload",
+        "<cardIds> must be an array of string"
+      );
 
     const deck = await prisma.deck.findUnique({ where: { id: deckid } });
     if (!deck) return serverError("invalid-deckid");
@@ -101,7 +111,7 @@ export const DELETE = async (req: NextRequest) => {
     if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const newCards = (deck.cards as FlashCard[]).filter(
-      (card) => card.id != cardid
+      (card) => !cardIds.includes(card.id)
     );
 
     await prisma.deck.update({

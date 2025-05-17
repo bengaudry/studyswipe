@@ -5,39 +5,9 @@ import { CardPreview } from "./CardPreview";
 import { useContext, useState, useRef } from "react";
 import { DeckDataContext } from "./DeckDataProvider";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
-
-function useDeleteQueue(deckId: string, updateDeckData: any) {
-  const queue = useRef<string[]>([]);
-  const [processing, setProcessing] = useState(false);
-
-  const processQueue = async () => {
-    if (processing || queue.current.length === 0) return;
-    setProcessing(true);
-
-    while (queue.current.length > 0) {
-      const cardId = queue.current[0];
-      try {
-        const res = await fetch(`/api/card?deckid=${deckId}&cardid=${cardId}`, {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-        });
-      } catch {}
-      queue.current.shift();
-    }
-    setProcessing(false);
-  };
-
-  const enqueueDelete = (cardId: string) => {
-    updateDeckData((prev: any) => ({
-      ...prev,
-      cards: prev.cards.filter((card: any) => card.id !== cardId),
-    }));
-    queue.current.push(cardId);
-    processQueue();
-  };
-
-  return enqueueDelete;
-}
+import { Button, Checkbox, Tooltip } from "@/components/ui";
+import { Copy, Trash2 } from "react-feather";
+import { useQuery } from "@tanstack/react-query";
 
 export function DeckPageBody({
   deck: initialDeck,
@@ -50,38 +20,117 @@ export function DeckPageBody({
     { data: FlashCard; index: number } | undefined
   >(undefined);
 
+  const [selectedCards, setSelectedCards] = useState<string[]>([]);
+
   const { data: deckState, updateDeckData } = useContext(DeckDataContext);
   const [isAiGeneratingCard, setIsAiGeneratingCard] = useState(false);
 
-  const enqueueDelete = useDeleteQueue(initialDeck.id, updateDeckData);
+  // Handling selected cards deletion
+  const {
+    isFetching: isCardDeletionPending,
+    error: cardDeletionError,
+    refetch: callCardDeletionApi,
+  } = useQuery({
+    queryKey: ["deleteCards"],
+    queryFn: () =>
+      fetch(`/api/card?deckid=${initialDeck.id}`, {
+        method: "DELETE",
+        body: JSON.stringify({
+          cardIds: selectedCards,
+        }),
+      }),
+    enabled: false,
+  });
 
-  const handleDeleteCard = (cardid: string) => enqueueDelete(cardid);
+  const handleDeleteCards = async () => {
+    try {
+      if (selectedCards.length === 0) return;
+      await callCardDeletionApi();
+      updateDeckData((prev) => ({
+        ...prev,
+        cards: prev.cards.filter(
+          (v) => !selectedCards.includes((v as FlashCard).id)
+        ),
+      }));
+      setSelectedCards([]);
+    } catch (err) {}
+  };
 
   return (
     <>
-      <NewCardModal
-        deckid={initialDeck.id}
-        card={cardToEdit}
-        canUseAiGeneration={hasAccessToPremiumFeatures}
-        onAiGenerateCard={() => setIsAiGeneratingCard(true)}
-        onAiStopGeneration={() => setIsAiGeneratingCard(false)}
-      />
-
-      {deckState &&
-        (deckState.cards as FlashCard[]).map((card, idx) => (
-          <CardPreview
-            key={card.id}
-            card={card as FlashCard}
-            deckTheme={deckState?.theme}
-            onAskDelete={() => handleDeleteCard(card.id)}
-            onAskEdit={() =>
-              setCardToEdit({ data: card as FlashCard, index: idx })
-            }
+      <header className="flex flex-row items-center gap-2 mb-6">
+        <Tooltip content="Select all">
+          <Checkbox
+            radius="full"
+            isSelected={selectedCards.length !== 0 && selectedCards.length === deckState?.cards.length}
+            isDisabled={!deckState || deckState.cards.length === 0}
+            onValueChange={(v) => {
+              if (!v) setSelectedCards([]);
+              else
+                setSelectedCards(
+                  deckState?.cards.map((card) => (card as FlashCard).id) ?? []
+                );
+            }}
           />
-        ))}
-      {isAiGeneratingCard && (
-        <SkeletonLoader className="w-full aspect-square border-2 rounded-lg h-full" />
-      )}
+        </Tooltip>
+        <Tooltip content="Delete selected cards">
+          <Button
+            size="md"
+            isIconOnly
+            isLoading={isCardDeletionPending}
+            color="danger"
+            variant="flat"
+            startContent={
+              isCardDeletionPending ? undefined : <Trash2 size={20} />
+            }
+            isDisabled={selectedCards.length === 0}
+            onPress={handleDeleteCards}
+          />
+        </Tooltip>
+        <Tooltip content="Duplicate selected cards">
+          <Button
+            size="md"
+            isIconOnly
+            variant="flat"
+            startContent={<Copy size={20} />}
+            isDisabled={true || selectedCards.length === 0 || isCardDeletionPending}
+            //onPress={handleDuplicateCards}
+          />
+        </Tooltip>
+      </header>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
+        <NewCardModal
+          deckid={initialDeck.id}
+          card={cardToEdit}
+          canUseAiGeneration={hasAccessToPremiumFeatures}
+          onAiGenerateCard={() => setIsAiGeneratingCard(true)}
+          onAiStopGeneration={() => setIsAiGeneratingCard(false)}
+        />
+
+        {deckState &&
+          (deckState.cards as FlashCard[]).map((card, idx) => (
+            <CardPreview
+              key={card.id}
+              card={card as FlashCard}
+              deckTheme={deckState?.theme}
+              onAskEdit={() =>
+                setCardToEdit({ data: card as FlashCard, index: idx })
+              }
+              isBeingDeleted={
+                isCardDeletionPending && selectedCards.includes(card.id)
+              }
+              isSelected={selectedCards.includes(card.id)}
+              onSelect={() => setSelectedCards((prev) => [...prev, card.id])}
+              onUnSelect={() =>
+                setSelectedCards((prev) => prev.filter((id) => id !== card.id))
+              }
+            />
+          ))}
+        {isAiGeneratingCard && (
+          <SkeletonLoader className="w-full aspect-square border-2 rounded-lg h-full" />
+        )}
+      </div>
     </>
   );
 }
