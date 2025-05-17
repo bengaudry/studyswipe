@@ -1,4 +1,5 @@
 import { BackButton } from "@/components/BackButton";
+import { DeckPageToolbar } from "@/components/pages/deck/DeckPageBody";
 import { NewCardModalTrigger } from "@/components/pages/deck/NewCardModal";
 import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { Button } from "@/components/ui";
@@ -32,6 +33,11 @@ export default async function DeckPageLoader() {
           </div>
         </div>
       </header>
+
+      <DeckPageToolbar
+        selectedCards={[]}
+        isCardDeletionPending={false}
+      />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         <NewCardModalTrigger isDisabled />
