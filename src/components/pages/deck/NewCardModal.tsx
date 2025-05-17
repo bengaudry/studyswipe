@@ -224,7 +224,6 @@ export function AiPromptModal({
                 placeholder="Enter the topic you want to generate cards about here..."
               />
               <Divider />
-              <span>Type: {file?.name} {file?.type}</span>
               <FileUploader
                 handleChange={handleChange}
                 name="file"
@@ -232,7 +231,8 @@ export function AiPromptModal({
                 uploadLabel="Upload a file or an image"
                 uploadedLabel={file?.name}
                 maxSize={1}
-                
+                fileTypes={fileTypes}
+                onTypeError={alert}
               />
             </ModalBody>
             <ModalFooter>
