@@ -232,7 +232,7 @@ export function AiPromptModal({
                 uploadLabel="Upload a file or an image"
                 uploadedLabel={file?.name}
                 maxSize={1}
-                types={fileTypes}
+                
               />
             </ModalBody>
             <ModalFooter>
