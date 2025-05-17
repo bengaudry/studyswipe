@@ -20,7 +20,7 @@ export function DeckPageToolbar({
   isCardDeletionPending: boolean;
   handleDeleteCards?: () => void;
 }) {
-  const { data: deckState, updateDeckData } = useContext(DeckDataContext);
+  const { data: deckState } = useContext(DeckDataContext);
 
   return (
     <header className="flex flex-row items-center gap-2 mb-6">

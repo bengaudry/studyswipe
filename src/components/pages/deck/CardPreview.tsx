@@ -2,7 +2,7 @@
 import clsx from "clsx";
 import React from "react";
 import Latex from "react-latex-next";
-import { Checkbox, Image } from "@/components/ui";
+import { Checkbox, Image, Tooltip } from "@/components/ui";
 
 export function CardPreview({
   card,
@@ -41,10 +41,14 @@ export function CardPreview({
           </div>
         ))}
       </div>
-      <div className="p-3 left-0 top-0 absolute">
+
+      <div
+        className={`absolute left-2 top-2 ${
+          isSelected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        } transition-opacity`}
+      >
         <Checkbox
           radius="full"
-          size="lg"
           classNames={{ wrapper: "shadow-xl border-2 border-neutral-400" }}
           isSelected={isSelected}
           onValueChange={(v) => {
@@ -54,20 +58,17 @@ export function CardPreview({
           }}
         />
       </div>
+
+      {card.aiGenerated && (
+        <div className="absolute right-2 top-0">
+          <Tooltip content="Generated with AI">
+            <span className="text-xs font-medium opacity-50">AI</span>
+          </Tooltip>
+        </div>
+      )}
+
       <div className="px-2 absolute left-0 bottom-0 flex items-center justify-center gap-2 translate-y-full group-hover:translate-y-0 transition-transform w-full bg-gradient-to-b from-black/0 to-black/20 backdrop-blur-md py-1">
         <span className="text-sm text-neutral-400">Click to edit</span>
-        {/* <button
-          onClick={onAskDelete}
-          className="rounded-xl p-2 hover:bg-neutral-100/70 dark:hover:bg-neutral-900 active:scale-90 transition-all"
-        >
-          <Trash size={22} />
-        </button>
-        <button
-          onClick={onAskEdit}
-          className="rounded-xl p-2 hover:bg-neutral-100/70 dark:hover:bg-neutral-900 active:scale-90 transition-all"
-        >
-          <Edit2 size={22} />
-        </button> */}
       </div>
     </button>
   );

@@ -298,8 +298,13 @@ const CardElement = ({
   return (
     <button
       onClick={onFlip}
-      className="w-full h-full md:hover:scale-95 opacity-100 scale-100 transition-all"
+      className="relative w-full h-full md:hover:scale-95 opacity-100 scale-100 transition-all group"
     >
+      {content.aiGenerated && (
+        <div className="absolute right-2 top-0 transition-opacity group-active:opacity-0">
+          <span className="text-xs font-medium opacity-50">AI</span>
+        </div>
+      )}
       <FlashcardPreview
         content={content.question}
         decktheme={theme}

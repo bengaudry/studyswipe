@@ -1,6 +1,7 @@
 import { geminiFlashcardsResponseSchema } from "@/lib/googleAi";
 import { GenerateContentResponse, GoogleGenAI } from "@google/genai";
 import { useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 
 export function useAiCardGeneration() {
   const [data, setData] = useState<FlashCard[] | null>(null);
@@ -145,9 +146,17 @@ export function useAiCardGeneration() {
                   };
                   return newElement;
                 }
+                if (element.text.match(".*$[^$]+$.*")) {
+                  const newElement: FlashCardContentJSON = {
+                    type: "equation",
+                    equation: element.text,
+                  };
+                  return newElement;
+                }
                 return element;
               };
 
+              obj.id = uuidv4();
               obj.aiGenerated = true;
               obj.question = obj.question.map(convertAiTextToLaTeX);
               obj.answer = obj.answer.map(convertAiTextToLaTeX);

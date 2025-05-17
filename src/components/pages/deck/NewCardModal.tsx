@@ -333,26 +333,27 @@ export function NewCardModal({
     }
   };
 
-  const editCard = async (cardBody: FlashCard) => {
-    if (!card) return;
+  const editCard = async (newCardData: FlashCard) => {
+    if (!card) return; // No card in entry, not editing
     const prevDeckState = deckData;
 
     try {
+      // Update the ui state
       updateDeckData((prevDeck) => ({
         ...prevDeck,
-        cards: (prevDeck.cards as FlashCard[]).map((card) => {
-          if (card.id === cardBody.id) return cardBody;
-          return card;
+        cards: (prevDeck.cards as FlashCard[]).map((c) => {
+          if (c.id === card.data.id) return newCardData;
+          return c;
         }),
       }));
 
-      // Edit the card otherwise
-      await fetch(`/api/card?deckid=${deckid}&cardid=${cardBody.id}`, {
+      // Edit the card in database
+      await fetch(`/api/card?deckid=${deckid}&cardid=${card.data.id}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(cardBody),
+        body: JSON.stringify(newCardData),
       });
     } catch (err) {
       if (prevDeckState) updateDeckData(prevDeckState);
