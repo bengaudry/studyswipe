@@ -204,6 +204,7 @@ export function AiPromptModal({
     console.log(file?.name);
   };
 
+
   const fileTypes = ["pdf", "jpg", "png", "heic", "heif", "jpeg"];
 
   return (
@@ -223,6 +224,7 @@ export function AiPromptModal({
                 placeholder="Enter the topic you want to generate cards about here..."
               />
               <Divider />
+              <span>{file?.type}</span>
               <FileUploader
                 handleChange={handleChange}
                 name="file"
