@@ -224,7 +224,7 @@ export function AiPromptModal({
                 placeholder="Enter the topic you want to generate cards about here..."
               />
               <Divider />
-              <span>{file?.type}</span>
+              <span>Type: {file?.name} {file?.type}</span>
               <FileUploader
                 handleChange={handleChange}
                 name="file"
