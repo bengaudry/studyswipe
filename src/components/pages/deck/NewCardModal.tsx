@@ -204,7 +204,7 @@ export function AiPromptModal({
     console.log(file?.name);
   };
 
-  const fileTypes = ["jpg", "jpeg", "png", "pdf"];
+  const fileTypes = ["pdf", "jpg", "png", "heic", "jpeg"];
 
   return (
     <Modal placement="center" {...props}>
