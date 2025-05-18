@@ -492,11 +492,7 @@ export function NewCardModal({
                 </Accordion>
               </DrawerBody>
               <DrawerFooter>
-                <Button
-                  color="primary"
-                  variant="flat"
-                  onPress={onClose}
-                >
+                <Button color="primary" variant="flat" onPress={onClose}>
                   Close
                 </Button>
                 <Button
@@ -526,36 +522,36 @@ function FlashcardPreview({
   updateContent: Dispatch<SetStateAction<FlashCardContentJSON[]>>;
 }) {
   return (
-    <div
-      className={clsx(
-        `w-full h-full border rounded-lg mb-3 p-3 flex flex-col gap-2 transition-all`
-      )}
-    >
+    <div className={clsx(`w-full h-full mb-3 transition-all`)}>
       {content.length > 0 ? (
         <Reorder.Group values={content} onReorder={updateContent}>
-          {content.map((value, idx) => (
-            <Reorder.Item value={value} key={idx} index={idx}>
-              <ContentElement
-                key={idx}
-                content={value}
-                onUpdate={(updatedValue) =>
-                  updateContent((prev) =>
-                    prev.map((item, itemIdx) =>
-                      itemIdx === idx ? updatedValue : item
+          <div className="flex flex-col gap-2">
+            {content.map((value, idx) => (
+              <Reorder.Item value={value} key={idx} index={idx}>
+                <ContentElement
+                  key={idx}
+                  content={value}
+                  onUpdate={(updatedValue) =>
+                    updateContent((prev) =>
+                      prev.map((item, itemIdx) =>
+                        itemIdx === idx ? updatedValue : item
+                      )
                     )
-                  )
-                }
-                onDelete={() =>
-                  updateContent((prev) => {
-                    return prev.filter((_, i) => i !== idx);
-                  })
-                }
-              />
-            </Reorder.Item>
-          ))}
+                  }
+                  onDelete={() =>
+                    updateContent((prev) => {
+                      return prev.filter((_, i) => i !== idx);
+                    })
+                  }
+                />
+              </Reorder.Item>
+            ))}
+          </div>
         </Reorder.Group>
       ) : (
-        <p className="text-neutral-400 text-center text-sm">No content yet.</p>
+        <p className="text-neutral-400 text-center text-sm mt-3">
+          No content yet.
+        </p>
       )}
     </div>
   );
@@ -576,7 +572,7 @@ function ContentElement({
 
   return (
     <div
-      className={`group relative border border-dashed rounded-lg transition-colors px-6 ${
+      className={`group relative border border-dashed rounded-lg transition-colors px-4 ${
         isFocused
           ? "border-black dark:border-neutral-200 shadow-md"
           : "border-neutral-300 hover:border-neutral-500 dark:border-neutral-600"
@@ -597,7 +593,7 @@ function ContentElement({
             <textarea
               value={content.text || ""}
               autoFocus
-              className={`absolute z-40 top-full left-0 bg-white dark:bg-neutral-800 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
+              className={`absolute z-50 bottom-full mb-2 left-0 right-0 bg-white dark:bg-neutral-800 mt-2 rounded-lg w-full overflow-y-scroll whitespace-normal p-2`}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               onChange={(e) => onUpdate({ ...content, text: e.target.value })}
@@ -621,7 +617,7 @@ function ContentElement({
             <textarea
               value={content.content || ""}
               autoFocus
-              className={`absolute z-40 top-full left-0 bg-white dark:bg-neutral-800 mt-2 rounded-lg w-full h-full overflow-y-scroll whitespace-normal p-2`}
+              className={`absolute z-50 bottom-full mb-2 left-0 right-0 border-none bg-white dark:bg-neutral-800 mt-2 rounded-lg w-full overflow-y-scroll whitespace-normal p-2`}
               onFocus={() => setFocused(true)}
               onBlur={() => setFocused(false)}
               onChange={(e) =>
@@ -661,7 +657,7 @@ function ContentElement({
                 onBlur={() => setFocused(false)}
                 wrap="hard"
                 rows={2}
-                className={`absolute z-40 top-full mt-2 bg-white dark:bg-neutral-800 rounded-lg w-full h-fit overflow-y-scroll p-2`}
+                className={`absolute z-50 bottom-full mb-2 left-0 right-0 border-none bg-white dark:bg-neutral-800 rounded-lg w-full overflow-y-scroll p-2`}
                 onChange={(e) =>
                   onUpdate({ ...content, equation: e.target.value })
                 }
