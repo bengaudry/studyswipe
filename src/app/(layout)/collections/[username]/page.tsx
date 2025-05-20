@@ -1,7 +1,6 @@
 import { redirect } from "next/navigation";
 import { Collection } from "@prisma/client";
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { Divider } from "@/components/ui";
 import { authCache } from "@/lib/cache";

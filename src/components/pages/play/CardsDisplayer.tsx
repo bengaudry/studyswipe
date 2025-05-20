@@ -53,7 +53,8 @@ const AnimatedSwiperWrapper = ({
             ? "animate-validate-last-card"
             : "animate-validate-card"
           : ""
-      } relative w-full aspect-square max-w-80 mx-auto transition-all duration-200`}
+      } relative aspect-square max-w-96 mx-auto transition-all duration-200`}
+      style={{width: `${window?.innerHeight/2}px`}}
     >
       {children}
     </div>
