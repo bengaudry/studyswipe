@@ -54,7 +54,7 @@ const AnimatedSwiperWrapper = ({
             : "animate-validate-card"
           : ""
       } relative aspect-square max-w-96 mx-auto transition-all duration-200`}
-      style={{width: `${window?.innerHeight/2}px`}}
+      style={{width: `${0.65*Math.sqrt(window?.innerHeight*window?.innerWidth)}px`}}
     >
       {children}
     </div>
