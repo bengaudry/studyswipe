@@ -3,7 +3,13 @@ import { clsx } from "clsx";
 import { Reorder } from "motion/react";
 import Latex from "react-latex-next";
 import { LatexToolbar } from "./LatexToolbar";
-import { Plus, Feather, Link2, Circle } from "react-feather";
+import {
+  Plus,
+  Feather,
+  Link2,
+  Circle,
+  Image as ImageIcon,
+} from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
 import {
   Button,
@@ -36,6 +42,11 @@ import {
 import { FileUploader } from "react-drag-drop-files";
 import { useAiCardGeneration } from "@/hooks/useAiCardGeneration";
 import { useRouter } from "next/navigation";
+import NextImage from "next/image";
+import { useSession } from "next-auth/react";
+import { useSupabaseImageUpload } from "@/hooks/useSupabaseImageUpload";
+import { useTailwindBreakpoint } from "@/hooks/useTailwindBreakpoint";
+import { ToolSelector } from "./ToolSelector";
 
 export function NewCardModalTrigger({
   onOpen,
@@ -70,120 +81,6 @@ export function NewCardModalTrigger({
   );
 }
 
-function useTailwindBreakpoint() {
-  const [breakpoint, setBreakpoint] = useState("base");
-
-  useEffect(() => {
-    function handleResize() {
-      const width = window.innerWidth;
-      if (width < 640) setBreakpoint("base");
-      else if (width < 768) setBreakpoint("sm");
-      else if (width < 1024) setBreakpoint("md");
-      else if (width < 1280) setBreakpoint("lg");
-      else if (width < 1536) setBreakpoint("xl");
-      else setBreakpoint("2xl");
-    }
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return breakpoint;
-}
-
-function ToolSelector({
-  onAddElement,
-}: {
-  onAddElement: (newElement: FlashCardContentJSON) => void;
-}) {
-  const twBreakpoint = useTailwindBreakpoint();
-  const tools: { el: FlashCardContentJSON; representingElement: ReactNode }[] =
-    [
-      {
-        el: {
-          type: "text",
-          heading: "title",
-          text: "",
-        },
-        representingElement: <span className="text-xl font-bold">H1</span>,
-      },
-      {
-        el: {
-          type: "text",
-          heading: "subtitle",
-          text: "",
-        },
-        representingElement: <span className="text-lg font-semibold">H2</span>,
-      },
-      {
-        el: {
-          type: "text",
-          heading: "paragraph",
-          text: "",
-        },
-        representingElement: <span>Text</span>,
-      },
-      {
-        el: { type: "equation", equation: "" },
-        representingElement: <Latex>$\sqrt{"{x}"}$</Latex>,
-      },
-      {
-        el: { type: "quote", content: "" },
-        representingElement: <Feather />,
-      },
-      {
-        el: { type: "link", href: "" },
-        representingElement: <Link2 />,
-      },
-    ];
-
-  let elPerRow = 6;
-  switch (twBreakpoint) {
-    case "base":
-      elPerRow = 3;
-      break;
-    default:
-      elPerRow = 6;
-      break;
-  }
-
-  return (
-    <div className="flex flex-col gap-y-1 mx-2">
-      <div className="grid grid-cols-3 sm:grid-cols-6 mx-auto w-full border rounded-lg">
-        {tools.map((tool, idx) => {
-          // Get the screen resolution for tailwind (sm, md, ...)
-          const hasRightNeighbour = (idx + 1) % elPerRow !== 0;
-          const nbElementsOnBottomLine = tools.length % elPerRow || elPerRow;
-          const nbElementsWithoutBottomLine =
-            tools.length - nbElementsOnBottomLine;
-          const hasBottomNeighbour = idx < nbElementsWithoutBottomLine;
-          const isTopRight = idx + 1 === elPerRow;
-          const isBottomRight = idx === tools.length - 1 && !hasRightNeighbour;
-          const isTopLeft = idx === 0;
-          const isBottomLeft = idx % elPerRow === 0;
-
-          return (
-            <button
-              key={idx}
-              className={`flex items-center justify-center p-2 hover:bg-neutral-100/50 dark:hover:bg-neutral-800 active:scale-95 transition-all
-              ${hasRightNeighbour ? "border-r-1" : "border-r-0"}
-              ${hasBottomNeighbour ? "border-b-1" : "border-b-0"}
-              ${isTopLeft ? "rounded-tl-lg" : ""}
-              ${isBottomLeft ? "rounded-bl-lg" : ""}
-              ${isTopRight ? "rounded-tr-lg" : ""}
-              ${isBottomRight ? "rounded-br-lg" : ""}
-            `}
-              onClick={() => onAddElement(tool.el)}
-            >
-              {tool.representingElement}
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
 export function AiPromptModal({
   isAskingGeneration,
   onAskGeneration,
@@ -204,7 +101,7 @@ export function AiPromptModal({
     alert("File " + file?.name + file?.type);
   };
 
-  const fileTypes = ["pdf", "jpg", "png", "heic", "heif", "jpeg"];
+  const fileTypes = ["pdf", "jpg", "png", "heic", "heif", "jpeg", "image/*"];
 
   return (
     <Modal placement="center" {...props}>
@@ -292,6 +189,7 @@ export function NewCardModal({
     []
   );
   const { push } = useRouter();
+  const { pushImages } = useSupabaseImageUpload();
 
   // AI GENERATION
   const { generateCards, isAskingGeneration, isGenerating } =
@@ -322,9 +220,7 @@ export function NewCardModal({
   }, [card]);
 
   useEffect(() => {
-    if (isOpen) {
-      setCurrent("question");
-    }
+    if (isOpen) setCurrent("question");
   }, [isOpen]);
 
   const createCard = async (cardBody: FlashCard) => {
@@ -335,6 +231,8 @@ export function NewCardModal({
         cards: [...prevDeck.cards, cardBody],
       }));
 
+      await pushImages();
+
       await fetch(`/api/card?deckid=${deckid}`, {
         method: "POST",
         headers: {
@@ -343,6 +241,8 @@ export function NewCardModal({
         body: JSON.stringify(cardBody),
       });
     } catch (err) {
+      console.error("Could not create card :");
+      console.error(err);
       if (prevCardState) updateDeckData(prevCardState);
     }
   };
@@ -370,6 +270,8 @@ export function NewCardModal({
         }),
       }));
 
+      await pushImages();
+
       // Edit the card in database
       await fetch(`/api/card?deckid=${deckid}&cardid=${card.data.id}`, {
         method: "PATCH",
@@ -379,6 +281,8 @@ export function NewCardModal({
         body: JSON.stringify(newCardData),
       });
     } catch (err) {
+      console.error("Could not edit card :");
+      console.error(err);
       if (prevDeckState) updateDeckData(prevDeckState);
     }
   };
@@ -566,13 +470,54 @@ function ContentElement({
   onUpdate: (updatedContent: FlashCardContentJSON) => void;
   onDelete: () => void;
 }) {
-  const [isFocused, setFocused] = useState(false);
+  const { data: session } = useSession();
 
-  if (content.type === "image") return null; // TODO
+  const [isFocused, setFocused] = useState(false);
+  const [fileUrl, setFileUrl] = useState<string | null>(null);
+
+  const { addFileToQueue } = useSupabaseImageUpload();
+
+  const handleChange = async (file: File | null) => {
+    if (content.type !== "image" || !file) return setFileUrl(null);
+
+    if (!session?.user?.id) return;
+    const imgUri = `https://oqtjixzwhpbmzpsieuoo.supabase.co/storage/v1/object/public/deck-images/${session.user.id}/${file.name}`;
+    try {
+      const imgDataUrl = URL.createObjectURL(file);
+      setFileUrl(imgDataUrl);
+
+      const { image } = addFileToQueue(file);
+
+      onUpdate({
+        ...content,
+        imgUri,
+        width: image.width,
+        height: image.height,
+      });
+    } catch (err) {
+      console.error(err);
+      if (typeof err === "object" && err) {
+        // If the image alreay exists, do not recreate it, but get the link and metadata
+        if ("error" in err && err.error === "Duplicate") {
+          const image = new Image();
+          image.src = imgUri;
+          onUpdate({
+            ...content,
+            imgUri,
+            width: image.width,
+            height: image.height,
+          });
+        }
+        if ("name" in err) alert(err.name);
+      }
+    }
+  };
+
+  const fileTypes = ["jpg", "png", "heic", "heif", "jpeg", "image/*"];
 
   return (
     <div
-      className={`group relative border border-dashed rounded-lg transition-colors px-4 ${
+      className={`group relative border-2 border-dashed rounded-lg transition-colors px-4 ${
         isFocused
           ? "border-black dark:border-neutral-200 shadow-md"
           : "border-neutral-300 hover:border-neutral-500 dark:border-neutral-600"
@@ -678,6 +623,29 @@ function ContentElement({
           className="text-blue-500"
           onChange={(e) => onUpdate({ ...content, href: e.target.value })}
         />
+      )}
+
+      {content.type === "image" && (
+        <>
+          {fileUrl ? (
+            <NextImage
+              src={fileUrl}
+              alt={content.alt}
+              className="mx-auto object-cover"
+              width={64}
+              height={64}
+            />
+          ) : (
+            <FileUploader
+              handleChange={handleChange}
+              name="file"
+              multiple={false}
+              fileTypes={fileTypes}
+              uploadLabel="Upload a file or an image"
+              maxSize={5}
+            />
+          )}
+        </>
       )}
 
       {/* Delete element button */}

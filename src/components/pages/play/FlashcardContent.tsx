@@ -1,10 +1,17 @@
 import clsx from "clsx";
 import Latex from "react-latex-next";
 import { Image, Alert } from "@/components/ui";
+import { useRef } from "react";
 
-export type FlashcardContentProps = { content: FlashCardContentJSON };
+export type FlashcardContentProps = {
+  content: FlashCardContentJSON;
+  cardDimension: number | undefined;
+};
 
-export function FlashcardContent({ content }: FlashcardContentProps) {
+export function FlashcardContent({
+  content,
+  cardDimension,
+}: FlashcardContentProps) {
   switch (content.type) {
     case "text":
       return (
@@ -17,9 +24,7 @@ export function FlashcardContent({ content }: FlashcardContentProps) {
         </p>
       );
     case "equation":
-      return (
-        <Latex>$ {content.equation} $</Latex>
-      );
+      return <Latex>$ {content.equation} $</Latex>;
     case "quote":
       return (
         <p
@@ -62,8 +67,25 @@ export function FlashcardContent({ content }: FlashcardContentProps) {
         </a>
       );
 
+    case "image":
+      return (
+        <Image
+          src={content.imgUri}
+          width={
+            ((cardDimension || 128) * (content?.width || 128)) /
+            (content?.height || 128)
+          }
+          height={
+            ((cardDimension || 128) * (content?.height || 128)) /
+            (content?.width || 128)
+          }
+          className="rounded-none w-full h-min aspect-auto object-cover"
+          alt={content.alt}
+        />
+      );
+
     default:
-      return null; // Extend here for other content types like images or equations.
+      return null;
   }
 }
 
@@ -78,8 +100,10 @@ export function FlashcardPreview({
   content,
   decktheme,
 }: FlashcardPreviewProps) {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   return (
     <div
+      ref={wrapperRef}
       className={clsx(
         `absolute inset-0 w-full h-full bg-${decktheme}-500 bg-opacity-20 dark:bg-opacity-50 shadow-xl rounded-lg p-6 overflow-y-scroll grid place-content-center gap-2 ${
           isActive
@@ -89,7 +113,11 @@ export function FlashcardPreview({
       )}
     >
       {content.map((value, idx) => (
-        <FlashcardContent key={idx} content={value} />
+        <FlashcardContent
+          cardDimension={wrapperRef.current?.clientWidth}
+          key={idx}
+          content={value}
+        />
       ))}
     </div>
   );

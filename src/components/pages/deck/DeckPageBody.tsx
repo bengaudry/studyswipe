@@ -8,6 +8,7 @@ import { SkeletonLoader } from "@/components/SkeletonLoader";
 import { Button, Checkbox, Tooltip } from "@/components/ui";
 import { Copy, Trash2 } from "react-feather";
 import { useQuery } from "@tanstack/react-query";
+import { SupabaseImageUploadProvider } from "@/hooks/useSupabaseImageUpload";
 
 export function DeckPageToolbar({
   selectedCards,
@@ -132,14 +133,16 @@ export function DeckPageBody({
       />
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mb-6">
-        <NewCardModal
-          deckid={initialDeck.id}
-          card={cardToEdit}
-          canUseAiGeneration={hasAccessToPremiumFeatures}
-          onAiGenerateCard={() => setIsAiGeneratingCard(true)}
-          onAiStopGeneration={() => setIsAiGeneratingCard(false)}
-          onCancel={() => setCardToEdit(undefined)}
-        />
+        <SupabaseImageUploadProvider>
+          <NewCardModal
+            deckid={initialDeck.id}
+            card={cardToEdit}
+            canUseAiGeneration={hasAccessToPremiumFeatures}
+            onAiGenerateCard={() => setIsAiGeneratingCard(true)}
+            onAiStopGeneration={() => setIsAiGeneratingCard(false)}
+            onCancel={() => setCardToEdit(undefined)}
+          />
+        </SupabaseImageUploadProvider>
 
         {deckState &&
           (deckState.cards as FlashCard[]).map((card, idx) => (
