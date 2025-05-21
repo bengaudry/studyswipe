@@ -5,19 +5,14 @@ import { Deck } from "@prisma/client";
 import { MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
 import { DeckDataContext } from "./DeckDataProvider";
 import {
-  Button,
   Input,
   useDisclosure,
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
-  Modal,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
 } from "@/components/ui";
+import { Modal } from "@/components/modals";
 import { MoreVertical, Edit2, Trash, EyeOff, Eye } from "react-feather";
 
 export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
@@ -130,77 +125,42 @@ export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
         </DropdownMenu>
       </Dropdown>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
-        <ModalContent>
-          {(onClose) =>
-            modalType === "delete" ? (
-              <>
-                <ModalHeader className="flex flex-col gap-1">
-                  Delete deck
-                </ModalHeader>
-                <ModalBody>
-                  If you delete this deck, all cards in it will be deleted too,
-                  and cannot be recovered
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    size="sm"
-                    color="danger"
-                    variant="flat"
-                    onPress={onClose}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    size="sm"
-                    color="danger"
-                    isLoading={loading}
-                    onPress={handleDeleteDeck}
-                  >
-                    Delete deck
-                  </Button>
-                </ModalFooter>
-              </>
-            ) : modalType === "rename" ? (
-              <>
-                <ModalHeader className="flex flex-col gap-1">
-                  Rename deck
-                </ModalHeader>
-                <ModalBody>
-                  <Input
-                    label="New title"
-                    labelPlacement="outside"
-                    isRequired
-                    required
-                    value={newtitle}
-                    maxLength={MAX_DECK_TITLE_LENGTH}
-                    onChange={(e) => setNewtitle(e.target.value)}
-                    placeholder="Physics, Philosophy, Computer Science..."
-                  />
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    size="sm"
-                    color="primary"
-                    variant="flat"
-                    onPress={onClose}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    size="sm"
-                    color="primary"
-                    isLoading={loading}
-                    onPress={handleRenameDeck}
-                  >
-                    Rename deck
-                  </Button>
-                </ModalFooter>
-              </>
-            ) : null
-          }
-        </ModalContent>
-      </Modal>
+      {modalType === "delete" && (
+        <Modal
+          title="Delete deck"
+          color="danger"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          onValidate={handleDeleteDeck}
+          submitButtonLabel="Delete deck"
+          submitButtonProps={{ isLoading: loading }}
+        >
+          If you delete this deck, all cards in it will be deleted too, and
+          cannot be recovered
+        </Modal>
+      )}
+
+      {modalType === "rename" && (
+        <Modal
+          title="Rename deck"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          onValidate={handleRenameDeck}
+          submitButtonLabel="Rename deck"
+          submitButtonProps={{ isLoading: loading }}
+        >
+          <Input
+            label="New title"
+            labelPlacement="outside"
+            isRequired
+            required
+            value={newtitle}
+            maxLength={MAX_DECK_TITLE_LENGTH}
+            onChange={(e) => setNewtitle(e.target.value)}
+            placeholder="Physics, Philosophy, Computer Science..."
+          />
+        </Modal>
+      )}
     </>
   );
 }

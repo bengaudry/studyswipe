@@ -3,13 +3,7 @@ import { clsx } from "clsx";
 import { Reorder } from "motion/react";
 import Latex from "react-latex-next";
 import { LatexToolbar } from "./LatexToolbar";
-import {
-  Plus,
-  Feather,
-  Link2,
-  Circle,
-  Image as ImageIcon,
-} from "react-feather";
+import { Plus, Circle } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
 import {
   Button,
@@ -22,18 +16,12 @@ import {
   DrawerHeader,
   Accordion,
   AccordionItem,
-  Modal,
-  ModalContent,
-  ModalFooter,
-  ModalBody,
-  ModalHeader,
   Textarea,
-  ModalProps,
   Divider,
 } from "@/components/ui";
+import { Modal, ModalProps } from "@/components/modals";
 import {
   Dispatch,
-  ReactNode,
   SetStateAction,
   useContext,
   useEffect,
@@ -45,7 +33,6 @@ import { useRouter } from "next/navigation";
 import NextImage from "next/image";
 import { useSession } from "next-auth/react";
 import { useSupabaseImageUpload } from "@/hooks/useSupabaseImageUpload";
-import { useTailwindBreakpoint } from "@/hooks/useTailwindBreakpoint";
 import { ToolSelector } from "./ToolSelector";
 
 export function NewCardModalTrigger({
@@ -85,13 +72,9 @@ export function AiPromptModal({
   isAskingGeneration,
   onAskGeneration,
   ...props
-}: Omit<ModalProps, "children"> & {
+}: Omit<ModalProps, "children" | "title"> & {
   isAskingGeneration: boolean;
-  onAskGeneration: (
-    prompt: string,
-    file: File | null,
-    onClose: () => void
-  ) => void;
+  onAskGeneration: (prompt: string, file: File | null) => void;
 }) {
   const [prompt, setPrompt] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -104,60 +87,40 @@ export function AiPromptModal({
   const fileTypes = ["pdf", "jpg", "png", "heic", "heif", "jpeg", "image/*"];
 
   return (
-    <Modal placement="center" {...props}>
-      <ModalContent>
-        {(onClose) => (
-          <>
-            <ModalHeader className="flex flex-col gap-1">
-              Generate data
-            </ModalHeader>
-            <ModalBody>
-              <Textarea
-                label="Topic"
-                labelPlacement="outside"
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                placeholder="Enter the topic you want to generate cards about here..."
-              />
-              <Divider />
-              <FileUploader
-                handleChange={handleChange}
-                name="file"
-                multiple={false}
-                uploadLabel="Upload a file or an image"
-                uploadedLabel={file?.name}
-                maxSize={1}
-                fileTypes={fileTypes}
-                onTypeError={(err: any) => {
-                  alert(JSON.stringify(err));
-                }}
-              />
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                size="sm"
-                color="primary"
-                variant="flat"
-                onPress={onClose}
-              >
-                Close
-              </Button>
-              <Button
-                size="sm"
-                color="primary"
-                isDisabled={!file && prompt.length < 3}
-                isLoading={isAskingGeneration}
-                onPress={() => {
-                  if (!file && prompt.length < 3) return;
-                  onAskGeneration(prompt, file, onClose);
-                }}
-              >
-                Generate flashcards
-              </Button>
-            </ModalFooter>
-          </>
-        )}
-      </ModalContent>
+    <Modal
+      {...props}
+      title="Generate data"
+      submitButtonProps={{
+        isDisabled: !file && prompt.length < 3,
+        isLoading: isAskingGeneration,
+        startContent: <Circle size={16} />,
+      }}
+      onValidate={() => {
+        if (!file && prompt.length < 3) return;
+        onAskGeneration(prompt, file);
+      }}
+      submitButtonLabel="Generate flashcards"
+    >
+      <Textarea
+        label="Topic"
+        labelPlacement="outside"
+        value={prompt}
+        onChange={(e) => setPrompt(e.target.value)}
+        placeholder="Enter the topic you want to generate cards about here..."
+      />
+      <Divider />
+      <FileUploader
+        handleChange={handleChange}
+        name="file"
+        multiple={false}
+        uploadLabel="Upload a file or an image"
+        uploadedLabel={file?.name}
+        maxSize={1}
+        fileTypes={fileTypes}
+        onTypeError={(err: any) => {
+          alert(JSON.stringify(err));
+        }}
+      />
     </Modal>
   );
 }
@@ -178,7 +141,7 @@ export function NewCardModal({
   onAiStopGeneration: () => void;
   onCancel: () => void;
 }) {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [loading, setLoading] = useState(false);
 
   const [current, setCurrent] = useState<"question" | "answer">("question");
@@ -326,8 +289,9 @@ export function NewCardModal({
       <AiPromptModal
         isOpen={aiPromptModalIsOpen}
         onOpenChange={onOpenChangeAiPromptModal}
+        onClose={onClose}
         isAskingGeneration={isAskingGeneration}
-        onAskGeneration={(prompt, file, onClose) =>
+        onAskGeneration={(prompt, file) =>
           generateCards(
             prompt,
             file,

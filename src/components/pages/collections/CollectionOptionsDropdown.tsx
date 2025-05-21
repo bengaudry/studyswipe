@@ -1,23 +1,18 @@
 "use client";
 import { MAX_COLLECTION_TITLE_LENGTH } from "@/lib/constants";
 import {
-  Button,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
   Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   useDisclosure,
 } from "@/components/ui";
 import { Collection } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Edit2, MoreVertical, Trash } from "react-feather";
+import { Modal } from "@/components/modals";
 
 export function CollectionOptionsDropdown({
   collection,
@@ -100,78 +95,48 @@ export function CollectionOptionsDropdown({
         </DropdownMenu>
       </Dropdown>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
-        <ModalContent>
-          {(onClose) =>
-            modalType === "delete" ? (
-              <>
-                <ModalHeader className="flex flex-col gap-1">
-                  Delete collection
-                </ModalHeader>
-                <ModalBody>
-                  If you delete this collection, all decks in it, and the cards
-                  it contains will be deleted too, and cannot be recovered.
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    size="sm"
-                    color="danger"
-                    variant="flat"
-                    onPress={onClose}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    size="sm"
-                    color="danger"
-                    isLoading={loading}
-                    onPress={handleDeleteCollection}
-                    startContent={!loading && <Trash size={16} />}
-                  >
-                    Delete collection
-                  </Button>
-                </ModalFooter>
-              </>
-            ) : (
-              <>
-                <ModalHeader className="flex flex-col gap-1">
-                  Rename collection
-                </ModalHeader>
-                <ModalBody>
-                  <Input
-                    label="New title"
-                    labelPlacement="outside"
-                    isRequired
-                    required
-                    maxLength={MAX_COLLECTION_TITLE_LENGTH}
-                    value={newtitle}
-                    onChange={(e) => setNewtitle(e.target.value)}
-                    placeholder="Physics, Philosophy, Computer Science..."
-                  />
-                </ModalBody>
-                <ModalFooter>
-                  <Button
-                    size="sm"
-                    color="primary"
-                    variant="flat"
-                    onPress={onClose}
-                  >
-                    Close
-                  </Button>
-                  <Button
-                    size="sm"
-                    color="primary"
-                    isLoading={loading}
-                    onPress={handleRenameCollection}
-                  >
-                    Rename collection
-                  </Button>
-                </ModalFooter>
-              </>
-            )
-          }
-        </ModalContent>
-      </Modal>
+      {modalType === "delete" && (
+        <Modal
+          title="Delete collection"
+          color="danger"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          onValidate={handleDeleteCollection}
+          submitButtonLabel="Delete collection"
+          submitButtonProps={{
+            isLoading: loading,
+            startContent: <Trash size={16} />,
+          }}
+        >
+          If you delete this collection, all decks in it, and the cards it
+          contains will be deleted too, and cannot be recovered.
+        </Modal>
+      )}
+
+      {modalType === "rename" && (
+        <Modal
+          title="Rename collection"
+          isOpen={isOpen}
+          onOpenChange={onOpenChange}
+          onValidate={handleRenameCollection}
+          submitButtonLabel="Rename collection"
+          submitButtonProps={{
+            isLoading: loading,
+            startContent: <Edit2 size={16} />,
+          }}
+        >
+          <Input
+            label="New title"
+            labelPlacement="outside"
+            isRequired
+            required
+            maxLength={MAX_COLLECTION_TITLE_LENGTH}
+            value={newtitle}
+            onChange={(e) => setNewtitle(e.target.value)}
+            placeholder="Physics, Philosophy, Computer Science..."
+          />
+        </Modal>
+      )}
     </>
   );
 }

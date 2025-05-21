@@ -11,18 +11,12 @@ import {
   Button,
   Divider,
   Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   Radio,
   RadioGroup,
   Textarea,
   useDisclosure,
 } from "@/components/ui";
-
-export function DeckButton({ title }: { title: string; id: string }) {}
+import { Modal } from "@/components/modals";
 
 export const DeckButtonWrapper = React.forwardRef<
   HTMLButtonElement,
@@ -53,7 +47,7 @@ const CustomRadio = ({ color }: { color: string }) => (
 );
 
 export function CreateDeckButton({ collectionId }: { collectionId: string }) {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [loading, setLoading] = useState(false);
   const { refresh } = useRouter();
 
@@ -69,7 +63,7 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
     isPublic: false,
   });
 
-  const handleSubmit = async (onClose: () => void) => {
+  const handleSubmit = async () => {
     setLoading(true);
 
     try {
@@ -106,98 +100,81 @@ export function CreateDeckButton({ collectionId }: { collectionId: string }) {
         New deck
       </Button>
 
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Create a new deck
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  label="Name"
-                  required
-                  isRequired
-                  autoFocus
-                  labelPlacement="outside"
-                  maxLength={MAX_DECK_TITLE_LENGTH}
-                  value={data.title}
-                  onChange={(e) =>
-                    setData((prev) => ({ ...prev, title: e.target.value }))
-                  }
-                  placeholder="Chapter 4, Newton Laws, World War I..."
-                />
-                <Textarea
-                  label="Description"
-                  labelPlacement="outside"
-                  value={data.description}
-                  maxLength={MAX_DECK_DESCRIPTION_LENGTH}
-                  onChange={(e) =>
-                    setData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                />
+      <Modal
+        title="Create a new deck"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        onValidate={handleSubmit}
+        submitButtonLabel="Create deck"
+        submitButtonProps={{
+          isLoading: loading,
+          startContent: <Plus size={16} />,
+        }}
+      >
+        <>
+          <Input
+            label="Name"
+            required
+            isRequired
+            autoFocus
+            labelPlacement="outside"
+            maxLength={MAX_DECK_TITLE_LENGTH}
+            value={data.title}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, title: e.target.value }))
+            }
+            placeholder="Chapter 4, Newton Laws, World War I..."
+          />
+          <Textarea
+            label="Description"
+            labelPlacement="outside"
+            value={data.description}
+            maxLength={MAX_DECK_DESCRIPTION_LENGTH}
+            onChange={(e) =>
+              setData((prev) => ({
+                ...prev,
+                description: e.target.value,
+              }))
+            }
+          />
 
-                <RadioGroup
-                  label="Visibility"
-                  orientation="horizontal"
-                  value={data.isPublic ? "public" : "private"}
-                  onValueChange={(value) =>
-                    setData((prev) => ({
-                      ...prev,
-                      isPublic: value === "public",
-                    }))
-                  }
-                >
-                  <Radio description="Private" value="private" />
-                  <Radio description="Public" value="public" />
-                </RadioGroup>
+          <RadioGroup
+            label="Visibility"
+            orientation="horizontal"
+            value={data.isPublic ? "public" : "private"}
+            onValueChange={(value) =>
+              setData((prev) => ({
+                ...prev,
+                isPublic: value === "public",
+              }))
+            }
+          >
+            <Radio description="Private" value="private" />
+            <Radio description="Public" value="public" />
+          </RadioGroup>
 
-                <Divider orientation="horizontal" />
-                <RadioGroup
-                  label="Theme color"
-                  orientation="horizontal"
-                  classNames={{ wrapper: "ml-2" }}
-                  value={data.theme}
-                  onChange={(e) =>
-                    setData((prev) => ({ ...prev, theme: e.target.value }))
-                  }
-                >
-                  <CustomRadio color="neutral" />
-                  <CustomRadio color="red" />
-                  <CustomRadio color="orange" />
-                  <CustomRadio color="yellow" />
-                  <CustomRadio color="green" />
-                  <CustomRadio color="cyan" />
-                  <CustomRadio color="blue" />
-                  <CustomRadio color="indigo" />
-                  <CustomRadio color="purple" />
-                  <CustomRadio color="pink" />
-                </RadioGroup>
-              </ModalBody>
-              <ModalFooter>
-                <Button
-                  size="sm"
-                  color="primary"
-                  variant="flat"
-                  onPress={onClose}
-                >
-                  Close
-                </Button>
-                <Button
-                  size="sm"
-                  color="primary"
-                  isLoading={loading}
-                  onPress={() => handleSubmit(onClose)}
-                >
-                  Create deck
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
+          <Divider orientation="horizontal" />
+          <RadioGroup
+            label="Theme color"
+            orientation="horizontal"
+            classNames={{ wrapper: "ml-2" }}
+            value={data.theme}
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, theme: e.target.value }))
+            }
+          >
+            <CustomRadio color="neutral" />
+            <CustomRadio color="red" />
+            <CustomRadio color="orange" />
+            <CustomRadio color="yellow" />
+            <CustomRadio color="green" />
+            <CustomRadio color="cyan" />
+            <CustomRadio color="blue" />
+            <CustomRadio color="indigo" />
+            <CustomRadio color="purple" />
+            <CustomRadio color="pink" />
+          </RadioGroup>
+        </>
       </Modal>
     </>
   );

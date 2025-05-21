@@ -13,7 +13,7 @@ export function useAiCardGeneration() {
     file: File | null,
     deckid: string,
     onUpdate: (generatedCard: FlashCard) => void,
-    onStartGeneration: () => void
+    onStartGeneration?: () => void
   ) => {
     try {
       setIsAskingGeneration(true);
@@ -68,7 +68,7 @@ export function useAiCardGeneration() {
 
       setIsAskingGeneration(false);
 
-      onStartGeneration();
+      if (onStartGeneration) onStartGeneration();
       setIsGenerating(true);
       let buffer = "";
       const generatedCards: FlashCard[] = [];

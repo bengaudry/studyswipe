@@ -7,13 +7,9 @@ import {
   Button,
   ButtonProps,
   Input,
-  Modal,
-  ModalBody,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
   useDisclosure,
 } from "@/components/ui";
+import { Modal } from "@/components/modals";
 import { Plus } from "react-feather";
 
 export type PartialCollection = Omit<
@@ -21,10 +17,7 @@ export type PartialCollection = Omit<
   "id" | "createdAt" | "updatedAt" | "ownerId"
 >;
 
-export function NewCollectionModalTrigger({
-  color,
-  ...props
-}: ButtonProps) {
+export function NewCollectionModalTrigger({ color, ...props }: ButtonProps) {
   return (
     <Button
       color={color ?? "primary"}
@@ -38,7 +31,7 @@ export function NewCollectionModalTrigger({
 }
 
 export function NewCollectionModal() {
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const [loadingCreation, setLoadingCreation] = useState(false);
   const { refresh } = useRouter();
 
@@ -46,7 +39,7 @@ export function NewCollectionModal() {
     title: "",
   });
 
-  const handleSubmit = async (onClose: () => void) => {
+  const handleSubmit = async () => {
     setLoadingCreation(true);
 
     try {
@@ -71,43 +64,29 @@ export function NewCollectionModal() {
   return (
     <>
       <NewCollectionModalTrigger onPress={onOpen} />
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange} placement="center">
-        <ModalContent>
-          {(onClose) => (
-            <>
-              <ModalHeader className="flex flex-col gap-1">
-                Create a new collection
-              </ModalHeader>
-              <ModalBody>
-                <Input
-                  label="Name"
-                  labelPlacement="outside"
-                  autoFocus
-                  required
-                  isRequired
-                  maxLength={MAX_COLLECTION_TITLE_LENGTH}
-                  value={data.title}
-                  onChange={(e) =>
-                    setData((prev) => ({ ...prev, title: e.target.value }))
-                  }
-                  placeholder="Physics, Philosophy, Computer Science..."
-                />
-              </ModalBody>
-              <ModalFooter>
-                <Button size="sm" color="primary" variant="flat" onPress={onClose}>
-                  Close
-                </Button>
-                <Button size="sm"
-                  color="primary"
-                  isLoading={loadingCreation}
-                  onPress={() => handleSubmit(onClose)}
-                >
-                  Create collection
-                </Button>
-              </ModalFooter>
-            </>
-          )}
-        </ModalContent>
+      <Modal
+        title="Create a new collection"
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+        onValidate={handleSubmit}
+        submitButtonLabel="Create collection"
+        submitButtonProps={{
+          isLoading: loadingCreation,
+        }}
+      >
+        <Input
+          label="Name"
+          labelPlacement="outside"
+          autoFocus
+          required
+          isRequired
+          maxLength={MAX_COLLECTION_TITLE_LENGTH}
+          value={data.title}
+          onChange={(e) =>
+            setData((prev) => ({ ...prev, title: e.target.value }))
+          }
+          placeholder="Physics, Philosophy, Computer Science..."
+        />
       </Modal>
     </>
   );
