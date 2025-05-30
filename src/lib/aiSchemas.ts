@@ -1,4 +1,60 @@
 import { Schema, Type } from "@google/genai";
+import { z } from "zod";
+
+// Define the schema for each type in the union
+const textSchema = z
+  .object({
+    type: z.literal("text"),
+    heading: z.enum(["title", "subtitle", "paragraph"]),
+    text: z.string(),
+  })
+
+const imageSchema = z
+  .object({
+    type: z.literal("image"),
+    alt: z.string(),
+    imgUri: z.string(),
+    width: z.number().nullable(),
+    height: z.number().nullable(),
+  })
+
+const equationSchema = z
+  .object({
+    type: z.literal("equation"),
+    equation: z.string(),
+  })
+
+const quoteSchema = z
+  .object({
+    type: z.literal("quote"),
+    content: z.string(),
+    author: z.string().nullable(),
+    year: z.number().nullable(),
+  })
+
+const linkSchema = z
+  .object({
+    type: z.literal("link"),
+    href: z.string(),
+  })
+
+// Combine the schemas into a union type
+const flashCardContentJSONSchema = z.discriminatedUnion("type", [
+  textSchema,
+  imageSchema,
+  equationSchema,
+  quoteSchema,
+  linkSchema,
+]);
+
+const flashcardSchema = z
+  .object({
+    question: z.array(flashCardContentJSONSchema),
+    answer: z.array(flashCardContentJSONSchema),
+  })
+
+export const openaiFlashcardsResponseSchema = z
+  .object({ cards: z.array(flashcardSchema) })
 
 export const geminiFlashcardsResponseSchema: Schema = {
   type: Type.ARRAY,

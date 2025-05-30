@@ -61,7 +61,7 @@ export function useSupabaseImageUpload() {
         if (!session?.user?.id) throw { error: "Unauthenticated" };
 
         const compressedImage = await imageCompression(file, {
-          maxSizeMB: 1,
+          maxSizeMB: 0.5,
           maxWidthOrHeight: 1024,
           useWebWorker: true,
         });

@@ -18,7 +18,7 @@ export type ModalProps = {
   submitButtonProps?: Omit<UI.ButtonProps, "children">;
   onOpenChange?: (isOpen: boolean) => void;
   onClose?: () => void;
-  onValidate?: () => void;
+  onValidate?: (onClose: () => void) => void;
 };
 
 export function Modal({
@@ -63,12 +63,14 @@ export function Modal({
               <UI.Button
                 size="sm"
                 color={color ?? "primary"}
-                onPress={onValidate}
+                onPress={() => {
+                  if (onValidate) onValidate(onClose);
+                }}
                 {...submitButtonProps}
                 startContent={
                   submitButtonProps?.isLoading !== true
-                  ? submitButtonProps?.startContent
-                  : null
+                    ? submitButtonProps?.startContent
+                    : null
                 }
               >
                 {submitButtonLabel || "Submit"}

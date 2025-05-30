@@ -74,7 +74,7 @@ export function AiPromptModal({
   ...props
 }: Omit<ModalProps, "children" | "title"> & {
   isAskingGeneration: boolean;
-  onAskGeneration: (prompt: string, file: File | null) => void;
+  onAskGeneration: (prompt: string, file: File | null, onClose: () => void) => void;
 }) {
   const [prompt, setPrompt] = useState("");
   const [file, setFile] = useState<File | null>(null);
@@ -95,9 +95,9 @@ export function AiPromptModal({
         isLoading: isAskingGeneration,
         startContent: <Circle size={16} />,
       }}
-      onValidate={() => {
+      onValidate={(onClose) => {
         if (!file && prompt.length < 3) return;
-        onAskGeneration(prompt, file);
+        onAskGeneration(prompt, file, onClose);
       }}
       submitButtonLabel="Generate flashcards"
     >
@@ -291,11 +291,12 @@ export function NewCardModal({
         onOpenChange={onOpenChangeAiPromptModal}
         onClose={onClose}
         isAskingGeneration={isAskingGeneration}
-        onAskGeneration={(prompt, file) =>
+        onAskGeneration={(prompt, file, onClose) =>
           generateCards(
             prompt,
             file,
             deckid,
+            "gpt-4o",
             (generatedCard) => {
               updateDeckData((prevDeck) => ({
                 ...prevDeck,
