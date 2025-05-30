@@ -18,6 +18,8 @@ import {
   AccordionItem,
   Textarea,
   Divider,
+  Select,
+  SelectItem,
 } from "@/components/ui";
 import { Modal, ModalProps } from "@/components/modals";
 import {
@@ -74,10 +76,16 @@ export function AiPromptModal({
   ...props
 }: Omit<ModalProps, "children" | "title"> & {
   isAskingGeneration: boolean;
-  onAskGeneration: (prompt: string, file: File | null, onClose: () => void) => void;
+  onAskGeneration: (
+    prompt: string,
+    file: File | null,
+    model: string,
+    onClose: () => void
+  ) => void;
 }) {
   const [prompt, setPrompt] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [model, setModel] = useState("gpt-4o");
 
   const handleChange = (file: File | null) => {
     setFile(file);
@@ -89,7 +97,7 @@ export function AiPromptModal({
   return (
     <Modal
       {...props}
-      title="Generate data"
+      title="Generate flashcards"
       submitButtonProps={{
         isDisabled: !file && prompt.length < 3,
         isLoading: isAskingGeneration,
@@ -97,7 +105,7 @@ export function AiPromptModal({
       }}
       onValidate={(onClose) => {
         if (!file && prompt.length < 3) return;
-        onAskGeneration(prompt, file, onClose);
+        onAskGeneration(prompt, file, model, onClose);
       }}
       submitButtonLabel="Generate flashcards"
     >
@@ -109,6 +117,7 @@ export function AiPromptModal({
         placeholder="Enter the topic you want to generate cards about here..."
       />
       <Divider />
+
       <FileUploader
         handleChange={handleChange}
         name="file"
@@ -121,6 +130,11 @@ export function AiPromptModal({
           alert(JSON.stringify(err));
         }}
       />
+
+      <Select label="AI Model" size="sm" onSelectionChange={(key) => setModel(key.currentKey ?? "gpt-4o")} defaultSelectedKeys={["gpt-4o"]}>
+        <SelectItem key="gpt-4o">gpt-4o</SelectItem>
+        <SelectItem key="gemini-2.0-flash">gemini-2.0-flash</SelectItem>
+      </Select>
     </Modal>
   );
 }
@@ -291,12 +305,13 @@ export function NewCardModal({
         onOpenChange={onOpenChangeAiPromptModal}
         onClose={onClose}
         isAskingGeneration={isAskingGeneration}
-        onAskGeneration={(prompt, file, onClose) =>
+        onAskGeneration={(prompt, file, model, onClose) =>
           generateCards(
             prompt,
             file,
             deckid,
-            "gpt-4o",
+            // @ts-expect-error
+            model,
             (generatedCard) => {
               updateDeckData((prevDeck) => ({
                 ...prevDeck,
