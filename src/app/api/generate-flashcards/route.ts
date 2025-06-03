@@ -111,7 +111,7 @@ const openai = new OpenAI({
   apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY,
 });
 
-export const AVAILABLE_MODELS = ["gemini-2.0-flash", "gpt-4o"];
+const AVAILABLE_MODELS = ["gemini-2.0-flash", "gpt-4o"];
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
