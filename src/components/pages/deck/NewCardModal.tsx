@@ -2,7 +2,6 @@
 import { clsx } from "clsx";
 import { Reorder } from "motion/react";
 import Latex from "react-latex-next";
-import { LatexToolbar } from "./LatexToolbar";
 import { Plus, Circle } from "react-feather";
 import { DeckDataContext } from "./DeckDataProvider";
 import {
@@ -124,7 +123,7 @@ export function AiPromptModal({
         multiple={false}
         uploadLabel="Upload a file or an image"
         uploadedLabel={file?.name}
-        maxSize={1}
+        maxSize={15}
         fileTypes={fileTypes}
         onTypeError={(err: any) => {
           alert(JSON.stringify(err));
