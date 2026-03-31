@@ -127,7 +127,7 @@ export function useAiCardGeneration() {
     prompt: string,
     file: File | null,
     deckid: string,
-    model: "gemini-2.0-flash" | "gpt-4o",
+    model: "gemini-2.0-flash" | "gemini-3.1-pro-preview" | "gpt-4o",
     onUpdate: (generatedCard: FlashCard) => void,
     onStartGeneration?: () => void
   ) => {
@@ -148,7 +148,7 @@ export function useAiCardGeneration() {
 
       setIsAskingGeneration(true);
       
-      if ("gemini-2.0-flash" === model) {
+      if ("gemini-2.0-flash" === model || "gemini-3.1-pro-preview" === model) {
         const ai = new GoogleGenAI({
           apiKey: process.env.NEXT_PUBLIC_GOOGLE_AI_API_KEY,
         });
@@ -166,7 +166,7 @@ export function useAiCardGeneration() {
           ];
 
           stream = await ai.models.generateContentStream({
-            model: "gemini-2.0-flash",
+            model,
             contents,
             config: {
               maxOutputTokens: 7500,
@@ -178,7 +178,7 @@ export function useAiCardGeneration() {
         } else {
           // Stream generated data
           stream = await ai.models.generateContentStream({
-            model: "gemini-2.0-flash",
+            model,
             contents: prompt,
             config: {
               systemInstruction:

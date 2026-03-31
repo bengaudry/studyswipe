@@ -133,6 +133,7 @@ export function AiPromptModal({
       <Select label="AI Model" size="sm" onSelectionChange={(key) => setModel(key.currentKey ?? "gpt-4o")} defaultSelectedKeys={["gpt-4o"]}>
         <SelectItem key="gpt-4o">gpt-4o</SelectItem>
         <SelectItem key="gemini-2.0-flash">gemini-2.0-flash</SelectItem>
+        <SelectItem key="gemini-3.1-pro-preview">gemini-3.1-pro-preview</SelectItem>
       </Select>
     </Modal>
   );
