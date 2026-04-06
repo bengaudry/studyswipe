@@ -3,7 +3,6 @@ import { Collection, Deck } from "@prisma/client";
 import { Divider } from "@/components/ui";
 
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
 
 import { NewCollectionModal } from "@/components/pages/collections/NewCollectionModal";
 import { CreateDeckButton } from "@/components/pages/collections/DeckLink";

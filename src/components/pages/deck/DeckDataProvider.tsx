@@ -6,7 +6,7 @@ import {
   SetStateAction,
   useState,
 } from "react";
-import { Deck } from "@prisma/client";
+import type { Deck } from "@/db/generated/prisma";
 
 export type MinimalDeck = Omit<
   Deck,

@@ -1,8 +1,9 @@
 import {NextRequest, NextResponse} from "next/server";
 import prisma from "@/lib/prisma"
 import axios from "axios";
+import {redirect} from "next/navigation";
 
-export const GET = async (req: NextRequest, res: NextResponse) => {
+export const GET = async (req: NextRequest) => {
     const params = req.nextUrl.searchParams;
 
     const serviceTicket = params.get("st")
@@ -39,6 +40,6 @@ export const GET = async (req: NextRequest, res: NextResponse) => {
         })
     }
 
-    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/cas/callback?st=${serviceTicket}`;
-    return NextResponse.redirect(redirectUrl);
+    const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/`;
+    redirect(redirectUrl)
 }
