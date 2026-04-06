@@ -13,9 +13,11 @@ export const GET = async (req: NextRequest) => {
 
     let response: any;
     try {
-        response = await axios.get(`https://cas.bengaudry.dev/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`)
+        response = await axios.get(process.env.NODE_ENV === "development"
+            ? `http://localhost:8000/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`
+            : `https://cas.bengaudry.dev/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`)
     } catch (err) {
-        return NextResponse.json({msg: "Could not connect with cas ticket service", error: err}, { status: 500 });
+        return NextResponse.json({msg: "Could not connect with cas ticket service", error: err}, {status: 500});
     }
     if (response.status !== 200) {
         return NextResponse.json({error: "Bad request"}, {status: 400});
