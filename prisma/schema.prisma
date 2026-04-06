@@ -1,16 +1,34 @@
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
 }
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../src/db/generated/prisma"
 }
 
 enum UserPlan {
   FREE
   PREMIUM
+}
+
+model CasUser {
+  id    String @id
+  email String @unique
+
+  isEmailVerified   Boolean
+  name              String
+  surname           String
+  displayName       String
+  profilePictureUrl String?
+
+  // Payments
+  stripeCustomerId String?
+  plan             UserPlan @default(FREE)
+
+  casCreatedAt DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model User {
