@@ -11,7 +11,12 @@ export const GET = async (req: NextRequest) => {
         return NextResponse.json({error: "Bad request"}, {status: 400});
     }
 
-    const response = await axios.get(`https://cas.bengaudry.dev/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`)
+    let response: any;
+    try {
+        response = await axios.get(`https://cas.bengaudry.dev/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`)
+    } catch (err) {
+        return NextResponse.json({msg: "Could not connect with cas ticket service", error: err}, { status: 500 });
+    }
     if (response.status !== 200) {
         return NextResponse.json({error: "Bad request"}, {status: 400});
     }
