@@ -46,7 +46,7 @@ export function ProfileButton(props: ButtonProps) {
                             className="cursor-pointer"
                         />
                     )}
-                    src={session?.user?.image ?? undefined}
+                    src={session?.user?.profilePictureUrl ?? undefined}
                 />
             </DropdownTrigger>
             <DropdownMenu>

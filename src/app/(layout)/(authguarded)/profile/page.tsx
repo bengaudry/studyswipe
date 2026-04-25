@@ -13,7 +13,7 @@ export default function ProfilePage() {
       <header className="flex items-center justify-between w-full pb-6">
         <User
           avatarProps={{
-            src: session.user.image ?? undefined,
+            src: session.user.profilePictureUrl ?? undefined,
             fallback: (session.user.name ?? "-")[0],
           }}
           name={"@" + session.user.name}
