@@ -42,7 +42,7 @@ export default async function PlayPage({
         <div>
           <h1 className="text-xl leading-6 mb-1 font-semibold">{deck.title}</h1>
           <Link href={`/collections/${owner?.name}`}>
-            <h3 className="text-sm text-neutral-400 -mt-1">@{owner?.pseudo}</h3>
+            <h3 className="text-sm text-neutral-400 -mt-1">@{owner?.displayName}</h3>
           </Link>
         </div>
       </header>

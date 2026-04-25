@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
 import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
 import {
   MAX_DECK_DESCRIPTION_LENGTH,
   MAX_DECK_TITLE_LENGTH,
 } from "@/lib/constants";
+import {getUser} from "@/lib/session";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
@@ -48,8 +48,8 @@ export const POST = async (req: NextRequest) => {
 
     if (collection === null) return serverError("invalid-collectionid");
 
-    const session = await auth();
-    if (session?.user?.id !== collection.ownerId)
+    const user = await getUser();
+    if (!user || user?.id !== collection.ownerId)
       return serverError("unauthorized");
 
     await prisma.deck.create({
@@ -82,8 +82,8 @@ export const PATCH = async (req: NextRequest) => {
     const prevDeckValue = await prisma.deck.findUnique({ where: { id } });
     if (prevDeckValue === null) return serverError("invalid-deckid");
 
-    const session = await auth();
-    if (session?.user?.id !== prevDeckValue.ownerId)
+    const user = await getUser();
+    if (user?.id !== prevDeckValue.ownerId)
       return serverError("unauthorized");
 
     if (action === "rename") {
@@ -134,8 +134,8 @@ export const DELETE = async (req: NextRequest) => {
     const prevDeck = await prisma.deck.findFirst({ where: { id } });
     if (prevDeck === null) return serverError("invalid-deckid");
 
-    const session = await auth();
-    if (session?.user?.id !== prevDeck.ownerId)
+    const user = await getUser();
+    if (!user || user?.id !== prevDeck.ownerId)
       return serverError("unauthorized");
 
     await prisma.deck.delete({ where: { id } });

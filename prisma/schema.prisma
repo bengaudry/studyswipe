@@ -12,7 +12,7 @@ enum UserPlan {
   PREMIUM
 }
 
-model CasUser {
+model User {
   id    String @id
   email String @unique
 
@@ -26,94 +26,19 @@ model CasUser {
   stripeCustomerId String?
   plan             UserPlan @default(FREE)
 
-  casCreatedAt DateTime
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-}
-
-model User {
-  id            String          @id @default(cuid())
-  name          String?
-  pseudo        String?
-  email         String          @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  // Optional for WebAuthn support
-  Authenticator Authenticator[]
-
-  // Payments
-  stripeCustomerId String?
-  plan             UserPlan @default(FREE)
-
   collections Collection[]
   decks       Deck[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Account {
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([provider, providerAccountId])
-}
-
-model Session {
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model VerificationToken {
-  identifier String
-  token      String
-  expires    DateTime
-
-  @@id([identifier, token])
-}
-
-// Optional for WebAuthn support
-model Authenticator {
-  credentialID         String  @unique
-  userId               String
-  providerAccountId    String
-  credentialPublicKey  String
-  counter              Int
-  credentialDeviceType String
-  credentialBackedUp   Boolean
-  transports           String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([userId, credentialID])
+  casCreatedAt DateTime
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 //////    CUSTOM MODELS    \\\\\\
 
 // An object grouping Decks of cards
 model Collection {
-  id      String @unique @default(uuid())
+  id      String @id @default(uuid())
   ownerId String
 
   title String
@@ -127,7 +52,7 @@ model Collection {
 
 // An object that contains a set of flashcards
 model Deck {
-  id           String @unique @default(uuid())
+  id           String @id @default(uuid())
   collectionId String
   ownerId      String
 
@@ -142,5 +67,5 @@ model Deck {
   updatedAt DateTime @default(now())
 
   Collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  Owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade) // Relation to User
+  Owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

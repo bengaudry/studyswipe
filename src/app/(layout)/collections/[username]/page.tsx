@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation";
-import { Collection } from "@prisma/client";
+import { Collection } from "@/db/generated/prisma";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { Divider } from "@/components/ui";
-import { authCache } from "@/lib/cache";
+import {getUser} from "@/lib/session";
 
 const renderDecks = async (collectionId: string) => {
   const decks = await prisma.deck.findMany({
@@ -74,26 +74,23 @@ export default async function DecksPage({
 }: {
   params: Promise<{ username: string }>;
 }) {
-  const session = await authCache();
-
   const username = (await params).username;
-  console.info(username);
 
-  const user = await prisma.user.findFirst({
+  const user = await getUser();
+  const deckOwner = await prisma.user.findFirst({
     where: { name: username },
   });
-
-  if (user === null) redirect("/?error=user-not-found");
-  if (session?.user?.id === user?.id) redirect("/collections");
+  if (deckOwner === null) redirect("/?error=user-not-found");
+  if (deckOwner?.id === user?.id) redirect("/collections");
 
   const collections = await prisma.collection.findMany({
-    where: { ownerId: user.id },
+    where: { ownerId: deckOwner.id },
     orderBy: { updatedAt: "desc" },
   });
 
   return (
     <div className="max-w-screen-sm mx-auto">
-      <h1 className="text-3xl font-semibold">@{user.name}'s collections</h1>
+      <h1 className="text-3xl font-semibold">@{deckOwner.name}'s collections</h1>
       <div className="flex flex-col ">{renderCollections(collections)}</div>
     </div>
   );

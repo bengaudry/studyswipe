@@ -1,5 +1,5 @@
 "use client";
-import { Deck } from "@prisma/client";
+import type { Deck } from "@/db/generated/prisma";
 import { NewCardModal } from "./NewCardModal";
 import { CardPreview } from "./CardPreview";
 import { useContext, useState, Dispatch, SetStateAction } from "react";

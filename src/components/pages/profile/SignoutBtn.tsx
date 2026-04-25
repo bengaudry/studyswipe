@@ -1,23 +1,17 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { signOut } from "next-auth/react";
 import { Button } from "@/components/ui";
 import { LogOut } from "react-feather";
 
 export function SignOutBtn() {
   const [loading, setLoading] = useState(false);
 
-  const { prefetch } = useRouter();
+  const { forward } = useRouter();
 
   const handleSignOut = async () => {
-    setLoading(true);
-    try {
-      prefetch("/");
-      await signOut();
-    } finally {
-      setLoading(false);
-    }
+    // TODO
+    // forward("/signout");
   };
 
   return (

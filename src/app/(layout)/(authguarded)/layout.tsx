@@ -1,14 +1,14 @@
-import { auth } from "@/lib/auth";
-import { authCache } from "@/lib/cache";
 import { redirect } from "next/navigation";
 import { PropsWithChildren } from "react";
+import {getUser} from "@/lib/session";
 
 export default async function AuthGuardedLayout({
   children,
 }: PropsWithChildren) {
-  const session = await authCache();
+  const user = await getUser();
 
-  if (session === null) redirect("/auth");
-  
+  console.log("User : ", user)
+  if (user === null) redirect(process.env.NEXT_PUBLIC_AUTH_URL as string);
+
   return children;
 }

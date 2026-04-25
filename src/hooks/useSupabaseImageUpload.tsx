@@ -1,5 +1,4 @@
 import imageCompression from "browser-image-compression";
-import { useSession } from "next-auth/react";
 import { createClient } from "@supabase/supabase-js";
 import {
   Dispatch,
@@ -9,6 +8,7 @@ import {
   useContext,
   createContext,
 } from "react";
+import {useAuth} from "@/hooks/useAuth";
 
 const supabase = createClient(
   "https://oqtjixzwhpbmzpsieuoo.supabase.co",
@@ -35,7 +35,7 @@ export function useSupabaseImageUpload() {
   const { queue, setQueue } = useContext(SupabaseImageUploadContext);
   const [isPushing, setIsPushing] = useState(false);
 
-  const { data: session } = useSession();
+  const { session } = useAuth();
 
   const addFileToQueue = (file: File) => {
     console.info("Adding", file.name, "to queue");
@@ -46,6 +46,7 @@ export function useSupabaseImageUpload() {
 
     const image = new Image();
     image.src = URL.createObjectURL(file);
+    // TODO : wtf
     const imgDbUri = `https://oqtjixzwhpbmzpsieuoo.supabase.co/storage/v1/object/public/deck-images/${session?.user?.id}/${file.name}`;
 
     return { imgDbUri, image };
@@ -56,6 +57,7 @@ export function useSupabaseImageUpload() {
     console.info("Pushing", queue.length, "images");
     console.log(queue);
     try {
+      // TODO : WTF is this
       queue.forEach(async (file) => {
         if (file === null) throw { error: "NullFile" };
         if (!session?.user?.id) throw { error: "Unauthenticated" };

@@ -1,14 +1,14 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
-import { auth } from "@/lib/auth";
 import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
 import { MAX_COLLECTION_TITLE_LENGTH } from "@/lib/constants";
+import { getUser } from "@/lib/session";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
   try {
-    const session = await auth();
-    if (session?.user?.id === undefined) return serverError("unauthenticated");
+    const user = await getUser();
+    if (!user) return serverError("unauthenticated");
 
     const body = await req.json();
 
@@ -30,12 +30,13 @@ export const POST = async (req: NextRequest) => {
     await prisma.collection.create({
       data: {
         title: body.title,
-        ownerId: session.user.id,
+        ownerId: user.id,
       },
     });
 
     return serverOk();
   } catch (err) {
+    console.error("Could not create collection :", err)
     return serverError("internal-server-error", err);
   }
 };
@@ -95,8 +96,8 @@ export const DELETE = async (req: NextRequest) => {
 
     const collection = await prisma.collection.findUnique({ where: { id } });
 
-    const session = await auth();
-    if (session?.user?.id !== collection?.ownerId)
+    const user = await getUser();
+    if (!user || user?.id !== collection?.ownerId)
       return serverError("unauthorized");
 
     await prisma.collection.delete({ where: { id } });

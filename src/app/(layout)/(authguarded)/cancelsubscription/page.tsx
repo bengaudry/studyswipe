@@ -1,18 +1,13 @@
 import { Button } from "@/components/ui";
-import { auth } from "@/lib/auth";
-import { authCache } from "@/lib/cache";
-import prisma from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
-import { Check } from "react-feather";
+import {getUser} from "@/lib/session";
 
 export default async function CancelSubscriptionPage() {
   // Get session data
-  const session = await auth();
-  const user = await prisma.user.findUnique({
-    where: { id: session?.user?.id },
-  });
+  const user = await getUser();
   if (!user) return null;
+
   const userPlan = user.plan;
   if (userPlan === "FREE") redirect("/subscription");
 
