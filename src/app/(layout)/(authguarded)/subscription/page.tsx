@@ -1,6 +1,4 @@
 import { Button } from "@/components/ui";
-import { auth } from "@/lib/auth";
-import prisma from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { Check } from "react-feather";

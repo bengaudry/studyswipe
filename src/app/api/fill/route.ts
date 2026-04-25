@@ -1,6 +1,5 @@
 import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
 import { NextRequest } from "next/server";
-import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { validateFlashCardArray } from "@/lib/cardObject";
 import { v4 as uuidv4 } from "uuid";
