@@ -1,109 +1,114 @@
-import prisma from "@/lib/prisma";
-import Link from "next/link";
-import { Collection, Deck } from "@/db/generated/prisma";
-import { Divider } from "@/components/ui";
-import { NewCollectionModal } from "@/components/pages/collections/NewCollectionModal";
-import { CreateDeckButton } from "@/components/pages/collections/DeckLink";
-import { CollectionOptionsDropdown } from "@/components/pages/collections/CollectionOptionsDropdown";
-import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
-import { Suspense } from "react";
-import {getUser} from "@/lib/session";
+import prisma from '@/lib/prisma'
+import Link from 'next/link'
+import { Collection, Deck } from '@/db/generated/prisma'
+import { Divider } from '@/components/ui'
+import { NewCollectionModal } from '@/components/pages/collections/NewCollectionModal'
+import { CreateDeckButton } from '@/components/pages/collections/DeckLink'
+import { CollectionOptionsDropdown } from '@/components/pages/collections/CollectionOptionsDropdown'
+import { DeckOptionsDropdown } from '@/components/pages/deck/DeckOptionsDropdown'
+import { Suspense } from 'react'
+import { getUser } from '@/lib/session'
 
 const DeckLink = ({ deck }: { deck: Deck }) => {
-  return (
-    <div
-      key={deck.id}
-      className="group flex items-center justify-between py-1 border-b"
-    >
-      <Link
-        href={`deck/${deck.id}`}
-        className={`rounded-xl w-full p-2 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800`}
-      >
-        <div className="flex items-center gap-3">
-          <div
-            className={`w-8 h-8 aspect-square bg-${deck.theme}-500 bg-opacity-50 rounded-lg`}
-          />
-          <div className="flex flex-col">
-            <span className="text-sm leading-4 font-medium">{deck.title}</span>
-            <span className="text-xs leading-4 text-neutral-400">
-              {deck.cards.length} cards - {deck.isPublic ? "Public" : "Private"}
-            </span>
-          </div>
+    return (
+        <div
+            key={deck.id}
+            className="group flex items-center justify-between py-1 border-b"
+        >
+            <Link
+                href={`deck/${deck.id}`}
+                className={`rounded-xl w-full p-2 transition-colors hover:bg-neutral-100 dark:hover:bg-neutral-800`}
+            >
+                <div className="flex items-center gap-3">
+                    <div
+                        className={`w-8 h-8 aspect-square bg-${deck.theme}-500 bg-opacity-50 rounded-lg`}
+                    />
+                    <div className="flex flex-col">
+                        <span className="text-sm leading-4 font-medium">
+                            {deck.title}
+                        </span>
+                        <span className="text-xs leading-4 text-neutral-400">
+                            {deck.cards.length} cards -{' '}
+                            {deck.isPublic ? 'Public' : 'Private'}
+                        </span>
+                    </div>
+                </div>
+            </Link>
+            <div className="opacity-0 transition-opacity group-hover:opacity-100">
+                <DeckOptionsDropdown deck={deck} />
+            </div>
         </div>
-      </Link>
-      <div className="opacity-0 transition-opacity group-hover:opacity-100">
-        <DeckOptionsDropdown deck={deck} />
-      </div>
-    </div>
-  );
-};
+    )
+}
 
 const DecksList = async ({ collectionId }: { collectionId: string }) => {
-  const decks = await prisma.deck.findMany({
-    where: { collectionId },
-    orderBy: { title: "asc" },
-  });
+    const decks = await prisma.deck.findMany({
+        where: { collectionId },
+        orderBy: { title: 'asc' }
+    })
 
-  return (
-    <div>
-      <div className="flex flex-col gap-2 overflow-x-scroll px-6 pb-4 -mx-6">
-        {decks.map((deck) => (
-          <DeckLink deck={deck} />
-        ))}
-        <CreateDeckButton collectionId={collectionId} />
-      </div>
-    </div>
-  );
-};
+    return (
+        <div>
+            <div className="flex flex-col gap-2 overflow-x-scroll px-6 pb-4 -mx-6">
+                {decks.map((deck) => (
+                    <DeckLink deck={deck} />
+                ))}
+                <CreateDeckButton collectionId={collectionId} />
+            </div>
+        </div>
+    )
+}
 
 const CollectionsList = async ({
-  collections,
+    collections
 }: {
-  collections: Collection[] | null;
+    collections: Collection[] | null
 }) => {
-  if (collections === null || collections.length < 1)
-    return (
-      <p className="mt-2 text-neutral-400">
-        No deck yet. Start by creating a collection, and then a deck.
-      </p>
-    );
+    if (collections === null || collections.length < 1)
+        return (
+            <p className="mt-2 text-neutral-400">
+                No deck yet. Start by creating a collection, and then a deck.
+            </p>
+        )
 
-  return collections.map((collection, idx) => (
-    <Suspense>
-      <div key={collection.id}>
-        <div className="pt-4 pb-6">
-          <div className="flex flex-row items-center justify-between mb-2">
-            <h3 className="text-xl font-medium">{collection.title}</h3>
-            <CollectionOptionsDropdown collection={collection} />
-          </div>
+    return collections.map((collection, idx) => (
+        <Suspense>
+            <div key={collection.id}>
+                <div className="pt-4 pb-6">
+                    <div className="flex flex-row items-center justify-between mb-2">
+                        <h3 className="text-xl font-medium">
+                            {collection.title}
+                        </h3>
+                        <CollectionOptionsDropdown collection={collection} />
+                    </div>
 
-          <DecksList collectionId={collection.id} />
-        </div>
-        {idx < collections.length - 1 && <Divider />}
-      </div>
-    </Suspense>
-  ));
-};
+                    <DecksList collectionId={collection.id} />
+                </div>
+                {idx < collections.length - 1 && <Divider />}
+            </div>
+        </Suspense>
+    ))
+}
 
 export default async function CollectionsPage() {
-  const user = await getUser();
+    const user = await getUser()
 
-  if (!user?.id) return null;
+    if (!user?.id) return null
 
-  const collections = await prisma.collection.findMany({
-    where: { ownerId: user.id },
-    orderBy: { updatedAt: "desc" },
-  });
+    const collections = await prisma.collection.findMany({
+        where: { ownerId: user.id },
+        orderBy: { updatedAt: 'desc' }
+    })
 
-  return (
-    <div className="max-w-screen-sm mx-auto">
-      <header className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold">Collections</h1>
-        <NewCollectionModal />
-      </header>
-      <div className="flex flex-col ">
-        <CollectionsList collections={collections} />
-      </div>
-    </div>
-  );
+    return (
+        <div className="max-w-screen-sm mx-auto">
+            <header className="flex items-center justify-between">
+                <h1 className="text-3xl font-semibold">Collections</h1>
+                <NewCollectionModal />
+            </header>
+            <div className="flex flex-col ">
+                <CollectionsList collections={collections} />
+            </div>
+        </div>
+    )
 }

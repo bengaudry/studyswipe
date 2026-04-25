@@ -1,19 +1,19 @@
-"use client";
-import { useState } from "react";
-import {redirect, useRouter, useSearchParams} from "next/navigation";
-import Image from "next/image";
-import { authErrorToMessage } from "@/lib/errorHandling/authErrors";
-import { Button, Divider, Alert, Spinner } from "@/components/ui";
-import { GitHub as GitHubIcon } from "react-feather";
+'use client'
+import { useState } from 'react'
+import { redirect, useRouter, useSearchParams } from 'next/navigation'
+import Image from 'next/image'
+import { authErrorToMessage } from '@/lib/errorHandling/authErrors'
+import { Button, Divider, Alert, Spinner } from '@/components/ui'
+import { GitHub as GitHubIcon } from 'react-feather'
 
 export default function AuthPage() {
-  const params = useSearchParams();
-  const authError = params.get("error");
-  const [isLoading, setIsLoading] = useState(false);
+    const params = useSearchParams()
+    const authError = params.get('error')
+    const [isLoading, setIsLoading] = useState(false)
 
-  const { prefetch } = useRouter();
+    const { prefetch } = useRouter()
 
-  /*
+    /*
   const handleSignInRequest = (provider: string) => {
     setIsLoading(true);
     prefetch("/collections");

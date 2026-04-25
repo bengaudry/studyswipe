@@ -1,97 +1,102 @@
-import imageCompression from "browser-image-compression";
-import { createClient } from "@supabase/supabase-js";
+import imageCompression from 'browser-image-compression'
+import { createClient } from '@supabase/supabase-js'
 import {
-  Dispatch,
-  SetStateAction,
-  PropsWithChildren,
-  useState,
-  useContext,
-  createContext,
-} from "react";
-import {useAuth} from "@/hooks/useAuth";
+    Dispatch,
+    SetStateAction,
+    PropsWithChildren,
+    useState,
+    useContext,
+    createContext
+} from 'react'
+import { useAuth } from '@/hooks/useAuth'
 
 const supabase = createClient(
-  "https://oqtjixzwhpbmzpsieuoo.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xdGppeHp3aHBibXpwc2lldW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxNDk5MDksImV4cCI6MjA1MjcyNTkwOX0.hSbFpfD-y_0okPX61KsdSPE2KogyO5LtzDqVn9T3D40"
-);
+    'https://oqtjixzwhpbmzpsieuoo.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xdGppeHp3aHBibXpwc2lldW9vIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcxNDk5MDksImV4cCI6MjA1MjcyNTkwOX0.hSbFpfD-y_0okPX61KsdSPE2KogyO5LtzDqVn9T3D40'
+)
 
 export const SupabaseImageUploadContext = createContext<{
-  queue: File[];
-  setQueue: Dispatch<SetStateAction<File[]>>;
-}>({ queue: [], setQueue: () => {} });
+    queue: File[]
+    setQueue: Dispatch<SetStateAction<File[]>>
+}>({ queue: [], setQueue: () => {} })
 
 export const SupabaseImageUploadProvider = ({
-  children,
+    children
 }: PropsWithChildren) => {
-  const [queue, setQueue] = useState<File[]>([]);
-  return (
-    <SupabaseImageUploadContext.Provider value={{ queue, setQueue }}>
-      {children}
-    </SupabaseImageUploadContext.Provider>
-  );
-};
+    const [queue, setQueue] = useState<File[]>([])
+    return (
+        <SupabaseImageUploadContext.Provider value={{ queue, setQueue }}>
+            {children}
+        </SupabaseImageUploadContext.Provider>
+    )
+}
 
 export function useSupabaseImageUpload() {
-  const { queue, setQueue } = useContext(SupabaseImageUploadContext);
-  const [isPushing, setIsPushing] = useState(false);
+    const { queue, setQueue } = useContext(SupabaseImageUploadContext)
+    const [isPushing, setIsPushing] = useState(false)
 
-  const { session } = useAuth();
+    // using auth directly and not session context to make sure the user is still authenticated
+    const { session } = useAuth()
 
-  const addFileToQueue = (file: File) => {
-    console.info("Adding", file.name, "to queue");
-    setQueue((prev) => {
-      console.log(prev);
-      return [...prev, file];
-    });
+    const addFileToQueue = (file: File) => {
+        console.info('Adding', file.name, 'to queue')
+        setQueue((prev) => {
+            console.log(prev)
+            return [...prev, file]
+        })
 
-    const image = new Image();
-    image.src = URL.createObjectURL(file);
-    // TODO : wtf
-    const imgDbUri = `https://oqtjixzwhpbmzpsieuoo.supabase.co/storage/v1/object/public/deck-images/${session?.user?.id}/${file.name}`;
+        const image = new Image()
+        image.src = URL.createObjectURL(file)
+        // TODO : wtf
+        const imgDbUri = `https://oqtjixzwhpbmzpsieuoo.supabase.co/storage/v1/object/public/deck-images/${session?.user?.id}/${file.name}`
 
-    return { imgDbUri, image };
-  };
-
-  const pushImages = async () => {
-    setIsPushing(true);
-    console.info("Pushing", queue.length, "images");
-    console.log(queue);
-    try {
-      // TODO : WTF is this
-      queue.forEach(async (file) => {
-        if (file === null) throw { error: "NullFile" };
-        if (!session?.user?.id) throw { error: "Unauthenticated" };
-
-        const compressedImage = await imageCompression(file, {
-          maxSizeMB: 0.5,
-          maxWidthOrHeight: 1024,
-          useWebWorker: true,
-        });
-
-        const { error } = await supabase.storage
-          .from("deck-images")
-          .upload(`${session.user.id}/${file.name}`, compressedImage, {
-            cacheControl: "3600",
-            upsert: false,
-          });
-
-        if (error) throw error;
-        emptyQueue();
-      });
-    } catch (err) {
-      throw err;
-    } finally {
-      setIsPushing(false);
+        return { imgDbUri, image }
     }
-  };
 
-  const emptyQueue = () => setQueue([]);
+    const pushImages = async () => {
+        setIsPushing(true)
+        console.info('Pushing', queue.length, 'images')
+        console.log(queue)
+        try {
+            // TODO : WTF is this
+            queue.forEach(async (file) => {
+                if (file === null) throw { error: 'NullFile' }
+                if (!session?.user?.id) throw { error: 'Unauthenticated' }
 
-  return {
-    addFileToQueue,
-    updateQueue: setQueue,
-    pushImages,
-    emptyQueue,
-    isPushing,
-  };
+                const compressedImage = await imageCompression(file, {
+                    maxSizeMB: 0.5,
+                    maxWidthOrHeight: 1024,
+                    useWebWorker: true
+                })
+
+                const { error } = await supabase.storage
+                    .from('deck-images')
+                    .upload(
+                        `${session.user.id}/${file.name}`,
+                        compressedImage,
+                        {
+                            cacheControl: '3600',
+                            upsert: false
+                        }
+                    )
+
+                if (error) throw error
+                emptyQueue()
+            })
+        } catch (err) {
+            throw err
+        } finally {
+            setIsPushing(false)
+        }
+    }
+
+    const emptyQueue = () => setQueue([])
+
+    return {
+        addFileToQueue,
+        updateQueue: setQueue,
+        pushImages,
+        emptyQueue,
+        isPushing
+    }
 }

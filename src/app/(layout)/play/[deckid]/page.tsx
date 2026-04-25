@@ -1,53 +1,59 @@
-import prisma from "@/lib/prisma";
-import { redirect } from "next/navigation";
-import { CardsDisplayer } from "@/components/pages/play/CardsDisplayer";
-import { PlaygroundContextProvider } from "@/components/pages/play/PlayerContext";
-import { BackButton } from "@/components/BackButton";
-import { CardsPlaygroundProgress } from "@/components/pages/play/CardsPlaygroundProgress";
-import Link from "next/link";
+import prisma from '@/lib/prisma'
+import { redirect } from 'next/navigation'
+import { CardsDisplayer } from '@/components/pages/play/CardsDisplayer'
+import { PlaygroundContextProvider } from '@/components/pages/play/PlayerContext'
+import { BackButton } from '@/components/BackButton'
+import { CardsPlaygroundProgress } from '@/components/pages/play/CardsPlaygroundProgress'
+import Link from 'next/link'
 
 export default async function PlayPage({
-  params,
+    params
 }: {
-  params: Promise<{ deckid: string }>;
+    params: Promise<{ deckid: string }>
 }) {
-  const deck = await prisma.deck.findUnique({
-    where: { id: (await params).deckid },
-  });
+    const deck = await prisma.deck.findUnique({
+        where: { id: (await params).deckid }
+    })
 
-  if (deck === null) redirect("/");
+    if (deck === null) redirect('/')
 
-  const owner = await prisma.user.findFirst({
-    where: { id: deck.ownerId },
-  });
+    const owner = await prisma.user.findFirst({
+        where: { id: deck.ownerId }
+    })
 
-  const parentCollectionDecks = await prisma.deck.findMany({
-    where: { collectionId: deck.collectionId },
-    orderBy: { title: "asc" },
-  });
+    const parentCollectionDecks = await prisma.deck.findMany({
+        where: { collectionId: deck.collectionId },
+        orderBy: { title: 'asc' }
+    })
 
-  const nextDeckToBePlayedIndex = parentCollectionDecks.findIndex(
-    (d) => d.id === deck.id
-  )+1;
+    const nextDeckToBePlayedIndex =
+        parentCollectionDecks.findIndex((d) => d.id === deck.id) + 1
 
-  const nextDeckToBePlayed = (nextDeckToBePlayedIndex === parentCollectionDecks.length) ? undefined : parentCollectionDecks[nextDeckToBePlayedIndex];
+    const nextDeckToBePlayed =
+        nextDeckToBePlayedIndex === parentCollectionDecks.length
+            ? undefined
+            : parentCollectionDecks[nextDeckToBePlayedIndex]
 
-  const cards = deck.cards as FlashCard[];
+    const cards = deck.cards as FlashCard[]
 
-  return (
-    <PlaygroundContextProvider initialCards={cards} theme={deck.theme}>
-      <CardsPlaygroundProgress deck={deck} />
-      <header className="mt-4 -mx-2 mb-6 flex items-center gap-2">
-        <BackButton onlyIcon />
-        <div>
-          <h1 className="text-xl leading-6 mb-1 font-semibold">{deck.title}</h1>
-          <Link href={`/collections/${owner?.name}`}>
-            <h3 className="text-sm text-neutral-400 -mt-1">@{owner?.displayName}</h3>
-          </Link>
-        </div>
-      </header>
+    return (
+        <PlaygroundContextProvider initialCards={cards} theme={deck.theme}>
+            <CardsPlaygroundProgress deck={deck} />
+            <header className="mt-4 -mx-2 mb-6 flex items-center gap-2">
+                <BackButton onlyIcon />
+                <div>
+                    <h1 className="text-xl leading-6 mb-1 font-semibold">
+                        {deck.title}
+                    </h1>
+                    <Link href={`/collections/${owner?.name}`}>
+                        <h3 className="text-sm text-neutral-400 -mt-1">
+                            @{owner?.displayName}
+                        </h3>
+                    </Link>
+                </div>
+            </header>
 
-      <CardsDisplayer nextDeckToBePlayed={nextDeckToBePlayed} />
-    </PlaygroundContextProvider>
-  );
+            <CardsDisplayer nextDeckToBePlayed={nextDeckToBePlayed} />
+        </PlaygroundContextProvider>
+    )
 }

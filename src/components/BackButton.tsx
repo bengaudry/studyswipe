@@ -1,35 +1,35 @@
-"use client";
-import Link from "next/link";
-import { cn } from "@nextui-org/react";
-import { ChevronLeft } from "react-feather";
-import { useRouter } from "next/navigation";
+'use client'
+import Link from 'next/link'
+import { cn } from '@nextui-org/react'
+import { ChevronLeft } from 'react-feather'
+import { useRouter } from 'next/navigation'
 
 export type BackButtonProps = {
-  href?: string;
-  className?: string;
-  onlyIcon?: boolean;
-};
+    href?: string
+    className?: string
+    onlyIcon?: boolean
+}
 
 export function BackButton({
-  href,
-  className,
-  onlyIcon,
-  ...props
+    href,
+    className,
+    onlyIcon,
+    ...props
 }: BackButtonProps) {
-  const { prefetch, back } = useRouter();
+    const { prefetch, back } = useRouter()
 
-  return (
-    <Link
-      href={href ?? ""}
-      onClick={() => {
-        if (!href) back();
-      }}
-      onMouseEnter={() => prefetch(href ?? "..")}
-      className={cn("text-neutral-400 flex items-center", className)}
-      {...props}
-    >
-      <ChevronLeft />
-      {!onlyIcon && <span> Back</span>}
-    </Link>
-  );
+    return (
+        <Link
+            href={href ?? ''}
+            onClick={() => {
+                if (!href) back()
+            }}
+            onMouseEnter={() => prefetch(href ?? '..')}
+            className={cn('text-neutral-400 flex items-center', className)}
+            {...props}
+        >
+            <ChevronLeft />
+            {!onlyIcon && <span> Back</span>}
+        </Link>
+    )
 }

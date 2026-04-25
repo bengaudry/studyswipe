@@ -1,166 +1,170 @@
-"use client";
-import { useContext, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Deck } from "@/db/generated/prisma";
-import { MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
-import { DeckDataContext } from "./DeckDataProvider";
+'use client'
+import { useContext, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { Deck } from '@/db/generated/prisma'
+import { MAX_DECK_TITLE_LENGTH } from '@/lib/constants'
+import { DeckDataContext } from './DeckDataProvider'
 import {
-  Input,
-  useDisclosure,
-  Dropdown,
-  DropdownTrigger,
-  DropdownMenu,
-  DropdownItem,
-} from "@/components/ui";
-import { Modal } from "@/components/modals";
-import { MoreVertical, Edit2, Trash, EyeOff, Eye } from "react-feather";
+    Input,
+    useDisclosure,
+    Dropdown,
+    DropdownTrigger,
+    DropdownMenu,
+    DropdownItem
+} from '@/components/ui'
+import { Modal } from '@/components/modals'
+import { MoreVertical, Edit2, Trash, EyeOff, Eye } from 'react-feather'
 
 export function DeckOptionsDropdown({ deck }: { deck: Deck }) {
-  const [loading, setLoading] = useState(false);
-  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
-  const [modalType, setModalType] = useState<"rename" | "delete" | "generate">(
-    "delete"
-  );
-  const [newtitle, setNewtitle] = useState(deck.title ?? "");
-  const { replace, refresh } = useRouter();
+    const [loading, setLoading] = useState(false)
+    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+    const [modalType, setModalType] = useState<
+        'rename' | 'delete' | 'generate'
+    >('delete')
+    const [newtitle, setNewtitle] = useState(deck.title ?? '')
+    const { replace, refresh } = useRouter()
 
-  const { data: deckState, updateDeckData } = useContext(DeckDataContext);
+    const { data: deckState, updateDeckData } = useContext(DeckDataContext)
 
-  const handleDeleteDeck = async () => {
-    setLoading(true);
-    try {
-      await fetch(`/api/deck?id=${deck.id}`, {
-        method: "DELETE",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      replace("/collections");
-    } finally {
-      onClose();
-      setLoading(false);
-    }
-  };
-
-  const handleRenameDeck = async () => {
-    setLoading(true);
-    try {
-      await fetch(
-        `/api/deck?id=${deck.id}&action=rename&newtitle=${newtitle}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
+    const handleDeleteDeck = async () => {
+        setLoading(true)
+        try {
+            await fetch(`/api/deck?id=${deck.id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            replace('/collections')
+        } finally {
+            onClose()
+            setLoading(false)
         }
-      );
-      updateDeckData((prev) => ({ ...prev, title: newtitle }));
-    } finally {
-      onClose();
-      setLoading(false);
     }
-  };
 
-  const handleToggleVisibility = async () => {
-    setLoading(true);
-    const prevDeckState = deckState;
-    try {
-      updateDeckData((prev) => ({ ...prev, isPublic: !prev.isPublic }));
-      await fetch(`/api/deck?id=${deck.id}&action=toggle-visibility`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-    } catch (err) {
-      if (prevDeckState) updateDeckData(prevDeckState);
-    } finally {
-      onClose();
-      setLoading(false);
-      refresh();
+    const handleRenameDeck = async () => {
+        setLoading(true)
+        try {
+            await fetch(
+                `/api/deck?id=${deck.id}&action=rename&newtitle=${newtitle}`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+            )
+            updateDeckData((prev) => ({ ...prev, title: newtitle }))
+        } finally {
+            onClose()
+            setLoading(false)
+        }
     }
-  };
 
-  return (
-    <>
-      <Dropdown>
-        <DropdownTrigger>
-          <button className="rounded-full outline-none active:bg-neutral-200 transition-colors p-2">
-            <MoreVertical />
-          </button>
-        </DropdownTrigger>
-        <DropdownMenu variant="flat" aria-label="Static Actions">
-          <DropdownItem
-            key="rename"
-            startContent={<Edit2 size={16} />}
-            onPress={() => {
-              setModalType("rename");
-              onOpen();
-            }}
-          >
-            Rename
-          </DropdownItem>
-          <DropdownItem
-            key="toggleVisibility"
-            startContent={
-              deckState?.isPublic ? <EyeOff size={16} /> : <Eye size={16} />
-            }
-            showDivider
-            onPress={handleToggleVisibility}
-          >
-            {deckState?.isPublic ? "Make private" : "Make public"}
-          </DropdownItem>
-          <DropdownItem
-            key="delete"
-            className="text-danger"
-            color="danger"
-            startContent={<Trash size={16} />}
-            onPress={() => {
-              setModalType("delete");
-              onOpen();
-            }}
-          >
-            Delete deck
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+    const handleToggleVisibility = async () => {
+        setLoading(true)
+        const prevDeckState = deckState
+        try {
+            updateDeckData((prev) => ({ ...prev, isPublic: !prev.isPublic }))
+            await fetch(`/api/deck?id=${deck.id}&action=toggle-visibility`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+        } catch (err) {
+            if (prevDeckState) updateDeckData(prevDeckState)
+        } finally {
+            onClose()
+            setLoading(false)
+            refresh()
+        }
+    }
 
-      {modalType === "delete" && (
-        <Modal
-          title="Delete deck"
-          color="danger"
-          isOpen={isOpen}
-          onOpenChange={onOpenChange}
-          onValidate={handleDeleteDeck}
-          submitButtonLabel="Delete deck"
-          submitButtonProps={{ isLoading: loading }}
-        >
-          If you delete this deck, all cards in it will be deleted too, and
-          cannot be recovered
-        </Modal>
-      )}
+    return (
+        <>
+            <Dropdown>
+                <DropdownTrigger>
+                    <button className="rounded-full outline-none active:bg-neutral-200 transition-colors p-2">
+                        <MoreVertical />
+                    </button>
+                </DropdownTrigger>
+                <DropdownMenu variant="flat" aria-label="Static Actions">
+                    <DropdownItem
+                        key="rename"
+                        startContent={<Edit2 size={16} />}
+                        onPress={() => {
+                            setModalType('rename')
+                            onOpen()
+                        }}
+                    >
+                        Rename
+                    </DropdownItem>
+                    <DropdownItem
+                        key="toggleVisibility"
+                        startContent={
+                            deckState?.isPublic ? (
+                                <EyeOff size={16} />
+                            ) : (
+                                <Eye size={16} />
+                            )
+                        }
+                        showDivider
+                        onPress={handleToggleVisibility}
+                    >
+                        {deckState?.isPublic ? 'Make private' : 'Make public'}
+                    </DropdownItem>
+                    <DropdownItem
+                        key="delete"
+                        className="text-danger"
+                        color="danger"
+                        startContent={<Trash size={16} />}
+                        onPress={() => {
+                            setModalType('delete')
+                            onOpen()
+                        }}
+                    >
+                        Delete deck
+                    </DropdownItem>
+                </DropdownMenu>
+            </Dropdown>
 
-      {modalType === "rename" && (
-        <Modal
-          title="Rename deck"
-          isOpen={isOpen}
-          onOpenChange={onOpenChange}
-          onValidate={handleRenameDeck}
-          submitButtonLabel="Rename deck"
-          submitButtonProps={{ isLoading: loading }}
-        >
-          <Input
-            label="New title"
-            labelPlacement="outside"
-            isRequired
-            required
-            value={newtitle}
-            maxLength={MAX_DECK_TITLE_LENGTH}
-            onChange={(e) => setNewtitle(e.target.value)}
-            placeholder="Physics, Philosophy, Computer Science..."
-          />
-        </Modal>
-      )}
-    </>
-  );
+            {modalType === 'delete' && (
+                <Modal
+                    title="Delete deck"
+                    color="danger"
+                    isOpen={isOpen}
+                    onOpenChange={onOpenChange}
+                    onValidate={handleDeleteDeck}
+                    submitButtonLabel="Delete deck"
+                    submitButtonProps={{ isLoading: loading }}
+                >
+                    If you delete this deck, all cards in it will be deleted
+                    too, and cannot be recovered
+                </Modal>
+            )}
+
+            {modalType === 'rename' && (
+                <Modal
+                    title="Rename deck"
+                    isOpen={isOpen}
+                    onOpenChange={onOpenChange}
+                    onValidate={handleRenameDeck}
+                    submitButtonLabel="Rename deck"
+                    submitButtonProps={{ isLoading: loading }}
+                >
+                    <Input
+                        label="New title"
+                        labelPlacement="outside"
+                        isRequired
+                        required
+                        value={newtitle}
+                        maxLength={MAX_DECK_TITLE_LENGTH}
+                        onChange={(e) => setNewtitle(e.target.value)}
+                        placeholder="Physics, Philosophy, Computer Science..."
+                    />
+                </Modal>
+            )}
+        </>
+    )
 }

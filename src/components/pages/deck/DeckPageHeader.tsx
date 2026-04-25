@@ -1,55 +1,61 @@
-"use client";
-import clsx from "clsx";
-import { useContext } from "react";
-import { useRouter } from "next/navigation";
-import { Deck } from "@/db/generated/prisma";
-import { BackButton } from "@/components/BackButton";
-import { Button, Chip, Tooltip } from "@/components/ui";
-import { Play, Shuffle } from "react-feather";
-import { DeckOptionsDropdown } from "./DeckOptionsDropdown";
-import { DeckDataContext } from "./DeckDataProvider";
+'use client'
+import clsx from 'clsx'
+import { useContext } from 'react'
+import { useRouter } from 'next/navigation'
+import { Deck } from '@/db/generated/prisma'
+import { BackButton } from '@/components/BackButton'
+import { Button, Chip, Tooltip } from '@/components/ui'
+import { Play, Shuffle } from 'react-feather'
+import { DeckOptionsDropdown } from './DeckOptionsDropdown'
+import { DeckDataContext } from './DeckDataProvider'
 
 export function DeckPageHeader({ deck }: { deck: Deck }) {
-  const { push } = useRouter();
-  const { data: deckState } = useContext(DeckDataContext);
+    const { push } = useRouter()
+    const { data: deckState } = useContext(DeckDataContext)
 
-  return (
-    <header className="flex flex-col gap-3 mb-3">
-      <div className="flex justify-between items-center gap-4">
-        <BackButton />
-        <div className="flex gap-2">
-          <Tooltip content="Play in random mode">
-            <Button
-              isDisabled={(deckState?.cards.length ?? 0) < 1}
-              size="sm"
-              onPress={() => push(`/play/${deck.id}?random=true`)}
-              startContent={<Shuffle size={18} />}
-              isIconOnly
-            />
-          </Tooltip>
-          <Button
-            isDisabled={(deckState?.cards.length ?? 0) < 1}
-            color="primary"
-            size="sm"
-            className={deckState?.theme === "neutral" ? "bg-neutral-800 dark:bg-neutral-700" : clsx(`bg-${deckState?.theme}-500 dark:bg-opacity-80`)}
-            onPress={() => push(`/play/${deck.id}`)}
-            startContent={<Play fill="#fff" size={18} />}
-          >
-            Launch
-          </Button>
-        </div>
-      </div>
-      <div className="flex justify-between items-center gap-1">
-        <div className="flex gap-1 sm:gap-2 items-center">
-          <h1 className="text-xl sm:text-2xl font-semibold">
-            {deckState?.title}
-          </h1>
-          <Chip size="sm" variant="bordered">
-            {deckState?.isPublic ? "Public" : "Private"}
-          </Chip>
-        </div>
-        <DeckOptionsDropdown deck={deck} />
-      </div>
-    </header>
-  );
+    return (
+        <header className="flex flex-col gap-3 mb-3">
+            <div className="flex justify-between items-center gap-4">
+                <BackButton />
+                <div className="flex gap-2">
+                    <Tooltip content="Play in random mode">
+                        <Button
+                            isDisabled={(deckState?.cards.length ?? 0) < 1}
+                            size="sm"
+                            onPress={() => push(`/play/${deck.id}?random=true`)}
+                            startContent={<Shuffle size={18} />}
+                            isIconOnly
+                        />
+                    </Tooltip>
+                    <Button
+                        isDisabled={(deckState?.cards.length ?? 0) < 1}
+                        color="primary"
+                        size="sm"
+                        className={
+                            deckState?.theme === 'neutral'
+                                ? 'bg-neutral-800 dark:bg-neutral-700'
+                                : clsx(
+                                      `bg-${deckState?.theme}-500 dark:bg-opacity-80`
+                                  )
+                        }
+                        onPress={() => push(`/play/${deck.id}`)}
+                        startContent={<Play fill="#fff" size={18} />}
+                    >
+                        Launch
+                    </Button>
+                </div>
+            </div>
+            <div className="flex justify-between items-center gap-1">
+                <div className="flex gap-1 sm:gap-2 items-center">
+                    <h1 className="text-xl sm:text-2xl font-semibold">
+                        {deckState?.title}
+                    </h1>
+                    <Chip size="sm" variant="bordered">
+                        {deckState?.isPublic ? 'Public' : 'Private'}
+                    </Chip>
+                </div>
+                <DeckOptionsDropdown deck={deck} />
+            </div>
+        </header>
+    )
 }

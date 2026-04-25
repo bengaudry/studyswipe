@@ -1,36 +1,36 @@
-"use client";
+'use client'
 import {
-  createContext,
-  Dispatch,
-  PropsWithChildren,
-  SetStateAction,
-  useState,
-} from "react";
-import type { Deck } from "@/db/generated/prisma";
+    createContext,
+    Dispatch,
+    PropsWithChildren,
+    SetStateAction,
+    useState
+} from 'react'
+import type { Deck } from '@/db/generated/prisma'
 
 export type MinimalDeck = Omit<
-  Deck,
-  "id" | "collectionId" | "ownerId" | "createdAt" | "updatedAt"
->;
+    Deck,
+    'id' | 'collectionId' | 'ownerId' | 'createdAt' | 'updatedAt'
+>
 
 export const DeckDataContext = createContext<{
-  data?: MinimalDeck;
-  updateDeckData: Dispatch<SetStateAction<MinimalDeck>>;
-}>({ updateDeckData: () => {} });
+    data?: MinimalDeck
+    updateDeckData: Dispatch<SetStateAction<MinimalDeck>>
+}>({ updateDeckData: () => {} })
 
 export const DeckDataProvider = ({
-  initialDeckState,
-  children,
+    initialDeckState,
+    children
 }: PropsWithChildren<{
-  initialDeckState: Deck;
+    initialDeckState: Deck
 }>) => {
-  const [deckState, setDeckState] = useState<MinimalDeck>(initialDeckState);
+    const [deckState, setDeckState] = useState<MinimalDeck>(initialDeckState)
 
-  return (
-    <DeckDataContext.Provider
-      value={{ data: deckState, updateDeckData: setDeckState }}
-    >
-      {children}
-    </DeckDataContext.Provider>
-  );
-};
+    return (
+        <DeckDataContext.Provider
+            value={{ data: deckState, updateDeckData: setDeckState }}
+        >
+            {children}
+        </DeckDataContext.Provider>
+    )
+}
