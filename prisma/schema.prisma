@@ -26,6 +26,9 @@ model CasUser {
   stripeCustomerId String?
   plan             UserPlan @default(FREE)
 
+  collections Collection[]
+  decks       Deck[]
+
   casCreatedAt DateTime
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
@@ -46,9 +49,6 @@ model User {
   // Payments
   stripeCustomerId String?
   plan             UserPlan @default(FREE)
-
-  collections Collection[]
-  decks       Deck[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -122,7 +122,7 @@ model Collection {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
 
-  owner User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  owner CasUser @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 }
 
 // An object that contains a set of flashcards
@@ -142,5 +142,5 @@ model Deck {
   updatedAt DateTime @default(now())
 
   Collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-  Owner      User       @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade) // Relation to User
+  Owner      CasUser    @relation(fields: [ownerId], references: [id], onDelete: Cascade, onUpdate: Cascade)
 }

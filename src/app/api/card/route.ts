@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from "uuid";
 import { NextRequest } from "next/server";
 import prisma from "@/lib/prisma";
 import { serverError, serverOk } from "@/lib/errorHandling/serverErrors";
-import { auth } from "@/lib/auth";
+import {getUser} from "@/lib/session";
 
 /** Creates a collection in the database */
 export const POST = async (req: NextRequest) => {
@@ -23,8 +23,8 @@ export const POST = async (req: NextRequest) => {
     const deck = await prisma.deck.findUnique({ where: { id: deckid } });
     if (!deck) return serverError("invalid-deckid");
 
-    const session = await auth();
-    if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
+    const user = await getUser();
+    if (!user || user.id !== deck.ownerId) return serverError("unauthorized");
 
     const cards = deck.cards as FlashCard[];
     const id = uuidv4();
@@ -62,8 +62,8 @@ export const PATCH = async (req: NextRequest) => {
     const deck = await prisma.deck.findUnique({ where: { id: deckid } });
     if (!deck) return serverError("invalid-deckid");
 
-    const session = await auth();
-    if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
+    const user = await getUser();
+    if (!user || user.id !== deck.ownerId) return serverError("unauthorized");
 
     const newCards: FlashCard[] = (deck.cards as FlashCard[]).map((card) => {
       if (card.id === cardid) {
@@ -107,8 +107,8 @@ export const DELETE = async (req: NextRequest) => {
     const deck = await prisma.deck.findUnique({ where: { id: deckid } });
     if (!deck) return serverError("invalid-deckid");
 
-    const session = await auth();
-    if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
+    const user = await getUser();
+    if (!user || user.id !== deck.ownerId) return serverError("unauthorized");
 
     const newCards = (deck.cards as FlashCard[]).filter(
       (card) => !cardIds.includes(card.id)

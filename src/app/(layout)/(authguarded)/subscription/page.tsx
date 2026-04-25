@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui";
 import { auth } from "@/lib/auth";
-import { authCache } from "@/lib/cache";
 import prisma from "@/lib/prisma";
 import { stripe } from "@/lib/stripe";
 import { redirect } from "next/navigation";
 import { Check } from "react-feather";
+import {getUser} from "@/lib/session";
 
 const UpgradeToPremiumBtn = ({
   isAlreadyPremium,
@@ -13,11 +13,7 @@ const UpgradeToPremiumBtn = ({
 }) => {
   const handleUpgrade = async () => {
     "use server";
-    const session = await authCache();
-    const user = await prisma.user.findUnique({
-      where: { id: session?.user?.id },
-      select: { stripeCustomerId: true },
-    });
+    const user = await getUser();
     if (!user) {
       console.error("User not logged in");
       return;
@@ -58,11 +54,7 @@ const UpgradeToPremiumBtn = ({
 };
 
 export default async function PremiumPage() {
-  const session = await auth();
-
-  const user = await prisma.user.findUnique({
-    where: { id: session?.user?.id },
-  });
+  const user = await getUser();
   if (!user) return null;
 
   const userPlan = user.plan;

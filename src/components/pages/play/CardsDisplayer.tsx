@@ -1,7 +1,7 @@
 "use client";
 import { PropsWithChildren, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Deck } from "@prisma/client";
+import { Deck } from "@/db/generated/prisma";
 import { useSwipeable } from "react-swipeable";
 import { shuffleArray } from "@/lib/arrays";
 import { Button, Tooltip } from "@/components/ui";

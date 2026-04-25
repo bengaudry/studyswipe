@@ -1,7 +1,8 @@
 import {NextRequest, NextResponse} from "next/server";
 import prisma from "@/lib/prisma"
-import axios from "axios";
+import axios, { type AxiosResponse } from "axios";
 import {redirect} from "next/navigation";
+import {createSession} from "@/lib/session";
 
 export const GET = async (req: NextRequest) => {
     const params = req.nextUrl.searchParams;
@@ -11,11 +12,12 @@ export const GET = async (req: NextRequest) => {
         return NextResponse.json({error: "Bad request"}, {status: 400});
     }
 
-    let response: any;
+    let response: AxiosResponse<any, any>;
     try {
-        response = await axios.get(process.env.NODE_ENV === "development"
+        /* response = await axios.get(process.env.NODE_ENV === "development"
             ? `http://localhost:8000/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`
-            : `https://cas.bengaudry.dev/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`)
+            : `https://cas.bengaudry.dev/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`) */
+        response = await axios.get(`https://cas.bengaudry.dev/api/v1/validate-ticket?st=${serviceTicket}&serviceId=studyswipe}`)
     } catch (err) {
         return NextResponse.json({msg: "Could not connect with cas ticket service", error: err}, {status: 500});
     }
@@ -54,13 +56,20 @@ export const GET = async (req: NextRequest) => {
             }
         }
 
-        // user already exists
-        const redirectUrl = `${process.env.NEXT_PUBLIC_APP_URL}/`;
-        redirect(redirectUrl)
+        if (!process.env.NEXT_PUBLIC_APP_URL) {
+            console.error("NEXT_PUBLIC_APP_URL is not defined")
+            redirect("/?err=app-url-not-defined")
+        }
+
+        await createSession(user)
+
+        return NextResponse.redirect(process.env.NEXT_PUBLIC_APP_URL + "/profile")
     } catch (err) {
         console.error("Error while fetching user after cas redirection")
         console.error(err)
         redirect("/?err=fetch-user-failed")
+    } finally {
+        redirect("/")
     }
 
 }

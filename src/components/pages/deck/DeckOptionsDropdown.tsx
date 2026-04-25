@@ -1,7 +1,7 @@
 "use client";
 import { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Deck } from "@prisma/client";
+import { Deck } from "@/db/generated/prisma";
 import { MAX_DECK_TITLE_LENGTH } from "@/lib/constants";
 import { DeckDataContext } from "./DeckDataProvider";
 import {

@@ -1,7 +1,7 @@
 "use client";
 import { useContext } from "react";
 import { clsx } from "clsx";
-import { Deck } from "@prisma/client";
+import { Deck } from "@/db/generated/prisma";
 import { PlaygroundContext } from "./PlayerContext";
 import { Progress } from "@/components/ui";
 

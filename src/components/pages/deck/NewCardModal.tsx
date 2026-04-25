@@ -35,6 +35,7 @@ import NextImage from "next/image";
 import { useSession } from "next-auth/react";
 import { useSupabaseImageUpload } from "@/hooks/useSupabaseImageUpload";
 import { ToolSelector } from "./ToolSelector";
+import {useAuth} from "@/hooks/useAuth";
 
 export function NewCardModalTrigger({
   onOpen,
@@ -86,9 +87,10 @@ export function AiPromptModal({
   const [file, setFile] = useState<File | null>(null);
   const [model, setModel] = useState("gpt-4o");
 
-  const handleChange = (file: File | null) => {
-    setFile(file);
-    alert("File " + file?.name + file?.type);
+  const handleChange = (fileInput: File | File[]) => {
+    const singleFile = Array.isArray(fileInput) ? fileInput[0] : fileInput;
+    setFile(singleFile || null);
+    alert("File " + singleFile?.name + singleFile?.type);
   };
 
   const fileTypes = ["pdf", "jpg", "png", "heic", "heif", "jpeg", "image/*"];
@@ -121,13 +123,6 @@ export function AiPromptModal({
         handleChange={handleChange}
         name="file"
         multiple={false}
-        uploadLabel="Upload a file or an image"
-        uploadedLabel={file?.name}
-        maxSize={15}
-        fileTypes={fileTypes}
-        onTypeError={(err: any) => {
-          alert(JSON.stringify(err));
-        }}
       />
 
       <Select label="AI Model" size="sm" onSelectionChange={(key) => setModel(key.currentKey ?? "gpt-4o")} defaultSelectedKeys={["gpt-4o"]}>
@@ -411,7 +406,7 @@ function FlashcardPreview({
         <Reorder.Group values={content} onReorder={updateContent}>
           <div className="flex flex-col gap-2">
             {content.map((value, idx) => (
-              <Reorder.Item value={value} key={idx} index={idx}>
+              <Reorder.Item value={value} key={idx}>
                 <ContentElement
                   key={idx}
                   content={value}
@@ -450,23 +445,27 @@ function ContentElement({
   onUpdate: (updatedContent: FlashCardContentJSON) => void;
   onDelete: () => void;
 }) {
-  const { data: session } = useSession();
+  const { session } = useAuth();
 
   const [isFocused, setFocused] = useState(false);
   const [fileUrl, setFileUrl] = useState<string | null>(null);
 
   const { addFileToQueue } = useSupabaseImageUpload();
 
-  const handleChange = async (file: File | null) => {
+  const handleChange = async (file: File | File[]) => {
     if (content.type !== "image" || !file) return setFileUrl(null);
 
-    if (!session?.user?.id) return;
-    const imgUri = `https://oqtjixzwhpbmzpsieuoo.supabase.co/storage/v1/object/public/deck-images/${session.user.id}/${file.name}`;
+    // Extract single file from array if needed
+    const singleFile = Array.isArray(file) ? file[0] : file;
+    if (!singleFile) return setFileUrl(null);
+
+    if (!session?.user) return;
+    const imgUri = `https://oqtjixzwhpbmzpsieuoo.supabase.co/storage/v1/object/public/deck-images/${session.user.id}/${singleFile.name}`;
     try {
-      const imgDataUrl = URL.createObjectURL(file);
+      const imgDataUrl = URL.createObjectURL(singleFile);
       setFileUrl(imgDataUrl);
 
-      const { image } = addFileToQueue(file);
+      const { image } = addFileToQueue(singleFile);
 
       onUpdate({
         ...content,
@@ -620,9 +619,6 @@ function ContentElement({
               handleChange={handleChange}
               name="file"
               multiple={false}
-              fileTypes={fileTypes}
-              uploadLabel="Upload a file or an image"
-              maxSize={5}
             />
           )}
         </>

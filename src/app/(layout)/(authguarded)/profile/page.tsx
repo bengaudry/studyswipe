@@ -1,12 +1,12 @@
 "use client";
-import { useSession } from "next-auth/react";
 import { SignOutBtn } from "@/components/pages/profile/SignoutBtn";
 import { Divider, User } from "@/components/ui";
+import {useAuth} from "@/hooks/useAuth";
 
 export default function ProfilePage() {
-  const { data: session } = useSession();
+  const { session } = useAuth();
 
-  if (session?.user === undefined) return null;
+  if (!session?.user) return null;
 
   return (
     <div className="max-w-screen-sm w-full mx-auto">
@@ -16,7 +16,7 @@ export default function ProfilePage() {
             src: session.user.image ?? undefined,
             fallback: (session.user.name ?? "-")[0],
           }}
-          name={"@" + session.userPseudo}
+          name={"@" + session.user.name}
           description={session.user.email ?? undefined}
         />
         <SignOutBtn />

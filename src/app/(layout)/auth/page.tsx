@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {redirect, useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image";
 import { signIn } from "next-auth/react";
 import { authErrorToMessage } from "@/lib/errorHandling/authErrors";
@@ -14,6 +14,9 @@ export default function AuthPage() {
 
   const { prefetch } = useRouter();
 
+  redirect(process.env.NEXT_PUBLIC_AUTH_URL as string);
+
+  /*
   const handleSignInRequest = (provider: string) => {
     setIsLoading(true);
     prefetch("/collections");
@@ -78,5 +81,5 @@ export default function AuthPage() {
         </div>
       </div>
     </>
-  );
+  ); */
 }

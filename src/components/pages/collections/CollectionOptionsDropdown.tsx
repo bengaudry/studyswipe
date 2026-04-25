@@ -8,7 +8,7 @@ import {
   Input,
   useDisclosure,
 } from "@/components/ui";
-import { Collection } from "@prisma/client";
+import { Collection } from "@/db/generated/prisma";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Edit2, MoreVertical, Trash } from "react-feather";

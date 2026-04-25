@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Collection } from "@prisma/client";
+import { Collection } from "@/db/generated/prisma";
 import { MAX_COLLECTION_TITLE_LENGTH } from "@/lib/constants";
 import {
   Button,

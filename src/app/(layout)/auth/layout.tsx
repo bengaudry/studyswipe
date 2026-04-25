@@ -1,12 +1,9 @@
-import { auth } from "@/lib/auth";
-import { authCache } from "@/lib/cache";
 import { redirect } from "next/navigation";
 import { PropsWithChildren } from "react";
+import {getUser} from "@/lib/session";
 
 export default async function AuthLayout({ children }: PropsWithChildren) {
-  const session = await authCache();
-
-  if (session) redirect("/profile");
-
+  const user = await getUser();
+  if (user) redirect("/profile");
   return children;
 }

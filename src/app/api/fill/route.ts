@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { validateFlashCardArray } from "@/lib/cardObject";
 import { v4 as uuidv4 } from "uuid";
+import {getUser} from "@/lib/session";
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,8 +22,8 @@ export async function POST(req: NextRequest) {
 
     if (deck === null) return serverError("invalid-deckid");
 
-    const session = await auth();
-    if (session?.user?.id !== deck.ownerId) return serverError("unauthorized");
+    const user = await getUser();
+    if (!user || user?.id !== deck.ownerId) return serverError("unauthorized");
 
     const res = validateFlashCardArray(body.data);
     if (typeof res === "string") return serverError("invalid-payload", res);

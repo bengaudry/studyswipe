@@ -1,7 +1,6 @@
-import { auth } from "@/lib/auth";
-import { authCache } from "@/lib/cache";
 import prisma from "@/lib/prisma";
 import { PropsWithChildren } from "react";
+import {getUser} from "@/lib/session";
 
 export default async function PlaygroundLayout({
   params,
@@ -19,8 +18,8 @@ export default async function PlaygroundLayout({
     return <p>This deck does not seem to exist</p>;
   if (deck.isPublic) return children;
 
-  const session = await authCache();
-  if (collection.ownerId === session?.user?.id) return children;
+  const user = await getUser();
+  if (collection.ownerId === user?.id) return children;
 
   return <p>This deck does not seem to exist</p>;
 }

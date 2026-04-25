@@ -1,15 +1,13 @@
-import Link from "next/link";
-import { Collection, Deck } from "@prisma/client";
-import { Divider } from "@/components/ui";
-
 import prisma from "@/lib/prisma";
-
+import Link from "next/link";
+import { Collection, Deck } from "@/db/generated/prisma";
+import { Divider } from "@/components/ui";
 import { NewCollectionModal } from "@/components/pages/collections/NewCollectionModal";
 import { CreateDeckButton } from "@/components/pages/collections/DeckLink";
 import { CollectionOptionsDropdown } from "@/components/pages/collections/CollectionOptionsDropdown";
 import { DeckOptionsDropdown } from "@/components/pages/deck/DeckOptionsDropdown";
 import { Suspense } from "react";
-import { authCache } from "@/lib/cache";
+import {getUser} from "@/lib/session";
 
 const DeckLink = ({ deck }: { deck: Deck }) => {
   return (
@@ -88,12 +86,12 @@ const CollectionsList = async ({
 };
 
 export default async function CollectionsPage() {
-  const session = await authCache();
+  const user = await getUser();
 
-  if (session?.user?.id === undefined) return null;
+  if (!user?.id) return null;
 
   const collections = await prisma.collection.findMany({
-    where: { ownerId: session.user.id },
+    where: { ownerId: user.id },
     orderBy: { updatedAt: "desc" },
   });
 

@@ -2,12 +2,11 @@
 import clsx from "clsx";
 import { useContext } from "react";
 import { useRouter } from "next/navigation";
-import { Deck } from "@prisma/client";
+import { Deck } from "@/db/generated/prisma";
 import { BackButton } from "@/components/BackButton";
-import { Button } from "@nextui-org/button";
+import { Button, Chip, Tooltip } from "@/components/ui";
 import { Play, Shuffle } from "react-feather";
 import { DeckOptionsDropdown } from "./DeckOptionsDropdown";
-import { Chip, Tooltip } from "@/components/ui";
 import { DeckDataContext } from "./DeckDataProvider";
 
 export function DeckPageHeader({ deck }: { deck: Deck }) {
