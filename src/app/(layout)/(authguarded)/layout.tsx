@@ -8,7 +8,7 @@ export default async function AuthGuardedLayout({
   const user = await getUser();
 
   console.log("User : ", user)
-  if (user === null) redirect("/auth");
-  
+  if (user === null) redirect(process.env.NEXT_PUBLIC_AUTH_URL as string);
+
   return children;
 }

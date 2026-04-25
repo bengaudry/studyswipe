@@ -2,12 +2,15 @@ import 'server-only'
 
 import {jwtVerify, SignJWT} from 'jose'
 import {cookies} from "next/headers";
-import {CasUser, User} from "@/db/generated/prisma";
+import type {User} from "@/db/generated/prisma";
 import {redirect} from "next/navigation";
 import {cache} from "react";
 import prisma from "@/lib/prisma";
 
 const secretKey = process.env.SESSION_SECRET
+if (!secretKey) {
+    throw new Error('SESSION_SECRET environment variable is not set. Please add it to your .env file.')
+}
 const encodedKey = new TextEncoder().encode(secretKey)
 
 export async function encrypt(payload: any) {
@@ -65,20 +68,20 @@ export const verifySession = cache(async (): Promise<User | null> => {
     return session as User
 })
 
-export const getUser: (() => Promise<CasUser | null>) = cache(async (): Promise<CasUser | null> => {
+export const getUser: (() => Promise<User | null>) = cache(async (): Promise<User | null> => {
     const session = await verifySession()
     if (!session) {
         console.info("No session")
         return null
     }
 
-     try {
+    try {
         console.info("Retrieving session", session.id)
-         return await prisma.casUser.findUnique({
-             where: {id: session.id},
-         })
-     } catch (error) {
-         console.log('Failed to fetch user')
-         return null
-     }
+        return await prisma.user.findUnique({
+            where: {id: session.id},
+        })
+    } catch (error) {
+        console.log('Failed to fetch user', error)
+        return null
+    }
 })

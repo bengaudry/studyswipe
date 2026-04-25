@@ -17,7 +17,7 @@ export default async function PlayPage({
 
   if (deck === null) redirect("/");
 
-  const owner = await prisma.casUser.findFirst({
+  const owner = await prisma.user.findFirst({
     where: { id: deck.ownerId },
   });
 

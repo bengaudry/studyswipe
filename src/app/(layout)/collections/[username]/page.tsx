@@ -77,7 +77,7 @@ export default async function DecksPage({
   const username = (await params).username;
 
   const user = await getUser();
-  const deckOwner = await prisma.casUser.findFirst({
+  const deckOwner = await prisma.user.findFirst({
     where: { name: username },
   });
   if (deckOwner === null) redirect("/?error=user-not-found");

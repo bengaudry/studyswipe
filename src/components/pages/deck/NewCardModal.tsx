@@ -32,7 +32,6 @@ import { FileUploader } from "react-drag-drop-files";
 import { useAiCardGeneration } from "@/hooks/useAiCardGeneration";
 import { useRouter } from "next/navigation";
 import NextImage from "next/image";
-import { useSession } from "next-auth/react";
 import { useSupabaseImageUpload } from "@/hooks/useSupabaseImageUpload";
 import { ToolSelector } from "./ToolSelector";
 import {useAuth} from "@/hooks/useAuth";

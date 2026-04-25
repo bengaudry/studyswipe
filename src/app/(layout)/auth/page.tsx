@@ -2,7 +2,6 @@
 import { useState } from "react";
 import {redirect, useRouter, useSearchParams} from "next/navigation";
 import Image from "next/image";
-import { signIn } from "next-auth/react";
 import { authErrorToMessage } from "@/lib/errorHandling/authErrors";
 import { Button, Divider, Alert, Spinner } from "@/components/ui";
 import { GitHub as GitHubIcon } from "react-feather";
@@ -13,8 +12,6 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const { prefetch } = useRouter();
-
-  redirect(process.env.NEXT_PUBLIC_AUTH_URL as string);
 
   /*
   const handleSignInRequest = (provider: string) => {

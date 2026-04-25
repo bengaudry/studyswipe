@@ -9,7 +9,7 @@ export function useAuth() {
         const fetchSession = async () => {
             try {
                 console.log("fetching session");
-                const {data} = await axios.get("/api/auth/session");
+                const {data} = await axios.get("/api/auth");
                 setUser(data && "session" in data && data.session ? data.session as User : null);
             } catch (_) {
                 setUser(null)

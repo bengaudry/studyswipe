@@ -36,7 +36,7 @@ export const GET = async (req: NextRequest) => {
         })
         if (!localUser) {
             try {
-                await prisma.casUser.create({
+                await prisma.user.create({
                     data: {
                         id: user.id,
                         email: user.email,
@@ -58,7 +58,7 @@ export const GET = async (req: NextRequest) => {
 
         if (!process.env.NEXT_PUBLIC_APP_URL) {
             console.error("NEXT_PUBLIC_APP_URL is not defined")
-            redirect("/?err=app-url-not-defined")
+            redirect("/?err=internal-server-error")
         }
 
         await createSession(user)
