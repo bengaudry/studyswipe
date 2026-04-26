@@ -51,7 +51,7 @@ const DecksList = async ({ collectionId }: { collectionId: string }) => {
         <div>
             <div className="flex flex-col gap-2 overflow-x-scroll px-6 pb-4 -mx-6">
                 {decks.map((deck) => (
-                    <DeckLink deck={deck} />
+                    <DeckLink key={deck.id} deck={deck} />
                 ))}
                 <CreateDeckButton collectionId={collectionId} />
             </div>
