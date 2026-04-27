@@ -1,6 +1,37 @@
-import { serverError } from '@/lib/errorHandling/serverErrors'
-import { NextRequest } from 'next/server'
+import {serverError} from '@/lib/errorHandling/serverErrors'
+import {NextRequest, NextResponse} from 'next/server'
+import {getUser} from "@/lib/session";
+import type {User} from "@/db/generated/prisma";
+import {
+    geminiFlashcardsResponseSchema,
+    openaiFlashcardsResponseSchema
+} from '@/lib/aiSchemas'
+import {GenerateContentResponse, GoogleGenAI} from '@google/genai'
 import OpenAI from 'openai'
+import {zodTextFormat} from 'openai/helpers/zod'
+import {z} from "zod";
+import { v4 as uuidv4 } from 'uuid';
+import {AVAILABLE_MODELS, isUserAuthorizedToUseModel} from "@/lib/aiModels";
+
+async function uploadDocumentToOpenAI(fileObj: File) {
+    try {
+        const file = await openai.files.create({
+            file: fileObj,
+            purpose: "user_data",
+        });
+
+        console.log("File uploaded successfully. File ID:", file.id);
+        return file;
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        throw error;
+    }
+}
+
+async function deleteFileFromOpenAI(fileId: string) {
+    const deleted = await openai.files.delete(fileId);
+    console.log("File deleted:", deleted.deleted);
+}
 
 class AiResultFormatter {
     buffer: string
@@ -111,28 +142,281 @@ class AiResultFormatter {
 }
 
 const openai = new OpenAI({
-    apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY
 })
 
-const AVAILABLE_MODELS = ['gemini-2.0-flash', 'gpt-4o']
+async function hasUserEnoughCreditLeftToUseModel(model: typeof AVAILABLE_MODELS[number], user: User): Promise<boolean> {
+    return true
+}
 
-export async function GET(req: NextRequest) {
-    const params = req.nextUrl.searchParams
+function startOpenAIStreaming(model: string, prompt: string, file: File | null): ReadableStream<string> {
+    let userMessageContent: any = prompt
+    let openAiFileId: string | null = null
 
-    const id = params.get('id')
-    if (!id) return serverError('missing-parameters', 'Parameter missing: <id>')
+    return new ReadableStream({
+        async start(controller) {
+            try {
+                if (file !== null) {
+                    // Convertir le fichier en base64 côté serveur
+                    const buffer = await file.arrayBuffer()
+                    const base64Data = Buffer.from(buffer).toString('base64')
 
-    const model = params.get('model')
-    if (!model)
-        return serverError('missing-parameters', 'Parameter missing: <model>')
+                    const imageMimeTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
-    if (!AVAILABLE_MODELS.includes(model)) {
-        return serverError(
-            'invalid-payload',
-            'Parameter <model> must be one of : ' + AVAILABLE_MODELS.join(', ')
-        )
+                    // For images, pass as image_url
+                    if (imageMimeTypes.includes(file.type)) {
+                        userMessageContent = [
+                            {type: 'input_text', text: prompt},
+                            {
+                                type: 'input_image',
+                                image_url: {
+                                    url: `data:${file.type};base64,${base64Data}`
+                                }
+                            }
+                        ]
+                    } else {
+                        const openAiFile = await uploadDocumentToOpenAI(file)
+                        // For PDFs and other files, pass the base64 bytes directly
+                        userMessageContent = [
+                            {type: 'input_text', text: prompt},
+                            {
+                                type: 'input_file',
+                                file_id: openAiFile.id
+                            }
+                        ]
+                        openAiFileId = openAiFile.id
+                    }
+                }
+
+                const stream = openai.responses
+                    .stream({
+                        model,
+                        input: [
+                            {
+                                role: 'system',
+                                content:
+                                    'Generate a collection of flashcards about the topic that is given to you. The questions and answers must follow the language used in the topic. Keep questions and answers as concise as possible. Try to split all your knowledge into multiple cards, instead of putting everything on one card. Avoid using special characters such as * if it is not needed for comprehension. Make sentences as short as possible, while keeping important information. If the answer is a bit short, try adding a short and concise example. For math content, you HAVE TO use the equation component in LaTeX format.'
+                            },
+                            {role: 'user', content: userMessageContent},
+                        ],
+                        text: {
+                            format: zodTextFormat(
+                                openaiFlashcardsResponseSchema,
+                                'flashcards_schema'
+                            )
+                        }
+                    })
+                    .on('response.refusal.delta', (event) => {
+                        console.warn('response.refusal.delta')
+                        controller.error(event.delta)
+                    })
+                    .on('response.output_text.delta', (event) => {
+                        controller.enqueue(event.delta)
+                    })
+                    .on('response.failed', (event) => {
+                        controller.error(event.response)
+                    })
+
+                await stream.done()
+                controller.close()
+            } catch (error) {
+                controller.error(error)
+            } finally {
+                if (openAiFileId !== null) {
+                    await deleteFileFromOpenAI(openAiFileId)
+                }
+            }
+        }
+    })
+}
+
+function startGeminiStreaming(model: string, prompt: string, file: File | null): ReadableStream<string> {
+    return new ReadableStream({
+        async start(controller) {
+            try {
+                const ai = new GoogleGenAI({
+                    apiKey: process.env.GOOGLE_AI_API_KEY
+                })
+
+                let stream: AsyncGenerator<GenerateContentResponse, any, any>
+                if (file !== null) {
+                    const contents = [
+                        { text: prompt },
+                        {
+                            inlineData: {
+                                mimeType: 'application/pdf',
+                                data: Buffer.from(
+                                    await file.arrayBuffer()
+                                ).toString('base64')
+                            }
+                        }
+                    ]
+
+                    stream = await ai.models.generateContentStream({
+                        model,
+                        contents,
+                        config: {
+                            maxOutputTokens: 7500,
+                            systemInstruction: `Create a set of flashcards based on the analysis of the document. Ensure that both questions and answers are in the same language as the document. Keep the questions and answers brief and to the point. Distribute the information across multiple cards rather than consolidating it onto a single card. Avoid unnecessary special characters like * unless they are essential for understanding. Keep sentences short while retaining key information. If an answer is brief, consider adding a concise example. For mathematical content, it is mandatory to use LaTeX format for equations. When creating flashcards, ensure that LaTeX equations are formatted correctly within the structure. Use the "equation" type to encapsulate LaTeX equations. Here is an example of how to structure a LaTeX equation in the flashcard: {{"question": [{"type": "text","heading": "paragraph","text": "What is the formula for the area of a circle?"}],"answer": [{"type": "text", "heading": "paragraph", "text": "The area of a circle is defined by :"},{"type": "equation",equation": "A = \\pi r^2"}]}`,
+                            responseMimeType: 'application/json',
+                            responseSchema: geminiFlashcardsResponseSchema
+                        }
+                    })
+                } else {
+                    // Stream generated data
+                    stream = await ai.models.generateContentStream({
+                        model,
+                        contents: prompt,
+                        config: {
+                            systemInstruction:
+                                'Generate a collection of flashcards about the topic that is given to you. The questions and answers must follow the language used in the topic. Keep questions and answers as concise as possible. Try to split all your knowledge into multiple cards, instead of putting everything on one card. Avoid using special characters such as * if it is not needed for comprehension. Make sentences as short as possible, while keeping important information. If the answer is a bit short, try adding a short and concise example. For math content, you HAVE TO use the equation component in LaTeX format.',
+                            responseMimeType: 'application/json',
+                            responseSchema: geminiFlashcardsResponseSchema
+                        }
+                    })
+                }
+
+                for await (const chunk of stream) {
+                    console.log(chunk)
+                    const candidates = chunk.candidates
+                    const parts = candidates
+                        ? candidates[0].content?.parts
+                        : undefined
+                    const data = parts ? parts[0].text : undefined
+                    if (data) controller.enqueue(data)
+                }
+
+                controller.close()
+            } catch (error) {
+                controller.error(error)
+            }
+        }
+    })
+}
+
+async function* startStreamingAIResponse(
+    model: string,
+    prompt: string,
+    file: File | null
+): AsyncGenerator<FlashCard> {
+    const parser = new AiResultFormatter()
+
+    // Sélectionner le stream approprié en fonction du modèle
+    let aiStream: ReadableStream<string> | null = null
+    if (model.includes("gemini")) {
+        aiStream = startGeminiStreaming(model, prompt, file)
+    } else if (model.includes("gpt")) {
+        aiStream = startOpenAIStreaming(model, prompt, file)
+    }
+
+    if (!aiStream) {
+        throw new Error(`Invalid model: ${model}`)
+    }
+
+    // Lire le stream et parser les chunks
+    const reader = aiStream.getReader()
+
+    try {
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+
+            // value est déjà une string, pas besoin de décoder
+            const card = parser.updateBuffer(value)
+
+            // Yield chaque carte complète dès qu'elle est parsée
+            if (card) {
+                yield card
+            }
+        }
+    } finally {
+        reader.releaseLock()
     }
 }
-function uuidv4(): string {
-    throw new Error('Function not implemented.')
+
+
+const payloadSchema = z.object({
+    prompt: z.string({
+        required_error: "Prompt is required",
+        invalid_type_error: "Prompt must be a string"
+    }),
+    model: z.string({
+        required_error: "Model is required",
+        invalid_type_error: "Model must be a string"
+    }).min(1, "Model cannot be empty"),
+    file: z.object({
+        data: z.string({
+            required_error: "File data is required",
+            invalid_type_error: "File data must be a string (base64)"
+        }),
+        type: z.string(),
+        name: z.string()
+    }).nullable().optional()
+})
+
+export async function POST(req: NextRequest) {
+    const params = req.nextUrl.searchParams
+
+    const deckId = params.get('deck-id')
+    if (!deckId) return serverError('missing-parameters', 'Parameter missing: <deck-id>')
+    try {
+        const payload = payloadSchema.parse(await req.json())
+        const { prompt, model } = payload
+
+        // Convertir le fichier base64 en File
+        let file: File | null = null
+        if (payload.file) {
+            const buffer = Buffer.from(payload.file.data, 'base64')
+            file = new File([buffer], payload.file.name, { type: payload.file.type })
+
+            // Vérifier la taille
+            if (file.size > 10 * 1024 * 1024) {
+                return serverError('invalid-payload', 'File size must be less than 10MB')
+            }
+        }
+
+        if (!AVAILABLE_MODELS.includes(model)) {
+            return serverError(
+                'invalid-payload',
+                'Parameter <model> must be one of : ' + AVAILABLE_MODELS.join(', ')
+            )
+        }
+
+        const user = await getUser()
+        if (!user) {
+            return serverError('unauthenticated')
+        }
+
+        if (!isUserAuthorizedToUseModel(model, user)) {
+            return serverError('unauthorized', 'Your current plan does not allow you to use this model')
+        }
+
+        if (!(await hasUserEnoughCreditLeftToUseModel(model, user))) {
+            return serverError('unauthorized', 'You do not have enough credit left to use this model')
+        }
+
+        const encoder = new TextEncoder()
+        return new NextResponse(new ReadableStream({
+            async start(controller) {
+                try {
+                    for await (const card of startStreamingAIResponse(model, prompt, file)) {
+                        controller.enqueue(encoder.encode(JSON.stringify(card) + '\n'))
+                    }
+                    controller.close()
+                } catch (error) {
+                    controller.error(error)
+                }
+            }
+        }), {
+            headers: {
+                'Content-Type': 'text/plain; charset=utf-8',
+                'Transfer-Encoding': 'chunked'
+            }
+        })
+    } catch (e) {
+        if (e instanceof z.ZodError) {
+            return serverError('invalid-payload', e.errors.map((err) => err.message).join('; '))
+        }
+        return serverError('invalid-payload', 'An unknown error occurred while validating the payload')
+    }
 }

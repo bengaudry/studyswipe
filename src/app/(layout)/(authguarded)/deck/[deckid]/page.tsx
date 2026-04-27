@@ -18,15 +18,12 @@ export default async function DeckPage({
     })
     if (deck === null) redirect('/')
 
-    const hasAccessToPremiumFeatures = user.plan === 'PREMIUM'
-
     return (
         <DeckDataProvider initialDeckState={deck}>
             <DeckPageHeader deck={deck} />
 
             <DeckPageBody
                 deck={deck}
-                hasAccessToPremiumFeatures={hasAccessToPremiumFeatures}
             />
         </DeckDataProvider>
     )

@@ -36,6 +36,8 @@ import NextImage from 'next/image'
 import {useSupabaseImageUpload} from '@/hooks/useSupabaseImageUpload'
 import {ToolSelector} from './ToolSelector'
 import {useSessionContext} from '@/components/SessionProvider'
+import {AVAILABLE_MODELS, AVAILABLE_MODELS_BY_PLAN, isUserAuthorizedToUseModel} from "@/lib/aiModels";
+import {useAuth} from "@/hooks/useAuth";
 
 export function NewCardModalTrigger({
                                         onOpen,
@@ -84,6 +86,9 @@ export function AiPromptModal({
     ) => void
 }) {
     const fileInputRef = useRef<HTMLInputElement>(null)
+
+    const {push} = useRouter()
+    const {user} = useSessionContext()
 
     const [prompt, setPrompt] = useState('')
     const [file, setFile] = useState<File | null>(null)
@@ -177,16 +182,25 @@ export function AiPromptModal({
             <Select
                 label="AI Model"
                 size="sm"
-                onSelectionChange={(key) =>
-                    setModel(key.currentKey ?? 'gpt-4o')
-                }
-                defaultSelectedKeys={['gpt-4o']}
+                onSelectionChange={(key) => {
+                    if (!key.currentKey) return
+                    if (!user) return
+                    if (!isUserAuthorizedToUseModel(key.currentKey, user)) {
+                        push('/subscription?from_feature=ai-gen')
+                    } else setModel(key.currentKey)
+                }}
+                defaultSelectedKeys={AVAILABLE_MODELS[0]}
             >
-                <SelectItem key="gpt-4o"> gpt-4o</SelectItem>
-                <SelectItem key="gemini-2.0-flash">gemini-2.0-flash</SelectItem>
-                <SelectItem key="gemini-3.1-pro-preview">
-                    gemini-3.1-pro-preview
-                </SelectItem>
+                {AVAILABLE_MODELS.map((model) => {
+                    const type = AVAILABLE_MODELS_BY_PLAN['FREE'].includes(model)
+                        ? null
+                        : AVAILABLE_MODELS_BY_PLAN['PREMIUM'].includes(model)
+                        ? "(premium)"
+                        : "(pro)"
+
+                    return (
+                        <SelectItem key={model} endContent={type && <span className="text-neutral-500">{type}</span>}>{model}</SelectItem>
+                )})}
             </Select>
         </Modal>
     )
@@ -196,14 +210,12 @@ export function AiPromptModal({
 export function NewCardModal({
                                  deckid,
                                  card,
-                                 canUseAiGeneration,
                                  onAiGenerateCard,
                                  onAiStopGeneration,
                                  onCancel
                              }: {
     deckid: string
     card?: { data: FlashCard }
-    canUseAiGeneration: boolean
     onAiGenerateCard: () => void
     onAiStopGeneration: () => void
     onCancel: () => void
@@ -218,7 +230,6 @@ export function NewCardModal({
     const [answerContent, setAnswerContent] = useState<FlashCardContentJSON[]>(
         []
     )
-    const {push} = useRouter()
     const {pushImages} = useSupabaseImageUpload()
 
     // AI GENERATION
@@ -348,10 +359,7 @@ export function NewCardModal({
         <>
             <NewCardModalTrigger
                 onOpen={onOpen}
-                onGenerate={() => {
-                    if (canUseAiGeneration) onOpenAiPromptModal()
-                    else push('/subscription?from_feature=ai-gen')
-                }}
+                onGenerate={onOpenAiPromptModal}
             />
 
             <AiPromptModal

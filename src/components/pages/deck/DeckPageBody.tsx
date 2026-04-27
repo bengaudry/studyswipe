@@ -80,10 +80,8 @@ export function DeckPageToolbar({
 
 export function DeckPageBody({
     deck: initialDeck,
-    hasAccessToPremiumFeatures
 }: {
     deck: Deck
-    hasAccessToPremiumFeatures: boolean
 }) {
     const [cardToEdit, setCardToEdit] = useState<
         { data: FlashCard; index: number } | undefined
@@ -139,7 +137,6 @@ export function DeckPageBody({
                     <NewCardModal
                         deckid={initialDeck.id}
                         card={cardToEdit}
-                        canUseAiGeneration={hasAccessToPremiumFeatures}
                         onAiGenerateCard={() => setIsAiGeneratingCard(true)}
                         onAiStopGeneration={() => setIsAiGeneratingCard(false)}
                         onCancel={() => setCardToEdit(undefined)}

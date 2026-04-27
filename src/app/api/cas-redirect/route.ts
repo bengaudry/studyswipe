@@ -36,12 +36,12 @@ export const GET = async (req: NextRequest) => {
     }
 
     try {
-        const localUser = await prisma.user.findUnique({
+        let localUser = await prisma.user.findUnique({
             where: { email: user.email }
         })
         if (!localUser) {
             try {
-                await prisma.user.create({
+                localUser = await prisma.user.create({
                     data: {
                         id: user.id,
                         email: user.email,
@@ -66,7 +66,7 @@ export const GET = async (req: NextRequest) => {
             redirect('/?err=internal-server-error')
         }
 
-        await createSession(user)
+        await createSession(localUser)
 
         return NextResponse.redirect(
             process.env.NEXT_PUBLIC_APP_URL + '/profile'
