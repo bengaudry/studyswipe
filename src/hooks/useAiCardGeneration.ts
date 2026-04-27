@@ -121,6 +121,27 @@ const openai = new OpenAI({
     dangerouslyAllowBrowser: true
 })
 
+
+async function uploadDocumentToOpenAI(fileObj: File) {
+    try {
+        const file = await openai.files.create({
+            file: fileObj,
+            purpose: "user_data",
+        });
+
+        console.log("File uploaded successfully. File ID:", file.id);
+        return file;
+    } catch (error) {
+        console.error("Error uploading file:", error);
+        throw error;
+    }
+}
+
+async function deleteFileFromOpenAI(fileId: string) {
+    const deleted = await openai.files.delete(fileId);
+    console.log("File deleted:", deleted.deleted);
+}
+
 export function useAiCardGeneration() {
     const [data, setData] = useState<FlashCard[] | null>(null)
     const [isAskingGeneration, setIsAskingGeneration] = useState(false)
@@ -144,7 +165,6 @@ export function useAiCardGeneration() {
                 (prompt === undefined || prompt === null || prompt === '')
             )
                 return
-            if (typeof prompt !== 'string') return
             if (file === null && prompt.length < 3) return
 
             const generatedCards: FlashCard[] = []
@@ -220,6 +240,49 @@ export function useAiCardGeneration() {
 
             if ('gpt-4o' === model) {
                 let hasGenerationStarted = false
+
+                // Build user message content - support for files by passing base64
+                let userMessageContent: any = prompt
+                let openAiFileId: string | null = null
+
+                if (file !== null) {
+                    // Convert file to base64
+                    const base64Data = await new Promise<string>((resolve) => {
+                        const reader = new FileReader()
+                        reader.onloadend = () => {
+                            const result = reader.result as string
+                            resolve(result.split(',')[1])
+                        }
+                        reader.readAsDataURL(file)
+                    })
+
+                    const imageMimeTypes = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+
+                    // For images, pass as image_url
+                    if (imageMimeTypes.includes(file.type)) {
+                        userMessageContent = [
+                            { type: 'input_text', text: prompt },
+                            {
+                                type: 'input_image',
+                                image_url: {
+                                    url: `data:${file.type};base64,${base64Data}`
+                                }
+                            }
+                        ]
+                    } else {
+                        const openAiFile = await uploadDocumentToOpenAI(file)
+                        // For PDFs and other files, pass the base64 bytes directly
+                        userMessageContent = [
+                            { type: 'input_text', text: prompt },
+                            {
+                                type: 'input_file',
+                                file_id: openAiFile.id
+                            }
+                        ]
+                        openAiFileId = openAiFile.id
+                    }
+                }
+
                 const stream = openai.responses
                     .stream({
                         model: 'gpt-4o',
@@ -229,7 +292,7 @@ export function useAiCardGeneration() {
                                 content:
                                     'Generate a collection of flashcards about the topic that is given to you. The questions and answers must follow the language used in the topic. Keep questions and answers as concise as possible. Try to split all your knowledge into multiple cards, instead of putting everything on one card. Avoid using special characters such as * if it is not needed for comprehension. Make sentences as short as possible, while keeping important information. If the answer is a bit short, try adding a short and concise example. For math content, you HAVE TO use the equation component in LaTeX format.'
                             },
-                            { role: 'user', content: prompt }
+                            { role: 'user', content: userMessageContent },
                         ],
                         text: {
                             format: zodTextFormat(
@@ -261,6 +324,9 @@ export function useAiCardGeneration() {
                     })
 
                 await stream.done()
+                if (openAiFileId !== null) {
+                    await deleteFileFromOpenAI(openAiFileId)
+                }
             }
 
             console.info('generatedCards')
