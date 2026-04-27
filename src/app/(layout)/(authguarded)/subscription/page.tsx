@@ -1,165 +1,112 @@
-import { Button } from '@/components/ui'
-import { stripe } from '@/lib/stripe'
-import { redirect } from 'next/navigation'
-import { Check } from 'react-feather'
 import { getUser } from '@/lib/session'
+import PricingPageClientComponent from './pricing-client'
 
-const UpgradeToPremiumBtn = ({
-    isAlreadyPremium
-}: {
-    isAlreadyPremium: boolean
-}) => {
-    const handleUpgrade = async () => {
-        'use server'
-        const user = await getUser()
-        if (!user) {
-            console.error('User not logged in')
-            return
-        }
+type BillingPeriod = 'monthly' | 'annual'
 
-        const stripeCustomerId = user.stripeCustomerId ?? undefined
-        const stripeSession = await stripe.checkout.sessions.create({
-            customer: stripeCustomerId,
-            mode: 'subscription',
-            payment_method_types: ['card', 'link'],
-            line_items: [
-                {
-                    price:
-                        process.env.NODE_ENV === 'development'
-                            ? 'price_1RP5idQ6RlBHGHPYTTeUVAik'
-                            : 'price_1RP5idQ6RlBHGHPYTTeUVAik',
-                    quantity: 1
-                }
-            ],
-            success_url: 'http://localhost:3000/',
-            cancel_url: 'http://localhost:3000/?stripe_output=cancel'
-        })
-        redirect(stripeSession?.url ?? '/')
-    }
-
-    return (
-        <form>
-            <Button
-                type="submit"
-                color="primary"
-                formAction={handleUpgrade}
-                isDisabled={isAlreadyPremium}
-            >
-                {isAlreadyPremium ? 'Your current plan' : 'Upgrade to Premium'}
-            </Button>
-        </form>
-    )
+interface Plan {
+    id: string
+    name: string
+    subtitle: string
+    price: { monthly: number; annual: number }
+    priceId: { monthly: string; annual: string }
+    description: string
+    features: Array<{ name: string; included: boolean }>
+    highlighted: boolean
+    badge?: string
 }
 
-export default async function PremiumPage() {
+const plans: Plan[] = [
+    {
+        id: 'starter',
+        name: 'Starter',
+        subtitle: 'Pour découvrir',
+        price: { monthly: 0, annual: 0 },
+        priceId: { monthly: '', annual: '' },
+        description: 'Commencez votre parcours de révision',
+        features: [
+            { name: 'Création manuelle illimitée', included: true },
+            { name: '5 générations IA/mois (Gemini Flash)', included: true },
+            { name: 'Import 1 PDF (max 2Mo)', included: true },
+            { name: 'Collections illimitées', included: false },
+            { name: 'Algorithme SRS avancé', included: false },
+            { name: 'Support prioritaire', included: false },
+        ],
+        highlighted: false,
+    },
+    {
+        id: 'premium',
+        name: 'Premium',
+        subtitle: 'Pour étudiants réguliers',
+        price: { monthly: 5.99, annual: 59.90 },
+        priceId: {
+            monthly: 'price_1RP5idQ6RlBHGHPYTTeUVAik',
+            annual: 'price_annual_boost',
+        },
+        description: 'Le plus populaire pour une étude efficace',
+        features: [
+            { name: '100 générations IA/mois', included: true },
+            { name: 'Accès GPT-4o Mini & Gemini Flash', included: true },
+            { name: 'Import 20 PDF/mois', included: true },
+            { name: 'Algorithme SRS optimisé', included: true },
+            { name: 'Collections illimitées', included: true },
+            { name: 'Support prioritaire', included: false },
+        ],
+        highlighted: true,
+        badge: 'Populaire',
+    },
+    {
+        id: 'pro',
+        name: 'Pro',
+        subtitle: 'Pour la performance',
+        price: { monthly: 12.99, annual: 129.90 },
+        priceId: {
+            monthly: 'price_pro_monthly',
+            annual: 'price_pro_annual',
+        },
+        description: 'Performance maximale et analyse avancée',
+        features: [
+            { name: 'Générations IA illimitées', included: true },
+            { name: 'Accès GPT-4o & Gemini Pro', included: true },
+            { name: 'Analyse documents complexes (50Mo/doc)', included: true },
+            { name: 'Algorithme SRS avancé', included: true },
+            { name: 'Statistiques d\'apprentissage détaillées', included: true },
+            { name: 'Support prioritaire 24/7', included: true },
+        ],
+        highlighted: false,
+    },
+]
+
+const faqs = [
+    {
+        question: 'Puis-je annuler mon abonnement à tout moment ?',
+        answer: 'Oui, bien sûr ! Vous pouvez annuler votre abonnement à tout moment sans frais supplémentaires. Votre accès reste actif jusqu\'à la fin de la période de facturation.',
+    },
+    {
+        question: 'Quels modèles d\'IA utilisez-vous ?',
+        answer: 'Nous utilisons les meilleurs modèles disponibles : GPT-4o & GPT-4o Mini d\'OpenAI, ainsi que Gemini Flash et Gemini Pro de Google AI.',
+    },
+    {
+        question: 'Puis-je changer mon plan en cours de route ?',
+        answer: 'Absolument ! Vous pouvez passer à un plan supérieur ou inférieur à tout moment. Les changements prendront effet lors de votre prochain cycle de facturation.',
+    },
+    {
+        question: 'Offrez-vous une période d\'essai gratuite ?',
+        answer: 'Le plan Starter est gratuit et sans limite de durée. Vous pouvez l\'utiliser gratuitement pour tester toutes les fonctionnalités de base.',
+    },
+]
+
+async function PricingPage() {
     const user = await getUser()
-    if (!user) return null
-
-    const userPlan = user.plan
-
-    const freeFeatures = [
-        'Manual card creation',
-        'Group decks in collections',
-        'Unlimited cards'
-    ]
-
-    const premiumFeatures = [
-        'Including all free features',
-        'Upload images',
-        'No collections limit',
-        'Unlimited AI card generation',
-        'Document based generation'
-    ]
+    const userPlan = user?.plan ?? 'FREE'
 
     return (
-        <div className="max-w-screen-md mx-auto pt-8">
-            <h1 className="text-4xl text-center font-bold mb-12 gap-2">
-                Manage your plan
-            </h1>
-            <div className="flex flex-col-reverse md:flex-row gap-6">
-                <div className="flex-1 border-1 p-2 rounded-[3rem]">
-                    <div className="relative h-full flex flex-col justify-between overflow-hidden rounded-[2.5rem] p-3">
-                        <div className="px-8 py-16">
-                            <h2 className="text-3xl font-semibold mb-4">
-                                Free
-                            </h2>
-                            <ul>
-                                {freeFeatures.map((ft) => (
-                                    <li className="flex flex-row gap-2">
-                                        <Check color="#888888" />
-                                        <span>{ft}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div className="relative z-20 border-1 bg-gradient-to-br from-white dark:from-neutral-900 to-neutral-100 dark:to-neutral-900/10 rounded-[1.75rem] px-8 py-8 shadow-md">
-                            <div className="mb-4 flex items-center gap-2">
-                                <span className="text-3xl font-semibold">
-                                    0€
-                                </span>
-                                <span className="text-medium font-medium text-neutral-400">
-                                    / month
-                                </span>
-                            </div>
-                            <form>
-                                <Button
-                                    type="submit"
-                                    color="default"
-                                    isDisabled={userPlan === 'FREE'}
-                                    formAction={async () => {
-                                        'use server'
-                                        redirect('/cancelsubscription')
-                                    }}
-                                >
-                                    {userPlan === 'FREE'
-                                        ? 'Your current plan'
-                                        : 'End my subscription'}
-                                </Button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="flex-1 border-1 bg-neutral-100 dark:bg-neutral-800 p-2 rounded-[3rem]">
-                    <div className="relative flex flex-col justify-between overflow-hidden rounded-[2.5rem] light:bg-gradient-to-br from-white to-neutral-100/70  dark:bg-neutral-900 shadow-xl p-3">
-                        <div className="px-8 py-16">
-                            <h2 className="text-3xl font-semibold mb-4">
-                                Premium
-                            </h2>
-                            <ul>
-                                {premiumFeatures.map((ft) => (
-                                    <li className="flex flex-row gap-2">
-                                        <Check color="#00cf12" />
-                                        <span>{ft}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-
-                        <div className="relative z-20 border-1 bg-gradient-to-br from-white dark:from-neutral-800 to-neutral-100 dark:to-neutral-900 rounded-[1.75rem] px-8 py-8 shadow-md">
-                            <div className="mb-4 flex items-center gap-2">
-                                <span className="text-3xl font-semibold">
-                                    2.99€
-                                </span>
-                                <span className="text-medium font-medium text-neutral-400">
-                                    / month
-                                </span>
-                            </div>
-                            <UpgradeToPremiumBtn
-                                isAlreadyPremium={userPlan === 'PREMIUM'}
-                            />
-                        </div>
-
-                        <div className="z-0 grid grid-cols-2 grid-rows-2 absolute bottom-0 right-0 rounded-full h-1/2 blur-2xl aspect-square bg-gradient-to-tr opacity-50">
-                            <div className="bg-blue-500"></div>
-                            <div className="bg-purple-500"></div>
-                            <div className="bg-orange-500"></div>
-                            <div className="bg-yellow-500"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <PricingPageClientComponent
+            initialUserPlan={userPlan}
+            plans={plans}
+            faqs={faqs}
+        />
     )
 }
+
+export default PricingPage
+
