@@ -1,9 +1,9 @@
 'use client'
-import { clsx } from 'clsx'
-import { Reorder } from 'motion/react'
+import {clsx} from 'clsx'
+import {Reorder} from 'motion/react'
 import Latex from 'react-latex-next'
-import { Plus, Circle } from 'react-feather'
-import { DeckDataContext } from './DeckDataProvider'
+import {Plus, Circle, X, Upload} from 'react-feather'
+import {DeckDataContext} from './DeckDataProvider'
 import {
     Button,
     useDisclosure,
@@ -20,27 +20,28 @@ import {
     Select,
     SelectItem
 } from '@/components/ui'
-import { Modal, ModalProps } from '@/components/modals'
+import {Modal, ModalProps} from '@/components/modals'
 import {
     Dispatch,
     SetStateAction,
     useContext,
     useEffect,
+    useRef,
     useState
 } from 'react'
-import { FileUploader } from 'react-drag-drop-files'
-import { useAiCardGeneration } from '@/hooks/useAiCardGeneration'
-import { useRouter } from 'next/navigation'
+import {FileUploader} from 'react-drag-drop-files'
+import {useAiCardGeneration} from '@/hooks/useAiCardGeneration'
+import {useRouter} from 'next/navigation'
 import NextImage from 'next/image'
-import { useSupabaseImageUpload } from '@/hooks/useSupabaseImageUpload'
-import { ToolSelector } from './ToolSelector'
-import { useSessionContext } from '@/components/SessionProvider'
+import {useSupabaseImageUpload} from '@/hooks/useSupabaseImageUpload'
+import {ToolSelector} from './ToolSelector'
+import {useSessionContext} from '@/components/SessionProvider'
 
 export function NewCardModalTrigger({
-    onOpen,
-    onGenerate,
-    isDisabled
-}: {
+                                        onOpen,
+                                        onGenerate,
+                                        isDisabled
+                                    }: {
     onOpen?: () => void
     onGenerate?: () => void
     isDisabled?: boolean
@@ -51,7 +52,7 @@ export function NewCardModalTrigger({
                 isDisabled={isDisabled}
                 variant="faded"
                 className="w-full flex-1 aspect-square border-none"
-                startContent={<Plus size={22} />}
+                startContent={<Plus size={22}/>}
                 onPress={onOpen}
             >
                 Create a card
@@ -60,7 +61,7 @@ export function NewCardModalTrigger({
                 isDisabled={isDisabled}
                 variant="faded"
                 className="w-full flex-1 aspect-square border-none bg-gradient-to-tr from-pink-400 to-indigo-500 dark:from-pink-700 dark:to-indigo-600 text-white"
-                startContent={<Circle size={22} />}
+                startContent={<Circle size={22}/>}
                 onPress={onGenerate}
             >
                 Generate cards
@@ -70,10 +71,10 @@ export function NewCardModalTrigger({
 }
 
 export function AiPromptModal({
-    isAskingGeneration,
-    onAskGeneration,
-    ...props
-}: Omit<ModalProps, 'children' | 'title'> & {
+                                  isAskingGeneration,
+                                  onAskGeneration,
+                                  ...props
+                              }: Omit<ModalProps, 'children' | 'title'> & {
     isAskingGeneration: boolean
     onAskGeneration: (
         prompt: string,
@@ -82,17 +83,21 @@ export function AiPromptModal({
         onClose: () => void
     ) => void
 }) {
+    const fileInputRef = useRef<HTMLInputElement>(null)
+
     const [prompt, setPrompt] = useState('')
     const [file, setFile] = useState<File | null>(null)
     const [model, setModel] = useState('gpt-4o')
 
-    const handleChange = (fileInput: File | File[]) => {
-        const singleFile = Array.isArray(fileInput) ? fileInput[0] : fileInput
-        setFile(singleFile || null)
-        alert('File ' + singleFile?.name + singleFile?.type)
+    const formatSize = (sizeInBytes: number): string => {
+        if (sizeInBytes > 1000) {
+            const kb = Math.round(sizeInBytes / 100) / 10
+            return `${kb}kB`
+        }
+        return `${sizeInBytes}b`
     }
 
-    const fileTypes = ['pdf', 'jpg', 'png', 'heic', 'heif', 'jpeg', 'image/*']
+    const authorizedFileTypes = ['application/pdf', 'image/*', "text/plain", "text/markdown"]
 
     return (
         <Modal
@@ -101,7 +106,7 @@ export function AiPromptModal({
             submitButtonProps={{
                 isDisabled: !file && prompt.length < 3,
                 isLoading: isAskingGeneration,
-                startContent: <Circle size={16} />
+                startContent: <Circle size={16}/>
             }}
             onValidate={(onClose) => {
                 if (!file && prompt.length < 3) return
@@ -116,13 +121,58 @@ export function AiPromptModal({
                 onChange={(e) => setPrompt(e.target.value)}
                 placeholder="Enter the topic you want to generate cards about here..."
             />
-            <Divider />
+            <Divider/>
 
-            <FileUploader
-                handleChange={handleChange}
-                name="file"
-                multiple={false}
-            />
+            {file ? (
+                <div className="bg-neutral-900 border rounded-lg p-3 text-sm flex items-center justify-between">
+                    <div>
+                        <p className="font-medium">{file.name}</p>
+                        <p className="text-neutral-500 text-xs">
+                            {formatSize(file.size)}
+                        </p>
+                    </div>
+
+                    <button
+                        className="text-neutral-500 hover:text-white"
+                        onClick={() => setFile(null)}
+                    >
+                        <X/>
+                    </button>
+                </div>
+            ) : (
+                <>
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        className="hidden"
+                        onChange={(e) => {
+                            const uploadedFile = e.target.files?.[0] ?? null
+                            if (!uploadedFile) return;
+
+                            if (!authorizedFileTypes.includes(uploadedFile.type)) {
+                                alert(`The file type '${uploadedFile.type} is not supported. Try uploading a pdf document, a text file or an image.'`)
+                                return
+                            }
+
+                            if (uploadedFile.size > 10_000_000) {
+                                // file greater than 10MB
+                                alert("File is too large for upload. You might want to compress, or select relevant pages if it is a document.")
+                                return
+                            }
+                            setFile(uploadedFile)
+                        }}
+                    />
+                    <Button
+                        variant="bordered"
+                        startContent={<Upload size={16}/>}
+                        onPress={() => {
+                            fileInputRef?.current?.click()
+                        }}
+                    >
+                        Ajouter un fichier
+                    </Button>
+                </>
+            )}
 
             <Select
                 label="AI Model"
@@ -132,7 +182,7 @@ export function AiPromptModal({
                 }
                 defaultSelectedKeys={['gpt-4o']}
             >
-                <SelectItem key="gpt-4o">gpt-4o</SelectItem>
+                <SelectItem key="gpt-4o"> gpt-4o</SelectItem>
                 <SelectItem key="gemini-2.0-flash">gemini-2.0-flash</SelectItem>
                 <SelectItem key="gemini-3.1-pro-preview">
                     gemini-3.1-pro-preview
@@ -144,13 +194,13 @@ export function AiPromptModal({
 
 /** Provide `card` if this if for editing the card */
 export function NewCardModal({
-    deckid,
-    card,
-    canUseAiGeneration,
-    onAiGenerateCard,
-    onAiStopGeneration,
-    onCancel
-}: {
+                                 deckid,
+                                 card,
+                                 canUseAiGeneration,
+                                 onAiGenerateCard,
+                                 onAiStopGeneration,
+                                 onCancel
+                             }: {
     deckid: string
     card?: { data: FlashCard }
     canUseAiGeneration: boolean
@@ -158,7 +208,7 @@ export function NewCardModal({
     onAiStopGeneration: () => void
     onCancel: () => void
 }) {
-    const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure()
+    const {isOpen, onOpen, onOpenChange, onClose} = useDisclosure()
     const [loading, setLoading] = useState(false)
 
     const [current, setCurrent] = useState<'question' | 'answer'>('question')
@@ -168,11 +218,11 @@ export function NewCardModal({
     const [answerContent, setAnswerContent] = useState<FlashCardContentJSON[]>(
         []
     )
-    const { push } = useRouter()
-    const { pushImages } = useSupabaseImageUpload()
+    const {push} = useRouter()
+    const {pushImages} = useSupabaseImageUpload()
 
     // AI GENERATION
-    const { generateCards, isAskingGeneration, isGenerating } =
+    const {generateCards, isAskingGeneration, isGenerating} =
         useAiCardGeneration()
 
     useEffect(() => {
@@ -186,7 +236,7 @@ export function NewCardModal({
         onOpenChange: onOpenChangeAiPromptModal
     } = useDisclosure()
 
-    const { data: deckData, updateDeckData } = useContext(DeckDataContext)
+    const {data: deckData, updateDeckData} = useContext(DeckDataContext)
 
     useEffect(() => {
         if (card) {
@@ -235,9 +285,9 @@ export function NewCardModal({
             // Avoid api call and ui refresh if card has not changed
             if (
                 JSON.stringify(newCardData.question) ===
-                    JSON.stringify(card.data.question) &&
+                JSON.stringify(card.data.question) &&
                 JSON.stringify(newCardData.answer) ===
-                    JSON.stringify(card.data.answer)
+                JSON.stringify(card.data.answer)
             ) {
                 return
             }
@@ -349,7 +399,7 @@ export function NewCardModal({
                                 Create a new card
                             </DrawerHeader>
                             <DrawerBody>
-                                <ToolSelector onAddElement={handleAddElement} />
+                                <ToolSelector onAddElement={handleAddElement}/>
 
                                 <Accordion
                                     variant="splitted"
@@ -408,9 +458,9 @@ export function NewCardModal({
 }
 
 function FlashcardPreview({
-    content,
-    updateContent
-}: {
+                              content,
+                              updateContent
+                          }: {
     content: FlashCardContentJSON[]
     updateContent: Dispatch<SetStateAction<FlashCardContentJSON[]>>
 }) {
@@ -455,20 +505,20 @@ function FlashcardPreview({
 }
 
 function ContentElement({
-    content,
-    onUpdate,
-    onDelete
-}: {
+                            content,
+                            onUpdate,
+                            onDelete
+                        }: {
     content: FlashCardContentJSON
     onUpdate: (updatedContent: FlashCardContentJSON) => void
     onDelete: () => void
 }) {
-    const { user } = useSessionContext()
+    const {user} = useSessionContext()
 
     const [isFocused, setFocused] = useState(false)
     const [fileUrl, setFileUrl] = useState<string | null>(null)
 
-    const { addFileToQueue } = useSupabaseImageUpload()
+    const {addFileToQueue} = useSupabaseImageUpload()
 
     const handleChange = async (file: File | File[]) => {
         if (content.type !== 'image' || !file) return setFileUrl(null)
@@ -483,7 +533,7 @@ function ContentElement({
             const imgDataUrl = URL.createObjectURL(singleFile)
             setFileUrl(imgDataUrl)
 
-            const { image } = addFileToQueue(singleFile)
+            const {image} = addFileToQueue(singleFile)
 
             onUpdate({
                 ...content,
@@ -543,7 +593,7 @@ function ContentElement({
                             onFocus={() => setFocused(true)}
                             onBlur={() => setFocused(false)}
                             onChange={(e) =>
-                                onUpdate({ ...content, text: e.target.value })
+                                onUpdate({...content, text: e.target.value})
                             }
                         />
                     )}
@@ -633,7 +683,7 @@ function ContentElement({
                     }}
                     className="text-blue-500"
                     onChange={(e) =>
-                        onUpdate({ ...content, href: e.target.value })
+                        onUpdate({...content, href: e.target.value})
                     }
                 />
             )}
@@ -666,7 +716,7 @@ function ContentElement({
                 }}
                 className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 translate-x-1/2 -translate-y-1/2 rounded-full h-5 w-5 bg-red-500"
             >
-                <Plus size={15} color="#fff" className="mx-auto rotate-45" />
+                <Plus size={15} color="#fff" className="mx-auto rotate-45"/>
             </button>
         </div>
     )

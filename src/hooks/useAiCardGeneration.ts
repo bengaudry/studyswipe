@@ -138,7 +138,7 @@ export function useAiCardGeneration() {
 
         try {
             setIsAskingGeneration(true)
-            // Avoid calling the ai if the input is not good enough
+            // Avoid calling the AI if the input is not good enough
             if (
                 file === null &&
                 (prompt === undefined || prompt === null || prompt === '')

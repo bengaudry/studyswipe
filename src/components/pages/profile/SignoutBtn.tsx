@@ -7,7 +7,7 @@ export function SignOutBtn() {
     const { push } = useRouter()
 
     const handleSignOut = async () => {
-        push("/logout");
+        push('/logout')
     }
 
     return (
