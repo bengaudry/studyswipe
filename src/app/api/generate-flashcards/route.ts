@@ -10,8 +10,9 @@ import {GenerateContentResponse, GoogleGenAI} from '@google/genai'
 import OpenAI from 'openai'
 import {zodTextFormat} from 'openai/helpers/zod'
 import {z} from "zod";
-import { v4 as uuidv4 } from 'uuid';
+import {v4 as uuidv4} from 'uuid';
 import {AVAILABLE_MODELS, isUserAuthorizedToUseModel} from "@/lib/aiModels";
+import prisma from "@/lib/prisma"
 
 async function uploadDocumentToOpenAI(fileObj: File) {
     try {
@@ -145,8 +146,32 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY
 })
 
-async function hasUserEnoughCreditLeftToUseModel(model: typeof AVAILABLE_MODELS[number], user: User): Promise<boolean> {
-    return true
+async function hasUserEnoughCreditLeftToUseModel(user: User): Promise<boolean> {
+    if ("PRO" === user.plan) return true
+
+    try {
+        const usage = await prisma.fileUpdateUsage.findUnique({where: {userId: user.id}})
+        if (!usage) {
+            await prisma.fileUpdateUsage.create({data: {userId: user.id}})
+            return true
+        }
+
+        const THIRTY_DAYS_MS = 1000 * 60 * 60 * 24 * 30;
+        if ((Date.now() - usage.periodStart.valueOf()) >= THIRTY_DAYS_MS) {
+            // one month later, reset to 0
+            await prisma.fileUpdateUsage.update({
+                where: {userId: user.id},
+                data: {periodStart: new Date(), fileUpdatesUsed: 0}
+            })
+            return true
+        }
+
+        if ("PREMIUM" === user.plan) return usage.fileUpdatesUsed < 20
+        // if ("FREE" === user.plan)
+        return usage.fileUpdatesUsed < 1
+    } catch (e) {
+        return false
+    }
 }
 
 function startOpenAIStreaming(model: string, prompt: string, file: File | null): ReadableStream<string> {
@@ -241,7 +266,7 @@ function startGeminiStreaming(model: string, prompt: string, file: File | null):
                 let stream: AsyncGenerator<GenerateContentResponse, any, any>
                 if (file !== null) {
                     const contents = [
-                        { text: prompt },
+                        {text: prompt},
                         {
                             inlineData: {
                                 mimeType: 'application/pdf',
@@ -318,7 +343,7 @@ async function* startStreamingAIResponse(
 
     try {
         while (true) {
-            const { done, value } = await reader.read()
+            const {done, value} = await reader.read()
             if (done) break
 
             // value est déjà une string, pas besoin de décoder
@@ -361,13 +386,13 @@ export async function POST(req: NextRequest) {
     if (!deckId) return serverError('missing-parameters', 'Parameter missing: <deck-id>')
     try {
         const payload = payloadSchema.parse(await req.json())
-        const { prompt, model } = payload
+        const {prompt, model} = payload
 
         // Convertir le fichier base64 en File
         let file: File | null = null
         if (payload.file) {
             const buffer = Buffer.from(payload.file.data, 'base64')
-            file = new File([buffer], payload.file.name, { type: payload.file.type })
+            file = new File([buffer], payload.file.name, {type: payload.file.type})
 
             // Vérifier la taille
             if (file.size > 10 * 1024 * 1024) {
@@ -391,7 +416,7 @@ export async function POST(req: NextRequest) {
             return serverError('unauthorized', 'Your current plan does not allow you to use this model')
         }
 
-        if (!(await hasUserEnoughCreditLeftToUseModel(model, user))) {
+        if (!(await hasUserEnoughCreditLeftToUseModel(user))) {
             return serverError('unauthorized', 'You do not have enough credit left to use this model')
         }
 
