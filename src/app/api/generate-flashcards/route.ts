@@ -149,6 +149,8 @@ const openai = new OpenAI({
 async function hasUserEnoughCreditLeftToUseModel(user: User): Promise<boolean> {
     if ("PRO" === user.plan) return true
 
+    // TODO : should mark pro users overusing
+
     try {
         const usage = await prisma.fileUpdateUsage.findUnique({where: {userId: user.id}})
         if (!usage) {
@@ -161,10 +163,12 @@ async function hasUserEnoughCreditLeftToUseModel(user: User): Promise<boolean> {
             // one month later, reset to 0
             await prisma.fileUpdateUsage.update({
                 where: {userId: user.id},
-                data: {periodStart: new Date(), fileUpdatesUsed: 0}
+                data: {periodStart: new Date(), fileUpdatesUsed: 1}
             })
             return true
         }
+
+        await prisma.fileUpdateUsage.update({where: {userId: user.id}, data: {fileUpdatesUsed: {increment: 1}}})
 
         if ("PREMIUM" === user.plan) return usage.fileUpdatesUsed < 20
         // if ("FREE" === user.plan)
