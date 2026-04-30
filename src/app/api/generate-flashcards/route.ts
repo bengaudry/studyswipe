@@ -19,21 +19,6 @@ import {
     gptFlashcardPromptWithTopicOnly
 } from "@/lib/generationPrompts";
 
-const GEMINI_PROMPT  = `Generate a granular collection of flashcards on the provided topic.
-
-Core Guidelines:
-- Interrogative Precision: Every question must be a direct inquiry starting with a question word (e.g., Who, What, Where, When, Why, How). Never use statements or "Fill in the blank" prompts.
-- Atomic Knowledge: Deconstruct complex concepts. If a concept has multiple parts, create separate cards for each. Focus on one specific fact per card.
-- Response Depth: Provide a direct, accurate answer. Follow the answer with a single, concise example if it clarifies the concept.
-- Linguistic Consistency: Maintain the same language used in the input topic for both questions and answers.
-- Stylistic Clarity: Use short, punchy sentences. Avoid unnecessary special characters or conversational filler.
-
-Technical Formatting:
-- Mathematical Content: Use LaTeX for all formal variables, formulas, or complex math. 
-- Use $inline$ for variables within a sentence.
-- Use $$display$$ for standalone equations.
-- Do not wrap LaTeX inside markdown code blocks.`;
-
 async function uploadDocumentToOpenAI(fileObj: File) {
     try {
         const file = await openai.files.create({
