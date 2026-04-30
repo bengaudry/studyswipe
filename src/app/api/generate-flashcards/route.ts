@@ -12,7 +12,7 @@ import {zodTextFormat} from 'openai/helpers/zod'
 import {z} from "zod";
 import {v4 as uuidv4} from 'uuid';
 import {AVAILABLE_MODELS, isUserAuthorizedToUseModel} from "@/lib/aiModels";
-import prisma from "@/lib/prisma"
+import {redis} from "@/lib/redis";
 
 async function uploadDocumentToOpenAI(fileObj: File) {
     try {
@@ -152,27 +152,16 @@ async function hasUserEnoughCreditLeftToUseModel(user: User): Promise<boolean> {
     // TODO : should mark pro users overusing
 
     try {
-        const usage = await prisma.fileUpdateUsage.findUnique({where: {userId: user.id}})
-        if (!usage) {
-            await prisma.fileUpdateUsage.create({data: {userId: user.id}})
-            return true
+        const key = `studyswipe:file-upload-usage:${user.id}`
+        const usage = await redis.incr(key)
+
+        if (usage === 1) {
+            await redis.expire(key, 1000 * 60 * 60 * 24 * 30) // 1 month before reset
         }
 
-        const THIRTY_DAYS_MS = 1000 * 60 * 60 * 24 * 30;
-        if ((Date.now() - usage.periodStart.valueOf()) >= THIRTY_DAYS_MS) {
-            // one month later, reset to 0
-            await prisma.fileUpdateUsage.update({
-                where: {userId: user.id},
-                data: {periodStart: new Date(), fileUpdatesUsed: 1}
-            })
-            return true
-        }
-
-        await prisma.fileUpdateUsage.update({where: {userId: user.id}, data: {fileUpdatesUsed: {increment: 1}}})
-
-        if ("PREMIUM" === user.plan) return usage.fileUpdatesUsed < 20
+        if ("PREMIUM" === user.plan) return usage <= 20
         // if ("FREE" === user.plan)
-        return usage.fileUpdatesUsed < 1
+        return usage <= 1
     } catch (e) {
         return false
     }
