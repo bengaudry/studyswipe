@@ -428,8 +428,13 @@ export async function POST(req: NextRequest) {
         return new NextResponse(new ReadableStream({
             async start(controller) {
                 try {
+                    controller.enqueue(encoder.encode(JSON.stringify({ type: "ping", data: "Uploading document..." }) + '\n'))
                     for await (const card of startStreamingAIResponse(model, prompt, file)) {
-                        controller.enqueue(encoder.encode(JSON.stringify(card) + '\n'))
+                        const msg = {
+                            type: "card",
+                            data: card
+                        }
+                        controller.enqueue(encoder.encode(JSON.stringify(msg) + '\n'))
                     }
                     controller.close()
                 } catch (error) {

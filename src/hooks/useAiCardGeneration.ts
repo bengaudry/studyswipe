@@ -89,12 +89,18 @@ export function useAiCardGeneration() {
                 for (const line of lines) {
                     if (line.trim()) {
                         try {
-                            const card = JSON.parse(line) as FlashCard
-                            setData((prev) => (prev ? [...prev, card] : [card]))
-                            onUpdate(card)
-                            generatedCards.push(card)
+                            const message = JSON.parse(line) as { type: string; data: any }
+
+                            if (message.type === 'ping') {
+                                console.log('Server ping:', message.data)
+                            } else if (message.type === 'card') {
+                                const card = message.data as FlashCard
+                                setData((prev) => (prev ? [...prev, card] : [card]))
+                                onUpdate(card)
+                                generatedCards.push(card)
+                            }
                         } catch (e) {
-                            console.warn('Failed to parse card:', e)
+                            console.warn('Failed to parse message:', e)
                         }
                     }
                 }

@@ -13,6 +13,7 @@ import { Image } from '@/components/ui'
 import { LogOut, User, Zap } from 'react-feather'
 import Link from 'next/link'
 import { useSessionContext } from '@/components/SessionProvider'
+import {DropdownSection} from "@nextui-org/react";
 
 export function ProfileButton(props: ButtonProps) {
     const { user } = useSessionContext()
@@ -50,6 +51,13 @@ export function ProfileButton(props: ButtonProps) {
                 />
             </DropdownTrigger>
             <DropdownMenu>
+                <DropdownItem
+                    key="username"
+                    variant="flat"
+                    onPress={() => push("/profile")}
+                >
+                    {user.displayName}
+                </DropdownItem>
                 <DropdownItem
                     key="subscription-link"
                     variant="flat"

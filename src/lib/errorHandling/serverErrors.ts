@@ -35,6 +35,10 @@ export const SERVER_ERROR = {
     'invalid-deckid': {
         message: 'No collection with the provided id seem to exist',
         status: 400
+    },
+    'not-found': {
+        message: "The requested resource could not be found.",
+        status: 401
     }
 }
 

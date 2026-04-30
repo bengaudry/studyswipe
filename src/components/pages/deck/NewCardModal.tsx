@@ -37,7 +37,6 @@ import {useSupabaseImageUpload} from '@/hooks/useSupabaseImageUpload'
 import {ToolSelector} from './ToolSelector'
 import {useSessionContext} from '@/components/SessionProvider'
 import {AVAILABLE_MODELS, AVAILABLE_MODELS_BY_PLAN, isUserAuthorizedToUseModel} from "@/lib/aiModels";
-import {useAuth} from "@/hooks/useAuth";
 
 export function NewCardModalTrigger({
                                         onOpen,
