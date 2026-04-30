@@ -10,9 +10,10 @@ import {GenerateContentResponse, GoogleGenAI} from '@google/genai'
 import OpenAI from 'openai'
 import {zodTextFormat} from 'openai/helpers/zod'
 import {z} from "zod";
-import {v4 as uuidv4} from 'uuid';
+import {v4 as uuid} from 'uuid';
 import {AVAILABLE_MODELS, isUserAuthorizedToUseModel} from "@/lib/aiModels";
 import {redis} from "@/lib/redis";
+import prisma from "@/lib/prisma";
 import {
     geminiFlashcardPromptWithDocument,
     geminiFlashcardPromptWithTopicOnly, gptFlashcardPromptWithDocument,
@@ -116,23 +117,21 @@ class AiResultFormatter {
                         const LaTeXformatted = element.text
                             .replaceAll('\\(', '$')
                             .replaceAll('\\)', '$')
-                        const newElement: FlashCardContentJSON = {
+                        return {
                             type: 'equation',
                             equation: `$${LaTeXformatted}$`
-                        }
-                        return newElement
+                        } satisfies FlashCardContentJSON
                     }
                     if (element.text.match('.*$[^$]+$.*')) {
-                        const newElement: FlashCardContentJSON = {
+                        return {
                             type: 'equation',
                             equation: element.text
-                        }
-                        return newElement
+                        } satisfies FlashCardContentJSON
                     }
                     return element
                 }
 
-                obj.id = uuidv4()
+                obj.id = uuid()
                 obj.aiGenerated = true
                 obj.question = obj.question.map(convertAiTextToLaTeX)
                 obj.answer = obj.answer.map(convertAiTextToLaTeX)
@@ -152,22 +151,20 @@ const openai = new OpenAI({
 })
 
 async function hasUserEnoughCreditLeftToUseModel(user: User): Promise<boolean> {
-    if ("PRO" === user.plan) return true
-
-    // TODO : should mark pro users overusing
-
     try {
         const key = `studyswipe:file-upload-usage:${user.id}`
         const usage = await redis.incr(key)
 
         if (usage === 1) {
-            await redis.expire(key, 1000 * 60 * 60 * 24 * 30) // 1 month before reset
+            await redis.expire(key, 60 * 60 * 24 * 30) // 1 month before reset
         }
 
+        if ("PRO" == user.plan) return true;
         if ("PREMIUM" === user.plan) return usage <= 20
         // if ("FREE" === user.plan)
         return usage <= 1
     } catch (e) {
+        if ("PRO" === user.plan) return true; // avoid blocking pro users even if redis failed.
         return false
     }
 }
@@ -420,15 +417,37 @@ export async function POST(req: NextRequest) {
         return new NextResponse(new ReadableStream({
             async start(controller) {
                 try {
-                    controller.enqueue(encoder.encode(JSON.stringify({ type: "ping", data: "Uploading document..." }) + '\n'))
+                    const cards: FlashCard[] = []
+                    controller.enqueue(encoder.encode(JSON.stringify({
+                        type: "ping",
+                        data: "Uploading document..."
+                    }) + '\n'))
                     for await (const card of startStreamingAIResponse(model, prompt, file)) {
                         const msg = {
                             type: "card",
                             data: card
                         }
                         controller.enqueue(encoder.encode(JSON.stringify(msg) + '\n'))
+                        cards.push(card)
                     }
                     controller.close()
+
+                    // push cards to db
+                    await prisma.$transaction(async tx => {
+                        const prevDeckState = await tx.deck.findUnique({
+                            where: {id: deckId}
+                        })
+                        if (!prevDeckState) return
+                        const cardsJson = prevDeckState.cards as FlashCard[]
+                        cardsJson.push(...cards)
+                        await tx.deck.update({
+                            where: {id: deckId},
+                            data: {
+                                cards: cardsJson
+                            }
+                        })
+                    })
+
                 } catch (error) {
                     controller.error(error)
                 }
