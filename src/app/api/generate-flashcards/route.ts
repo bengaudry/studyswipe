@@ -13,6 +13,26 @@ import {z} from "zod";
 import {v4 as uuidv4} from 'uuid';
 import {AVAILABLE_MODELS, isUserAuthorizedToUseModel} from "@/lib/aiModels";
 import {redis} from "@/lib/redis";
+import {
+    geminiFlashcardPromptWithDocument,
+    geminiFlashcardPromptWithTopicOnly, gptFlashcardPromptWithDocument,
+    gptFlashcardPromptWithTopicOnly
+} from "@/lib/generationPrompts";
+
+const GEMINI_PROMPT  = `Generate a granular collection of flashcards on the provided topic.
+
+Core Guidelines:
+- Interrogative Precision: Every question must be a direct inquiry starting with a question word (e.g., Who, What, Where, When, Why, How). Never use statements or "Fill in the blank" prompts.
+- Atomic Knowledge: Deconstruct complex concepts. If a concept has multiple parts, create separate cards for each. Focus on one specific fact per card.
+- Response Depth: Provide a direct, accurate answer. Follow the answer with a single, concise example if it clarifies the concept.
+- Linguistic Consistency: Maintain the same language used in the input topic for both questions and answers.
+- Stylistic Clarity: Use short, punchy sentences. Avoid unnecessary special characters or conversational filler.
+
+Technical Formatting:
+- Mathematical Content: Use LaTeX for all formal variables, formulas, or complex math. 
+- Use $inline$ for variables within a sentence.
+- Use $$display$$ for standalone equations.
+- Do not wrap LaTeX inside markdown code blocks.`;
 
 async function uploadDocumentToOpenAI(fileObj: File) {
     try {
@@ -212,8 +232,7 @@ function startOpenAIStreaming(model: string, prompt: string, file: File | null):
                         input: [
                             {
                                 role: 'system',
-                                content:
-                                    'Generate a collection of flashcards about the topic that is given to you. The questions and answers must follow the language used in the topic. Keep questions and answers as concise as possible. Try to split all your knowledge into multiple cards, instead of putting everything on one card. Avoid using special characters such as * if it is not needed for comprehension. Make sentences as short as possible, while keeping important information. If the answer is a bit short, try adding a short and concise example. For math content, you HAVE TO use the equation component in LaTeX format.'
+                                content: file === null ? gptFlashcardPromptWithTopicOnly : gptFlashcardPromptWithDocument
                             },
                             {role: 'user', content: userMessageContent},
                         ],
@@ -275,7 +294,7 @@ function startGeminiStreaming(model: string, prompt: string, file: File | null):
                         contents,
                         config: {
                             maxOutputTokens: 7500,
-                            systemInstruction: `Create a set of flashcards based on the analysis of the document. Ensure that both questions and answers are in the same language as the document. Keep the questions and answers brief and to the point. Distribute the information across multiple cards rather than consolidating it onto a single card. Avoid unnecessary special characters like * unless they are essential for understanding. Keep sentences short while retaining key information. If an answer is brief, consider adding a concise example. For mathematical content, it is mandatory to use LaTeX format for equations. When creating flashcards, ensure that LaTeX equations are formatted correctly within the structure. Use the "equation" type to encapsulate LaTeX equations. Here is an example of how to structure a LaTeX equation in the flashcard: {{"question": [{"type": "text","heading": "paragraph","text": "What is the formula for the area of a circle?"}],"answer": [{"type": "text", "heading": "paragraph", "text": "The area of a circle is defined by :"},{"type": "equation",equation": "A = \\pi r^2"}]}`,
+                            systemInstruction: geminiFlashcardPromptWithDocument,
                             responseMimeType: 'application/json',
                             responseSchema: geminiFlashcardsResponseSchema
                         }
@@ -286,8 +305,7 @@ function startGeminiStreaming(model: string, prompt: string, file: File | null):
                         model,
                         contents: prompt,
                         config: {
-                            systemInstruction:
-                                'Generate a collection of flashcards about the topic that is given to you. The questions and answers must follow the language used in the topic. Keep questions and answers as concise as possible. Try to split all your knowledge into multiple cards, instead of putting everything on one card. Avoid using special characters such as * if it is not needed for comprehension. Make sentences as short as possible, while keeping important information. If the answer is a bit short, try adding a short and concise example. For math content, you HAVE TO use the equation component in LaTeX format.',
+                            systemInstruction: geminiFlashcardPromptWithTopicOnly,
                             responseMimeType: 'application/json',
                             responseSchema: geminiFlashcardsResponseSchema
                         }
